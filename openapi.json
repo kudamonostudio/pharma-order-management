@@ -1,0 +1,850 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Pharma Order Management API",
+    "version": "1.0.0",
+    "description": "API para gestionar tiendas, sucursales, usuarios y órdenes en el sistema de farmacia."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3010",
+      "description": "Local dev server"
+    }
+  ],
+  "paths": {
+    "/api/locations": {
+      "get": {
+        "summary": "Listar sucursales",
+        "tags": [
+          "Locations"
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de sucursales",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Location"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Crear sucursal",
+        "tags": [
+          "Locations"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationCreateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Sucursal creada"
+          }
+        }
+      }
+    },
+    "/api/stores": {
+      "get": {
+        "summary": "Listar tiendas",
+        "tags": [
+          "Stores"
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de tiendas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Store"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Crear tienda",
+        "tags": [
+          "Stores"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreCreateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tienda creada"
+          }
+        }
+      }
+    },
+    "/api/stores/{id}": {
+      "get": {
+        "summary": "Obtener tienda por ID",
+        "tags": [
+          "Stores"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tienda encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Store"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No encontrada"
+          }
+        }
+      },
+      "put": {
+        "summary": "Actualizar tienda",
+        "tags": [
+          "Stores"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StoreUpdateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tienda actualizada"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Eliminar tienda (soft delete)",
+        "tags": [
+          "Stores"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tienda eliminada"
+          }
+        }
+      }
+    },
+    "/api/users": {
+      "get": {
+        "summary": "Listar usuarios",
+        "tags": [
+          "Users"
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/User"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Crear usuario",
+        "tags": [
+          "Users"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserCreateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario creado"
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "summary": "Obtener usuario por ID",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No encontrado"
+          }
+        }
+      },
+      "put": {
+        "summary": "Actualizar usuario",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserUpdateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuario actualizado"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Eliminar usuario (soft delete)",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario eliminado"
+          }
+        }
+      }
+    },
+    "/api/orders": {
+      "get": {
+        "summary": "Listar órdenes",
+        "tags": [
+          "Orders"
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de órdenes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Order"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Crear orden",
+        "tags": [
+          "Orders"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Orden creada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/orders/{id}": {
+      "get": {
+        "summary": "Obtener orden por ID",
+        "tags": [
+          "Orders"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Orden encontrada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No encontrada"
+          }
+        }
+      },
+      "put": {
+        "summary": "Actualizar orden",
+        "tags": [
+          "Orders"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderUpdateInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Orden actualizada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Order"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Eliminar orden (soft delete)",
+        "tags": [
+          "Orders"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Orden eliminada"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Store": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "Location": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "storeId": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "role": {
+            "$ref": "#/components/schemas/Role"
+          },
+          "storeId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "locationId": {
+            "type": "integer",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "role"
+        ]
+      },
+      "Order": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "orderCode": {
+            "type": "string"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "status": {
+            "type": "string"
+          },
+          "total": {
+            "type": "number",
+            "format": "decimal"
+          },
+          "locationId": {
+            "type": "integer"
+          },
+          "userId": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "deletedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        }
+      },
+      "Role": {
+        "type": "string",
+        "enum": [
+          "ADMIN_SUPREMO",
+          "TIENDA_ADMIN",
+          "COLABORADOR"
+        ],
+        "example": "COLABORADOR",
+        "description": "Roles disponibles para los usuarios"
+      },
+      "OrderStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "COMPLETE",
+          "CANCELLED"
+        ],
+        "example": "PENDING",
+        "description": "Estados disponibles para las órdenes"
+      },
+      "LocationCreateInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "address",
+          "storeId"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "storeId": {
+            "type": "integer",
+            "example": 1
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "StoreUpdateInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "address"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "string"
+          },
+          "address": {
+            "type": "string",
+            "example": "Calle ABC 123"
+          }
+        }
+      },
+      "StoreCreateInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "address"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "string"
+          },
+          "address": {
+            "type": "string",
+            "example": "Calle ABC 123"
+          }
+        }
+      },
+      "UserCreateInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "role",
+          "storeId",
+          "locationId",
+          "locationId"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN_SUPREMO",
+              "TIENDA_ADMIN",
+              "COLABORADOR"
+            ]
+          },
+          "storeId": {
+            "type": "integer",
+            "example": 1,
+            "nullable": true
+          },
+          "locationId": {
+            "type": "integer",
+            "example": 1,
+            "nullable": true
+          }
+        }
+      },
+      "UserUpdateInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "email",
+          "role",
+          "storeId",
+          "locationId",
+          "locationId"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "ADMIN_SUPREMO",
+              "TIENDA_ADMIN",
+              "COLABORADOR"
+            ]
+          },
+          "storeId": {
+            "type": "integer",
+            "nullable": true,
+            "example": 1
+          },
+          "locationId": {
+            "type": "integer",
+            "nullable": true,
+            "example": 1
+          }
+        }
+      },
+      "OrderCreateInput": {
+        "type": "object",
+        "required": [
+          "orderCode",
+          "date",
+          "status",
+          "total",
+          "locationId",
+          "userId"
+        ],
+        "properties": {
+          "orderCode": {
+            "type": "string",
+            "example": "ORD-20250913-001"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-09-13T17:45:52.511Z"
+          },
+          "status": {
+            "type": "string",
+            "example": "PENDING"
+          },
+          "total": {
+            "type": "number",
+            "format": "decimal",
+            "example": 150.75
+          },
+          "locationId": {
+            "type": "integer",
+            "example": 1
+          },
+          "userId": {
+            "type": "integer",
+            "example": 3
+          }
+        }
+      },
+      "OrderUpdateInput": {
+        "type": "object",
+        "required": [
+          "orderCode",
+          "date",
+          "status",
+          "total",
+          "locationId",
+          "userId"
+        ],
+        "properties": {
+          "orderCode": {
+            "type": "string",
+            "example": "ORD-20250913-001"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2025-09-13T17:45:52.511Z"
+          },
+          "status": {
+            "type": "string",
+            "example": "PENDING"
+          },
+          "total": {
+            "type": "number",
+            "format": "decimal",
+            "example": 150.75
+          },
+          "locationId": {
+            "type": "integer",
+            "example": 1
+          },
+          "userId": {
+            "type": "integer",
+            "example": 3
+          }
+        }
+      }
+    }
+  }
+}

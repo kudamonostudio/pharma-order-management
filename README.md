@@ -1,8 +1,28 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
 ## Getting Started
 
 First, run the development server:
+
+1. Install dependencies
+
+```bash
+npm install
+```
+
+2. Start the local database container
+
+```
+docker compose up -d
+```
+
+3. Configure
+
+```bash
+cp .env.example .env
+npx prisma migrate dev
+npx prisma db seed
+```
+
+4. Run dev
 
 ```bash
 npm run dev
@@ -14,7 +34,8 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Access to
+   http://localhost:3010/api/docs
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

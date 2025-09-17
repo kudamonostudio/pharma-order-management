@@ -8,6 +8,9 @@
     "start": "next start",
     "lint": "eslint"
   },
+  "prisma": {
+    "seed": "ts-node prisma/seeds/dev.ts"
+  },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -16,6 +19,12 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "tailwind-merge": "^3.3.1"
+    "@prisma/client": "^6.16.1",
+    "next": "15.5.3",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "swagger-ui": "^5.29.0",
+    "swagger-ui-react": "^5.29.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -27,6 +36,12 @@
     "eslint-config-next": "15.5.3",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.8",
+    "@types/swagger-ui-react": "^5.18.0",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.3",
+    "prisma": "^6.16.1",
+    "tailwindcss": "^4",
+    "ts-node": "^10.9.2",
     "typescript": "^5"
   }
 }
