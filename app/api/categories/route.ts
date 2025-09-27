@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const stores = await prisma.store.findMany({
+  const categories = await prisma.category.findMany({
     where: {
       deletedAt: null,
     },
@@ -10,34 +10,32 @@ export async function GET() {
       deletedAt: true,
     },
   });
-  return NextResponse.json(stores);
+  return NextResponse.json(categories);
 }
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { name, address, phone } = body;
 
-    if (!name || !address) {
+    if (!body.name) {
       return NextResponse.json(
-        { error: 'Name and address are required' },
+        { error: 'Name is required' },
         { status: 400 }
-      )
+      );
     }
 
-    const store = await prisma.store.create({
+    const category = await prisma.category.create({
       data: {
-        name,
-        address,
-        phone,
+        name: body.name,
+        description: body.description ?? null,
       },
     });
 
-    return NextResponse.json(store, { status: 201 });
+    return NextResponse.json(category, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: 'Error creating store' },
+      { error: 'Something went wrong' },
       { status: 500 }
     );
   }
