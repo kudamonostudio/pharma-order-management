@@ -4,9 +4,42 @@ require('dotenv').config();
 
 const prisma = new PrismaClient();
 
+const createFunctions = async () => {
+  // 4) Function: insertar profile automáticamente en cada nuevo usuario
+  await prisma.$executeRawUnsafe(`
+    create or replace function public.handle_new_user()
+    returns trigger as $$
+    begin
+      insert into public.profiles (id, role) values (new.id, 'COLABORADOR')
+      on conflict (id) do nothing;
+      return new;
+    end;
+    $$ language plpgsql security definer;
+  `);
+
+  // 5) Trigger: se crea una sola vez si no existe
+  await prisma.$executeRawUnsafe(`
+    do $$
+    begin
+      if not exists (
+        select 1 from pg_trigger where tgname = 'on_auth_user_created'
+      ) then
+        create trigger on_auth_user_created
+        after insert on auth.users
+        for each row execute procedure public.handle_new_user();
+      end if;
+    end
+    $$;
+  `);
+}
+
 
 
 async function main() {
+
+  // functions and triggers
+  await createFunctions();
+
   // Crea Admin Supremo
   const admin = await prisma.user.create({
     data: {

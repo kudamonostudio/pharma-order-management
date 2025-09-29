@@ -5,6 +5,15 @@ CREATE TYPE "public"."Role" AS ENUM ('ADMIN_SUPREMO', 'TIENDA_ADMIN', 'COLABORAD
 CREATE TYPE "public"."OrderStatus" AS ENUM ('PENDING', 'COMPLETE', 'CANCELLED');
 
 -- CreateTable
+CREATE TABLE "public"."profiles" (
+    "id" UUID NOT NULL,
+    "role" "public"."Role" NOT NULL DEFAULT 'COLABORADOR',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "profiles_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "public"."users" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
