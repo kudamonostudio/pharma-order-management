@@ -24,6 +24,14 @@ enum OrderStatus {
   CANCELLED
 }
 
+model Profile {
+  id        String   @id @db.Uuid // mismo id que auth.users
+  role      Role     @default(COLABORADOR) // ADMIN_SUPREMO | TIENDA_ADMIN | COLABORADOR
+  createdAt DateTime @default(now())
+
+  @@map("profiles")
+}
+
 model User {
   id         Int       @id @default(autoincrement())
   name       String
