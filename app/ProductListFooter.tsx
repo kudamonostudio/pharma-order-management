@@ -28,7 +28,7 @@ const ProductListFooter = () => {
             <div className="flex items-center gap-6 sm:gap-12 ">
               <div className="flex">
                 {order.slice(0, 3).map((item) => (
-                  <Avatar className="shadow-lg border p-1 sm:w-10 sm:h-10 mr-[-15px] sm:mr-[-20px] bg-white">
+                  <Avatar className="shadow-lg border p-1 sm:w-10 sm:h-10 mr-[-15px] sm:mr-[-20px] bg-white" key={item.id}>
                     <AvatarImage src={item.image} alt="Product Image" />
                     <AvatarFallback />
                   </Avatar>
