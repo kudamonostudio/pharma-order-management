@@ -14,12 +14,19 @@ npm install
 docker compose up -d
 ```
 
-3. Configure
+3. Initial configuration
 
 ```bash
 cp .env.example .env
 npx prisma migrate dev
 npx prisma db seed
+```
+
+3. Deploy new migrations (update db) (Optional)
+
+```bash
+npx prisma migrate reset
+npx prisma migrate deploy
 ```
 
 4. Run dev

@@ -2,7 +2,14 @@ import { prisma } from '@/lib/prisma'
 import { NextResponse } from 'next/server'
 
 export async function GET() {
-  const users = await prisma.user.findMany()
+  const users = await prisma.user.findMany({
+    where: {
+      deletedAt: null,
+    },
+    omit: {
+      deletedAt: true,
+    },
+  });
   return NextResponse.json(users)
 }
 

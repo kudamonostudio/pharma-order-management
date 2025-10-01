@@ -24,6 +24,14 @@ enum OrderStatus {
   CANCELLED
 }
 
+model Profile {
+  id        String   @id @db.Uuid // mismo id que auth.users
+  role      Role     @default(COLABORADOR) // ADMIN_SUPREMO | TIENDA_ADMIN | COLABORADOR
+  createdAt DateTime @default(now())
+
+  @@map("profiles")
+}
+
 model User {
   id         Int       @id @default(autoincrement())
   name       String
@@ -91,4 +99,34 @@ model Order {
   deletedAt  DateTime?
 
   @@map("orders")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  products Product[]
+
+  @@map("categories")
+}
+
+model Product {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  price       Decimal   @db.Decimal(10, 2)
+  imageUrl    String?
+  brand       String?
+  unit        String? // Ej: "5 L", "1 Kg", "1 L"
+  category    Category  @relation(fields: [categoryId], references: [id])
+  categoryId  Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  @@map("products")
 }
