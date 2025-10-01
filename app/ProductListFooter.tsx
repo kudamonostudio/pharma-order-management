@@ -7,52 +7,63 @@ import { Button } from "@/components/ui/button";
 const ProductListFooter = () => {
   const { order, getOrderQuantity } = useOrderStore();
 
-  let areProductsInOrder = getOrderQuantity() > 0;
-  let emptyOrder = getOrderQuantity() === 0;
-  let moreThanThree = order.length > 3;
+  const areProductsInOrder = getOrderQuantity() > 0;
+  const emptyOrder = getOrderQuantity() === 0;
+  const moreThanThree = order.length > 3;
 
   return (
-    <div className="min-h-24 md:h-24 w-full bg-white shadow-2xl border-t fixed bottom-0 left-0 flex">
-      <div className="max-w-5xl m-auto px-8 h-full flex justify-center items-center w-full">
+    <div className="min-h-24 md:h-24 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-[0_-1px_3px_rgba(0,0,0,0.05)] border-t fixed bottom-0 left-0 flex">
+      <div className="max-w-4xl mx-auto px-6 h-full flex justify-center items-center w-full">
         {emptyOrder && (
-          <>
-            <h3 className="text-2xl text-zinc-700">La orden está vacía</h3>
+          <div className="flex items-center gap-2.5">
             <ShoppingCart
-              className="w-6 h-6 mt-1.5 ml-2 text-zinc-700"
-              strokeWidth={1.25}
+              className="w-5 h-5 text-muted-foreground"
+              strokeWidth={2}
             />
-          </>
+            <h3 className="text-sm font-medium text-muted-foreground">
+              La orden está vacía
+            </h3>
+          </div>
         )}
         {areProductsInOrder && (
-          <div className="flex flex-wrap gap-5 items-center relative justify-between w-full">
-            <div className="flex items-center gap-6 sm:gap-12 ">
+          <div className="flex flex-wrap gap-4 items-center relative justify-between w-full">
+            <div className="flex items-center gap-6 sm:gap-8">
               <div className="flex">
                 {order.slice(0, 3).map((item) => (
-                  <Avatar className="shadow-lg border p-1 sm:w-10 sm:h-10 mr-[-15px] sm:mr-[-20px] bg-white" key={item.id}>
-                    <AvatarImage src={item.image} alt="Product Image" />
+                  <Avatar
+                    className="shadow-sm border-2 border-background w-12 h-12 sm:w-14 sm:h-14 mr-[-16px] sm:mr-[-20px] ring-1 ring-border"
+                    key={item.id}
+                  >
+                    <AvatarImage
+                      src={item.image || "/placeholder.svg"}
+                      alt="Product Image"
+                      className="rounded-full"
+                    />
                     <AvatarFallback />
                   </Avatar>
                 ))}
                 {moreThanThree && (
-                  <Avatar className="shadow-lg border p-1 sm:w-10 sm:h-10 mr-[-15px] sm:mr-[-30px] bg-white item-center flex justify-center">
+                  <Avatar className="shadow-sm border-2 border-background w-12 h-12 sm:w-14 sm:h-14 bg-muted flex items-center justify-center ring-1 ring-border">
                     <Ellipsis
-                      className="w-9 h-auto text-zinc-500"
+                      className="w-6 h-auto text-muted-foreground"
                       strokeWidth={2}
                     />
                   </Avatar>
                 )}
               </div>
-              <h3 className="md:text-xl text-zinc-700 flex gap-1.5 items-center">
-                <span className="text-2xl">{getOrderQuantity()}</span>
-                <span className="hidden sm:block">
-                  {order.length === 1 ? "producto" : "productos"} en la orden
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-semibold text-foreground">
+                  {getOrderQuantity()}
                 </span>
-              </h3>
+                <span className="text-sm font-medium text-muted-foreground hidden sm:block">
+                  {order.length === 1 ? "producto" : "productos"}
+                </span>
+              </div>
             </div>
             <div className="lg:absolute md:right-0">
               <Button
                 onClick={() => {}} //TODO: CONFIRMAR ORDER
-                className="w-fit h-10 rounded-full bg-emerald-600 text-white font-normal shadow cursor-pointer hover:bg-emerald-500 hover:scale-105 transition-all"
+                className="h-10 px-6 rounded-md text-sm font-medium shadow-sm hover:shadow transition-shadow cursor-pointer text-white bg-emerald-600 hover:bg-emerald-700"
               >
                 Confirmar Orden
               </Button>

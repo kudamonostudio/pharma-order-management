@@ -1,8 +1,8 @@
 "use client";
+import { Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus } from "lucide-react";
-import { StoreProductItem } from "@/app/types/store";
 import { useOrderStore } from "@/app/zustand/orderStore";
+import type { StoreProductItem } from "@/app/types/store";
 
 interface AddButtonProps {
   product: StoreProductItem;
@@ -11,40 +11,58 @@ interface AddButtonProps {
 const AddButton = ({ product }: AddButtonProps) => {
   const { order, addProduct, increment, decrement } = useOrderStore();
 
-  const item = order.find((p) => p.id === product.id);
-  const quantity = item ? item.quantity : 0;
-  const containerStyle = "flex items-center gap-4 justify-end px-4";
+  const orderItem = order.find((item) => item.id === product.id);
+  const quantity = orderItem?.quantity || 0;
+
+  const handleAdd = () => {
+    addProduct(product);
+  };
+
+  const handleIncrease = () => {
+    increment(product.id);
+  };
+
+  const handleDecrease = () => {
+    decrement(product.id);
+  };
 
   if (quantity === 0) {
     return (
-      <div className={containerStyle}>
+      <div className="flex justify-end mt-3">
         <Button
-          onClick={() => addProduct(product)}
-          className="w-fit h-9 rounded-full bg-emerald-600 text-white shadow cursor-pointer hover:bg-emerald-500 hover:scale-105 transition-all font-normal"
+          onClick={handleAdd}
+          size="sm"
+          className="h-10 px-4 rounded-md text-sm font-medium shadow-sm hover:shadow transition-shadow  text-white cursor-pointer"
         >
-          Agregar a la orden
+          <Plus className="w-4 h-4 mr-1.5" strokeWidth={2} />
+          Agregar
         </Button>
       </div>
     );
   }
 
   return (
-    <div className={containerStyle}>
-      <Button
-        onClick={() => decrement(product.id)}
-        className="w-9 h-9 rounded-full bg-red-300 hover:bg-red-200 text-white cursor-pointer"
-      >
-        <Minus className="w-4 h-4" strokeWidth={1} />
-      </Button>
-      <h2 className="text-2xl w-6 text-center font-normal text-zinc-700">
-        {quantity}
-      </h2>
-      <Button
-        onClick={() => increment(product.id)}
-        className="w-9 h-9 rounded-full bg-emerald-600 text-white hover:bg-emerald-500 cursor-pointer"
-      >
-        <Plus className="!size-7" strokeWidth={1} />
-      </Button>
+    <div className="flex justify-end mt-3">
+      <div className="flex items-center gap-2 bg-muted rounded-md px-2 h-10 border">
+        <Button
+          onClick={handleDecrease}
+          variant="ghost"
+          size="icon"
+          className="h-7 w-7 rounded-sm hover:bg-gray-200 transition-colors cursor-pointer bg-gray-300"
+        >
+          <Minus className="w-4 h-4" strokeWidth={2} />
+        </Button>
+        <span className="text-base font-semibold text-foreground min-w-[28px] text-center">
+          {quantity}
+        </span>
+        <Button
+          onClick={handleIncrease}
+          size="icon"
+          className="h-7 w-7 rounded-sm transition-colors cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white"
+        >
+          <Plus className="w-4 h-4" strokeWidth={2} />
+        </Button>
+      </div>
     </div>
   );
 };
