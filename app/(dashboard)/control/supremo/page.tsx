@@ -29,7 +29,7 @@ export default async function ProtectedPage() {
   });
 
   if (profile?.role !== "ADMIN_SUPREMO") {
-    redirect("/my-store");
+    redirect("/control/tienda"); // TODO: Agregar slug dinámico
   }
 
   return (
