@@ -1,8 +1,8 @@
 // Listado de productos de la tienda, primer contacto del cliente/usuario con la tienda
 import Image from "next/image";
-import ProductList from "../components/ProductList";
+import ProductList from "./components/ProductList";
 import { StoreProductItem } from "@/app/types/store";
-import ProductListFooter from "../components/api/ProductListFooter";
+import ProductListFooter from "./components/ProductListFooter";
 const Page = () => {
   const products: StoreProductItem[] = [
     {
