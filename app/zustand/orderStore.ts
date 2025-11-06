@@ -19,6 +19,7 @@ interface OrderState {
   increment: (id: string) => void;
   decrement: (id: string) => void;
   getOrderQuantity: () => number;
+  clearOrder: () => void;
 }
 
 export const useOrderStore = create<OrderState>((set, get) => ({
@@ -73,4 +74,10 @@ export const useOrderStore = create<OrderState>((set, get) => ({
     const currentOrder = get().order;
     return currentOrder.reduce((total, item) => total + item.quantity, 0);
   },
+
+  clearOrder: () =>
+    set(() => {
+      localStorage.setItem("order", JSON.stringify([]));
+      return { order: [] };
+    }),
 }));
