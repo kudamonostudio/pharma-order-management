@@ -10,7 +10,7 @@ const createFunctions = async () => {
     create or replace function public.handle_new_user()
     returns trigger as $$
     begin
-      insert into public.profiles (id, role) values (new.id, 'COLABORADOR')
+      insert into public.profiles (id, role, email) values (new.id, 'COLABORADOR', new.email)
       on conflict (id) do nothing;
       return new;
     end;
@@ -33,42 +33,68 @@ const createFunctions = async () => {
   `);
 }
 
+const executeAuthRLS = async () => {
+  // 1. Habilitar RLS
+  await prisma.$executeRawUnsafe(`
+    ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+  `);
+
+  // 2. Crear política
+  await prisma.$executeRawUnsafe(`
+    CREATE POLICY "Allow authenticated users to read own profile"
+    ON public.profiles
+    FOR SELECT
+    TO authenticated
+    USING (id = auth.uid());
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    GRANT SELECT ON public.profiles TO authenticated;
+  `);
+
+  await prisma.$executeRawUnsafe(`
+    GRANT USAGE ON SCHEMA public TO authenticated;
+  `);
+}
+
 
 
 async function main() {
 
   // functions and triggers
   await createFunctions();
+  // await executeAuthRLS();
 
   // Crea Admin Supremo
-  const admin = await prisma.user.create({
-    data: {
-      name: "Admin Supremo",
-      email: "admin@pharma.com",
-      password: process.env.ADMIN_PASSWORD,
-      role: "ADMIN_SUPREMO",
-    },
-  });
+  // const admin = await prisma.user.create({
+  //   data: {
+  //     name: "Admin Supremo",
+  //     email: "admin@pharma.com",
+  //     password: process.env.ADMIN_PASSWORD,
+  //     role: "ADMIN_SUPREMO",
+  //   },
+  // });
 
   // Crea Tienda
   const store = await prisma.store.create({
     data: {
-      name: "Farmacia Central",
+      name: "Farmacia Paysandu",
       address: "Av. Principal 123",
       phone: "999-111-222",
+      slug: "farmacia-paysandu",
     },
   });
 
-  // Crea un Admin de la Tienda
-  const storeAdmin = await prisma.user.create({
+  const store2 = await prisma.store.create({
     data: {
-      name: "Tienda Admin",
-      email: "store.admin@pharma.com",
-      password: process.env.ADMIN_PASSWORD,
-      role: "TIENDA_ADMIN",
-      storeId: store.id,
+      name: "Farmacia Central",
+      address: "Av. Principal 321",
+      phone: "999-111-222",
+      slug: "farmacia-central",
     },
   });
+
+
 
   // Crea Sucursal (Location)
   const location = await prisma.location.create({
@@ -80,18 +106,6 @@ async function main() {
     },
   });
 
-  // Crea Colaborador
-  const collaborator = await prisma.user.create({
-    data: {
-      name: "Colaborador 1",
-      email: "colaborador@pharma.com",
-      password: process.env.ADMIN_PASSWORD,
-      role: "COLABORADOR",
-      storeId: store.id,
-      locationId: location.id,
-    },
-  });
-
   // Crea Ordenes
   await prisma.order.create({
     data: {
@@ -100,7 +114,6 @@ async function main() {
       status: "PENDING",
       total: 150.75,
       locationId: location.id,
-      userId: collaborator.id,
     },
   });
 
@@ -111,7 +124,6 @@ async function main() {
       status: "PENDING",
       total: 300.00,
       locationId: location.id,
-      userId: collaborator.id,
     },
   });
 

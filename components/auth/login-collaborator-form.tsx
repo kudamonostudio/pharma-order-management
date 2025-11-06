@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -15,11 +14,24 @@ import { Label } from "@/components/ui/auth/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { loginAsCollaborator } from "@/lib/auth/login";
 
-export function LoginForm({
+type Store = {
+  id: number;
+  name: string;
+  slug: string;
+  phone?: string | null;
+};
+
+type LoginCollaboratorFormProps = React.ComponentPropsWithoutRef<"div"> & {
+  store: Store;
+};
+
+export function LoginCollaboratorForm({
   className,
+  store,
   ...props
-}: React.ComponentPropsWithoutRef<"div">) {
+}: LoginCollaboratorFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -28,21 +40,16 @@ export function LoginForm({
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const supabase = createClient();
     setIsLoading(true);
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-      if (error) throw error;
-      // Update this route to redirect to an authenticated route. The user already has an active session.
-      console.log({ data });
-      router.push("/control/supremo");
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : "An error occurred");
+      await loginAsCollaborator(email, password, store.id); // TODO hacer esta validacion en server
+      router.push("/control/" + store.slug);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Ocurrió un error inesperado.";
+      setError(message);
     } finally {
       setIsLoading(false);
     }
@@ -52,7 +59,9 @@ export function LoginForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardTitle className="text-2xl">
+            Login Colaborador - {store.name}
+          </CardTitle>
           <CardDescription>
             Enter your email below to login to your account
           </CardDescription>
