@@ -1,8 +1,9 @@
 // Listado de productos de la tienda, primer contacto del cliente/usuario con la tienda
-import Image from "next/image";
 import ProductList from "./components/ProductList";
 import { StoreProductItem } from "@/app/types/store";
 import ProductListFooter from "./components/ProductListFooter";
+import StoreLogo from "./components/StoreLogo";
+import StoreContainer from "./components/StoreContainer";
 const Page = () => {
   const products: StoreProductItem[] = [
     {
@@ -47,24 +48,16 @@ const Page = () => {
   ];
 
   return (
-    <div className="bg-background min-h-screen">
-      <div className="max-w-4xl mx-auto">
-        <div className="pt-12 pb-8 flex gap-4 items-center justify-center border-b">
-          <Image
-            src="https://i.pinimg.com/736x/c9/9d/0e/c99d0ec4d6f81c2e2592f41216d8fcd7.jpg"
-            alt="Logo de la tienda"
-            width={150}
-            height={150}
-            className="rounded-full w-16 h-16 object-cover ring-2 ring-border"
-          />
-          <h1 className="text-3xl font-semibold text-foreground tracking-tight">
-            Nombre de la tienda
-          </h1>
-        </div>
-        <ProductList products={products} />
+    <StoreContainer>
+      <div className="pt-12 pb-8 flex gap-4 items-center justify-center border-b">
+        <StoreLogo logoUrl="https://i.pinimg.com/736x/c9/9d/0e/c99d0ec4d6f81c2e2592f41216d8fcd7.jpg" />
+        <h1 className="text-3xl font-semibold text-foreground tracking-tight">
+          Nombre de la tienda
+        </h1>
       </div>
+      <ProductList products={products} />
       <ProductListFooter />
-    </div>
+    </StoreContainer>
   );
 };
 export default Page;

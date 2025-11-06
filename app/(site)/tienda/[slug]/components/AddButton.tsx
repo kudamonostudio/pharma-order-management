@@ -3,6 +3,7 @@ import { Plus, Minus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useOrderStore } from "@/app/zustand/orderStore";
 import type { StoreProductItem } from "@/app/types/store";
+import { useState, useEffect } from "react";
 
 interface AddButtonProps {
   product: StoreProductItem;
@@ -10,6 +11,11 @@ interface AddButtonProps {
 
 const AddButton = ({ product }: AddButtonProps) => {
   const { order, addProduct, increment, decrement } = useOrderStore();
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   const orderItem = order.find((item) => item.id === product.id);
   const quantity = orderItem?.quantity || 0;
@@ -25,6 +31,22 @@ const AddButton = ({ product }: AddButtonProps) => {
   const handleDecrease = () => {
     decrement(product.id);
   };
+
+  // Preveir hidratación del estado en el servidor (o durante SSR)
+  if (!isHydrated) {
+    return (
+      <div className="flex justify-end mt-3">
+        <Button
+          disabled
+          size="sm"
+          className="h-10 px-4 rounded-md text-sm font-medium shadow-sm hover:shadow transition-shadow text-white"
+        >
+          <Plus className="w-4 h-4 mr-1.5" strokeWidth={2} />
+          Agregar
+        </Button>
+      </div>
+    );
+  }
 
   if (quantity === 0) {
     return (

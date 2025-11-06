@@ -4,14 +4,19 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useOrderStore } from "@/app/zustand/orderStore";
 import ConfirmOrderModal from "./ConfirmOrderModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const ProductListFooter = () => {
   const { order, getOrderQuantity } = useOrderStore();
   const [confirmOrderOpen, setConfirmOrderOpen] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  const areProductsInOrder = getOrderQuantity() > 0;
-  const emptyOrder = getOrderQuantity() === 0;
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
+  const areProductsInOrder = isHydrated && getOrderQuantity() > 0;
+  const emptyOrder = !isHydrated || getOrderQuantity() === 0;
   const moreThanThree = order.length > 3;
 
   const handleConfirmOrderOpen = () => {
