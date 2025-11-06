@@ -1,8 +1,8 @@
 "use client";
 import { ShoppingCart, Ellipsis } from "lucide-react";
-import { useOrderStore } from "./zustand/orderStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useOrderStore } from "@/app/zustand/orderStore";
 
 const ProductListFooter = () => {
   const { order, getOrderQuantity } = useOrderStore();
@@ -62,7 +62,7 @@ const ProductListFooter = () => {
             </div>
             <div className="lg:absolute md:right-0">
               <Button
-                onClick={() => {}} //TODO: CONFIRMAR ORDER
+                onClick={() => {}} //TODO: Confirmar Orden
                 className="h-10 px-6 rounded-md text-sm font-medium shadow-sm hover:shadow transition-shadow cursor-pointer text-white bg-emerald-600 hover:bg-emerald-700"
               >
                 Confirmar Orden

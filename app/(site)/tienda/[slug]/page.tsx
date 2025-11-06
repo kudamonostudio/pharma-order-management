@@ -1,9 +1,8 @@
 // Listado de productos de la tienda, primer contacto del cliente/usuario con la tienda
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Image from "next/image";
 import ProductList from "../components/ProductList";
-import ProductListFooter from "@/app/ProductListFooter";
 import { StoreProductItem } from "@/app/types/store";
+import ProductListFooter from "../components/api/ProductListFooter";
 const Page = () => {
   const products: StoreProductItem[] = [
     {

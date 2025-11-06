@@ -22,6 +22,16 @@ export default async function ProtectedPage() {
     redirect("/auth/login");
   }
 
+  const userId = data.claims.sub as string;
+
+  const profile = await prisma.profile.findUnique({
+    where: { id: userId },
+  });
+
+  if (profile?.role !== "ADMIN_SUPREMO") {
+    redirect("/control/tienda"); // TODO: Agregar slug dinámico
+  }
+
   return (
     <div className="flex-1 w-full flex flex-col gap-12">
       <div className="w-full">
@@ -32,8 +42,9 @@ export default async function ProtectedPage() {
         </div>
       </div>
       <div className="flex flex-col gap-2 items-start">
-        <h1 className="font-bold text-2xl mb-4">Vista de TIENDA_ADMIN</h1>
+        <h1 className="font-bold text-2xl mb-4">Vista de ADMIN_SUPREMO</h1>
       </div>
+
       <div className="flex flex-col gap-2 items-start">
         <h2 className="font-bold text-2xl mb-4">Tiendas</h2>
         <pre className="text-xs font-mono p-3 rounded border max-h-64 overflow-auto">
