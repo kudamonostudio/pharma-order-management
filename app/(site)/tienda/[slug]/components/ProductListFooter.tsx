@@ -26,7 +26,7 @@ const ProductListFooter = () => {
 
   return (
     <>
-      <div className="min-h-24 md:h-24 w-full bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-[0_-1px_3px_rgba(0,0,0,0.05)] border-t fixed bottom-0 left-0 flex">
+      <div className="min-h-24 md:h-24 w-full bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 shadow-[0_-1px_3px_rgba(0,0,0,0.05)] border-t fixed bottom-0 left-0 flex">
         <div className="max-w-4xl mx-auto px-6 h-full flex justify-center items-center w-full">
           {emptyOrder && (
             <div className="flex items-center gap-2.5">
@@ -45,7 +45,7 @@ const ProductListFooter = () => {
                 <div className="flex">
                   {order.slice(0, 3).map((item) => (
                     <Avatar
-                      className="shadow-sm border-2 border-background w-12 h-12 sm:w-14 sm:h-14 mr-[-16px] sm:mr-[-20px] ring-1 ring-border"
+                      className="shadow-sm border-2 border-background w-12 h-12 sm:w-14 sm:h-14 -mr-4 sm:-mr-5 ring-1 ring-border"
                       key={item.id}
                     >
                       <AvatarImage

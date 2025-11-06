@@ -74,7 +74,7 @@ const AddButton = ({ product }: AddButtonProps) => {
         >
           <Minus className="w-4 h-4" strokeWidth={2} />
         </Button>
-        <span className="text-base font-semibold text-foreground min-w-[28px] text-center">
+        <span className="text-base font-semibold text-foreground min-w-7 text-center">
           {quantity}
         </span>
         <Button

@@ -135,13 +135,17 @@ export default function ConfirmOrderModalContent({
           </DialogHeader>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 justify-center items-center">
-          {step === "products" ? (
-            <>
-            <SelectedProducts />
-            <SelectedProductsTotal totalQuantity={getOrderQuantity()} />
-            </>
-          ) : (
+        {step === "products" ? (
+          <div className="flex-1 flex flex-col px-6 overflow-hidden">
+            <div className="flex-1 overflow-y-auto">
+              <SelectedProducts order={order}/>
+            </div>
+            <div className="shrink-0 pt-4">
+              <SelectedProductsTotal totalQuantity={getOrderQuantity()} />
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto px-6 justify-center items-center">
             <ConfirmOrderModalForm
               register={register}
               errors={errors}
@@ -152,8 +156,8 @@ export default function ConfirmOrderModalContent({
               }}
               onSubmit={handleSubmit(onSubmit)}
             />
-          )}
-        </div>
+          </div>
+        )}
 
         <ConfirmOrderModalFooter
           step={step}

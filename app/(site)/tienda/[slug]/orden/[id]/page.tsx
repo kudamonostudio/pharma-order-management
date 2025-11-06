@@ -1,12 +1,29 @@
+"use client";
+import { useOrderStore } from "@/app/zustand/orderStore";
 import SelectedProducts from "../../components/SelectedProducts";
 import StoreContainer from "../../components/StoreContainer";
 import StoreLogo from "../../components/StoreLogo";
+import OrderStatus, { type OrderStatusVariant } from "./OrderStatus";
 
 // Esta página muestra la orden creada, el listado de productos, la sucursal y el estado de la orden
 const Page = () => {
-  const mockOrder = {
+  const { order } =
+    useOrderStore(); /* TODO: Esto debe quitarse, es la orden para la creacion */
+  const mockOrder: {
+    id: string;
+    status: OrderStatusVariant;
+    totalQuantity: number;
+    items: Array<{ quantity: number }>;
+    branch: { id: string; name: string };
+    createdAt?: Date;
+  } = {
     id: "order_12345",
-    status: "pending",
+    status: "preparing",
+    createdAt: new Date(),
+    branch: {
+      id: "3",
+      name: "Sucursal 1",
+    },
     /* branchId: "3", */ // TODO: Obtener la sucursal desde supabase una vez implementadas las sucursales
     items: [
       {
@@ -14,7 +31,7 @@ const Page = () => {
         quantity: 3,
       },
       {
-        /* productId: "5", */  // TODO: Obtener el producto desde supabase una vez implementados los productos
+        /* productId: "5", */ // TODO: Obtener el producto desde supabase una vez implementados los productos
         quantity: 1,
       },
     ],
@@ -28,12 +45,24 @@ const Page = () => {
           Nombre de la tienda
         </h1>
       </div>
-      <div className="flex flex-col py-4 gap-4">
+      <div className="flex flex-col py-8 gap-2">
         <div className="flex justify-between">
-
-        <h1 className="text-2xl font-normal text-gray-600">Detalles de la orden: #{mockOrder.id}</h1>
+          <div>
+            <h1 className="text-xl font-normal text-gray-600">
+              Detalles de la orden: #{mockOrder.id}
+            </h1>
+            <small>Creada el {mockOrder.createdAt?.toLocaleDateString()}</small>
+          </div>
+          {/* TODO: Cambiar el estado según la orden */}
+          <div className="flex flex-col items-end">
+            <OrderStatus status={mockOrder.status} />
+            <h3 className="text-lg font-normal mt-4">
+              Retira en la sucursal: {mockOrder.branch.name}
+            </h3>
+          </div>
         </div>
-        <SelectedProducts />
+        <SelectedProducts order={order} />
+        {/* TODO: Este componente debe recibir una orden como prop, en este caso los datos de la orden creada*/}
       </div>
     </StoreContainer>
   );
