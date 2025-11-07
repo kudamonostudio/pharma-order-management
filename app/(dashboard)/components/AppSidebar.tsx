@@ -15,14 +15,51 @@ import {
 
 import { ChevronsUpDown, LogOut } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ADMIN_SUPREMO_DASHBOARD_ITEMS } from "../utils/constants";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/auth/dropdown-menu";
+import {
+  ADMIN_SUPREMO_DASHBOARD_ITEMS,
+  getStoreMenuItems,
+} from "../utils/constants";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/auth/dropdown-menu";
+import { usePathname } from "next/navigation";
+import type { Store } from "../types";
+import Link from "next/link";
+import { getStoreBySlug } from "../utils/mockData";
 
+interface AppSidebarProps {
+  userRole: string;
+  user: any;
+  store?: Store | null;
+}
 
+export function AppSidebar({
+  userRole,
+  user,
+  store: storeProp,
+}: AppSidebarProps) {
+  const pathname = usePathname();
 
-export function AppSidebar({ userRole, user }: { userRole: string, user: any }) {
-  const menuItems =
-    userRole === "ADMIN_SUPREMO" ? ADMIN_SUPREMO_DASHBOARD_ITEMS : [];
+  // Extraer el slug de la URL si estamos en /control/tiendas/[slug]
+  const storeMatch = pathname.match(/\/control\/tiendas\/([^\/\?]+)/);
+  const storeSlug = storeMatch ? storeMatch[1] : null;
+
+  // Obtener datos de la tienda desde mock data si hay slug
+  const store = storeSlug ? getStoreBySlug(storeSlug) : storeProp;
+
+  // Determinar qué items mostrar
+  const showAdminItems = userRole === "ADMIN_SUPREMO";
+  const showStoreItems =
+    userRole === "ADMIN_DE_TIENDA" || (userRole === "ADMIN_SUPREMO" && store);
+
+  // Generar items de tienda con URLs dinámicas si hay store
+  const storeMenuItems = store ? getStoreMenuItems(store.slug) : [];
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -44,23 +81,65 @@ export function AppSidebar({ userRole, user }: { userRole: string, user: any }) 
       </SidebarHeader>
 
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel>Navegación</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {/* Grupo de Admin Supremo */}
+        {showAdminItems && (
+          <SidebarGroup>
+            <SidebarGroupLabel>ADMIN</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {ADMIN_SUPREMO_DASHBOARD_ITEMS.map((item) => {
+                  const isActive =
+                    pathname === item.url ||
+                    pathname.startsWith(item.url + "/");
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild isActive={isActive}>
+                        <Link href={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {/* Grupo de Tienda - Solo si estamos en una tienda o si es admin de tienda */}
+        {showStoreItems && store && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="flex items-center gap-2">
+              <Avatar className="h-6 w-6">
+                <AvatarImage src={store.logo} alt={store.name} />
+                <AvatarFallback className="text-xs">
+                  {store.name.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              <span className="truncate">{store.name}</span>
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {storeMenuItems.map((item) => {
+                  const isActive =
+                    pathname === item.url ||
+                    pathname.startsWith(item.url + "/");
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild isActive={isActive}>
+                        <Link href={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter>

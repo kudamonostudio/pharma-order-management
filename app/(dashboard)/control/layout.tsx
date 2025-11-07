@@ -1,8 +1,4 @@
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import Link from "next/link";
-import { DeployButton } from "@/components/auth/deploy-button";
-import { AuthButton } from "@/components/auth/auth-button";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
@@ -33,15 +29,12 @@ export default async function ProtectedLayout({
   if (!profile) {
     redirect("/auth/login");
   }
-
-  // Now you can use profile.role in your layout or pass it to children
   
   return (
     <SidebarProvider>
       <AppSidebar userRole={profile.role} user={user} />
       <main className="min-h-screen flex flex-col w-full">
         <AdminNavbar /> 
-        {/* You can pass the profile role to children through props or context */}
         {children}
       </main>
     </SidebarProvider>

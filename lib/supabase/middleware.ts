@@ -7,6 +7,9 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
+  // Add pathname to headers for server components
+  supabaseResponse.headers.set("x-invoke-path", request.nextUrl.pathname);
+
   // If the env vars are not set, skip middleware check. You can remove this
   // once you setup the project.
   if (!hasEnvVars) {
