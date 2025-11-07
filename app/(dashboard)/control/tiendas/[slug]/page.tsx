@@ -1,6 +1,9 @@
 import { getStoreBySlug } from "@/app/(dashboard)/utils/mockData";
 import { redirect } from "next/navigation";
 import { OrderList } from "./components/OrderList";
+import IsActiveButton from "@/app/(dashboard)/components/IsActiveButton";
+import { createClient } from "@/lib/supabase/server";
+import { prisma } from "@/lib/prisma";
 
 export default async function StorePage({
   params,
@@ -13,6 +16,17 @@ export default async function StorePage({
   if (!store) {
     redirect("/control/supremo/tiendas");
   }
+
+  // Get user profile to check role
+  const supabase = await createClient();
+  const { data } = await supabase.auth.getClaims();
+  const userId = data?.claims.sub as string;
+
+  const profile = await prisma.profile.findUnique({
+    where: { id: userId },
+  });
+
+  const isAdminSupremo = profile?.role === "ADMIN_SUPREMO";
 
   const mockLastOrders = [
     {
@@ -62,7 +76,12 @@ export default async function StorePage({
             className="w-20 h-20 rounded-full object-cover"
           />
           <div>
-            <h1 className="font-bold text-3xl">{store.name}</h1>
+            <div className="flex justify-center items-center gap-4">
+              <h1 className="font-bold text-3xl">{store.name}</h1>
+              {isAdminSupremo && (
+                <IsActiveButton isActive={store.isActive} variant="small" />
+              )}
+            </div>
             <p className="text-muted-foreground">{store.address}</p>
             <p className="text-muted-foreground">{store.phone}</p>
           </div>

@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
-import { ArrowRight, MapPin, Phone, Store } from "lucide-react";
+import { ArrowRight, MapPin, Phone, Store, Settings } from "lucide-react";
 import Link from "next/link";
-import IsActiveButton from "./IsActiveButton";
+import IsActiveButton from "../../../components/IsActiveButton";
 
 export default async function page() {
   const mockStores = [
@@ -66,7 +66,7 @@ export default async function page() {
         {mockStores.map((store) => (
           <Card
             key={store.id}
-            className="group overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 relative h-80"
+            className="group overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 relative h-96"
           >
             {/* Background Image */}
             <img
@@ -78,13 +78,16 @@ export default async function page() {
             {/* Overlay gradual para mejor legibilidad */}
             <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/65 to-transparent"></div>
 
-            <div className="absolute top-3 left-3 bg-background/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1.5">
+            {/* <div className="absolute top-3 left-3 bg-background/90 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-1.5">
               <Store className="h-3.5 w-3.5" />
               <span className="text-xs font-medium">{store.category}</span>
+            </div> */}
+            <div className="absolute top-3 left-3">
+              <IsActiveButton isActive={store.isActive} variant="small" />
             </div>
-
             {/* Contenido directamente sobre la imagen */}
             <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+              {/* <IsActiveButton isActive={store.isActive} variant="small"/> */}
               <h3 className="font-semibold text-base truncate">{store.name}</h3>
 
               <div className="mt-1 space-y-1 text-sm opacity-90">
@@ -97,17 +100,24 @@ export default async function page() {
                   <span>{store.phone}</span>
                 </div>
               </div>
+
+              <Button
+                className="mt-6 w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm"
+                size="sm"
+              >
+                Editar
+                <Settings className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Button>
               <Link key={store.id} href={`/control/tiendas/${store.id}`}>
                 <Button
-                  className="mt-3 w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm"
+                  className="mt-2 w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm"
                   size="sm"
                 >
                   Ir a la tienda
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
               </Link>
-
-              <IsActiveButton isActive={store.isActive} />
+              {/* <IsActiveButton isActive={store.isActive} /> */}
             </div>
           </Card>
         ))}

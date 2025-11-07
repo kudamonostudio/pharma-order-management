@@ -5,6 +5,7 @@ export interface Store {
   logo: string;
   address: string;
   phone: string;
+  isActive: boolean;
 }
 
 export interface User {
