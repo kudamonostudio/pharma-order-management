@@ -1,15 +1,12 @@
-import { prisma } from "@/lib/prisma";
 import TiendasContent from "./Content";
 
 export default async function TiendasPage() {
-  const stores = await prisma.store.findMany({
-    where: {
-      deletedAt: null,
-    },
-    omit: {
-      deletedAt: true,
-    },
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/api/stores`, { 
+    cache: 'no-store' 
   });
+  
+  const stores = res.ok ? await res.json() : [];
 
   return <TiendasContent stores={stores} />;
 }

@@ -8,7 +8,7 @@ import { ArrowRight, MapPin, Phone, Settings } from "lucide-react";
 import Link from "next/link";
 import IsActiveButton from "../../../components/IsActiveButton";
 import { CreateStoreModal } from "./CreateStoreModal";
-import { EditStoreModal } from "./EditStoreModal";
+import { StoreConfigModal } from "./components/StoreConfigModal";
 
 interface Store {
   id: number;
@@ -92,11 +92,11 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
                 onClick={() => handleEditClick(store)}
               >
                 <Settings className="w-4 h-4" />
-                Editar
+                Configuración
               </Button>
 
               <Link href={`/control/tiendas/${store.slug}`} className="w-full">
-                <Button className="w-full flex items-center justify-between rounded-xl">
+                <Button className="w-full flex items-center justify-center rounded-xl">
                   Ir a la tienda
                   <ArrowRight className="w-4 h-4" />
                 </Button>
@@ -107,7 +107,7 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
       </div>
 
       <CreateStoreModal open={isModalOpen} onOpenChange={setIsModalOpen} />
-      <EditStoreModal
+      <StoreConfigModal
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
         store={selectedStore}
