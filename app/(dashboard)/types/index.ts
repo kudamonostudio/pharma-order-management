@@ -1,11 +1,14 @@
 export interface Store {
-  id: string;
+  id: number;
   name: string;
   slug: string;
-  logo: string;
+  logo: string | null;
   address: string;
-  phone: string;
-  isActive: boolean;
+  phone: string | null;
+  banner?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+  isActive?: boolean;
 }
 
 export interface User {

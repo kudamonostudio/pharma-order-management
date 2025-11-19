@@ -1,31 +1,45 @@
-import { getStoreBySlug } from "@/app/(dashboard)/utils/mockData";
 import { redirect } from "next/navigation";
-import { OrderList } from "../components/OrderList";
 
-export default async function OrdenesPage({ 
-  params 
-}: { 
-  params: Promise<{ slug: string }> 
+export default async function OrdenesPage({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const store = getStoreBySlug(slug);
 
-  if (!store) {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/api/stores/${slug}`, { cache: 'no-store' });
+
+  if (!res.ok) {
     redirect("/control/supremo/tiendas");
   }
 
+  const store = await res.json();
+
+  // TODO: Reemplazar con datos reales de órdenes
   const mockOrders = [
-    { id: 1, code: "ORD-001", date: "2025-11-06", status: "PENDIENTE" as const, total: 150.00 },
-    { id: 2, code: "ORD-002", date: "2025-11-06", status: "EN_PROCESO" as const, total: 200.00 },
-    { id: 3, code: "ORD-003", date: "2025-11-06", status: "LISTO_PARA_RETIRO" as const, total: 180.00 },
-    { id: 4, code: "ORD-004", date: "2025-11-06", status: "ENTREGADA" as const, total: 250.50 },
-    { id: 5, code: "ORD-005", date: "2025-11-05", status: "CANCELADA" as const, total: 75.00 },
+    { id: "ORD-001", customer: "Cliente A", total: 150.00, status: "Pendiente" },
+    { id: "ORD-002", customer: "Cliente B", total: 85.50, status: "Completada" },
+    { id: "ORD-003", customer: "Cliente C", total: 200.00, status: "En proceso" },
   ];
 
   return (
     <div className="px-8 py-4 w-full">
       <h1 className="font-bold text-2xl mb-6">Órdenes de {store.name}</h1>
-      <OrderList orders={mockOrders} />
+      <div className="space-y-4">
+        {mockOrders.map((order) => (
+          <div key={order.id} className="p-4 border rounded-lg flex justify-between items-center">
+            <div>
+              <h3 className="font-semibold">{order.id}</h3>
+              <p className="text-sm text-muted-foreground">{order.customer}</p>
+            </div>
+            <div className="text-right">
+                <p className="font-bold">${order.total}</p>
+                <p className="text-sm text-muted-foreground">{order.status}</p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
