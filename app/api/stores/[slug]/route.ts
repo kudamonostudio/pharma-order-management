@@ -3,11 +3,11 @@ import { NextResponse } from 'next/server';
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { slug: string } }
 ) {
   try {
     const store = await prisma.store.findUnique({
-      where: { id: Number(params.id) },
+      where: { slug: params.slug },
     });
 
     if (!store) {
@@ -29,12 +29,12 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { slug: string } }
 ) {
   try {
     const body = await req.json();
     const store = await prisma.store.update({
-      where: { id: Number(params.id) },
+      where: { slug: params.slug },
       data: body,
     })
 
@@ -50,11 +50,11 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { slug: string } }
 ) {
   try {
     const store = await prisma.store.update({
-      where: { id: Number(params.id) },
+      where: { slug: params.slug },
       data: { deletedAt: new Date() },
     })
 

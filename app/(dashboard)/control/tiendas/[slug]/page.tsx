@@ -1,4 +1,3 @@
-import { getStoreBySlug } from "@/app/(dashboard)/utils/mockData";
 import { redirect } from "next/navigation";
 import { OrderList } from "./components/OrderList";
 import IsActiveButton from "@/app/(dashboard)/components/IsActiveButton";
@@ -11,7 +10,17 @@ export default async function StorePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const store = getStoreBySlug(slug);
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL!;
+  const res = await fetch(`${baseUrl}/api/stores/${slug}`, {
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    redirect("/control/supremo/tiendas");
+  }
+
+  const store = await res.json();
 
   if (!store) {
     redirect("/control/supremo/tiendas");
