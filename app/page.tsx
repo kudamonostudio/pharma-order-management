@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { DeployButton } from "@/components/auth/deploy-button";
 import { AuthButton } from "@/components/auth/auth-button";
+
 export default async function Home() {
   const stores = await prisma.store.findMany({
     where: {

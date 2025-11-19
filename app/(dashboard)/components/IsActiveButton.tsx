@@ -13,15 +13,15 @@ function IsActiveButton({ isActive, variant }: IsActiveButtonProps) {
     return (
       <Badge
         className={cn(
-          "mt-2 gap-1.5",
-          isActive ? "bg-emerald-600/70" : "bg-gray-500/60",
+          "gap-1.5 text-xs font-medium px-3 rounded-full",
+          isActive ? "bg-emerald-600/70 text-white" : "bg-gray-100 text-gray-600",
           "hover:bg-opacity-80 backdrop-blur-sm"
         )}
       >
         {isActive && (
           <span className="h-1.5 w-1.5 bg-emerald-400 rounded-full animate-pulse" />
         )}
-        {isActive ? "ONLINE" : "OFFLINE"}
+        {isActive ? "Activa" : "Inactiva"}
       </Badge>
     );
   }
