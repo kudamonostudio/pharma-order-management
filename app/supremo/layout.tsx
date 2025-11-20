@@ -2,8 +2,8 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
-import { AppSidebar } from "../components/AppSidebar";
-import { AdminNavbar } from "../components/AdminNavbar";
+import { AppSidebar } from "../(dashboard)/components/AppSidebar";
+import { AdminNavbar } from "../(dashboard)/components/AdminNavbar";
 
 export default async function ProtectedLayout({
   children,

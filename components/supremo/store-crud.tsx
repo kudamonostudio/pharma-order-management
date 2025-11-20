@@ -8,7 +8,6 @@ type StoreLite = {
   name: string;
   address: string;
   phone: string | null;
-  slug?: string;
 };
 
 export function StoreCrud() {
@@ -58,15 +57,6 @@ export function StoreCrud() {
           defaultValue={editing?.phone || ""}
           className="border p-2 rounded w-full"
         />
-
-        {!editing && (
-          <input
-            name="slug"
-            placeholder="slug-ejemplo"
-            className="border p-2 rounded w-full"
-            required
-          />
-        )}
 
         <button className="bg-blue-600 text-white px-4 py-2 rounded">
           {editing ? "Actualizar" : "Crear"}

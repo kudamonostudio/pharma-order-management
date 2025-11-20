@@ -14,24 +14,12 @@ import { Label } from "@/components/ui/auth/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { loginAsCollaborator } from "@/lib/auth/login";
+import { loginUnique } from "@/lib/auth/login";
 
-type Store = {
-  id: number;
-  name: string;
-  slug: string;
-  phone?: string | null;
-};
-
-type LoginCollaboratorFormProps = React.ComponentPropsWithoutRef<"div"> & {
-  store: Store;
-};
-
-export function LoginCollaboratorForm({
+export function LoginForm({
   className,
-  store,
   ...props
-}: LoginCollaboratorFormProps) {
+}: React.ComponentPropsWithoutRef<"div">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -44,8 +32,13 @@ export function LoginCollaboratorForm({
     setError(null);
 
     try {
-      await loginAsCollaborator(email, password, store.id); // TODO hacer esta validacion en server
-      router.push("/control/" + store.slug);
+      const { user, profile, storeSlug } = await loginUnique(email, password);
+      console.log({ user, profile, storeSlug })
+      if( profile?.role === "ADMIN_SUPREMO" ) {
+        router.push('/supremo'); // TODO
+      } else {
+        router.push(`/control/tiendas/${storeSlug}`);
+      }
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Ocurrió un error inesperado.";
@@ -59,9 +52,7 @@ export function LoginCollaboratorForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">
-            Login Colaborador - {store.name}
-          </CardTitle>
+          <CardTitle className="text-2xl">Login Supremo</CardTitle>
           <CardDescription>
             Enter your email below to login to your account
           </CardDescription>

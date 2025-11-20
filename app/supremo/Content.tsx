@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, MapPin, Phone, Settings } from "lucide-react";
 import Link from "next/link";
-import IsActiveButton from "../../../components/IsActiveButton";
 import { CreateStoreModal } from "./CreateStoreModal";
 import { EditStoreModal } from "./EditStoreModal";
+import IsActiveButton from "../(dashboard)/components/IsActiveButton";
 
 interface Store {
   id: number;
