@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/auth/input";
 import { Label } from "@/components/ui/auth/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { loginAsAdminSupremo } from "@/lib/auth/login";
 
 export function LoginAdminForm({
@@ -23,24 +23,23 @@ export function LoginAdminForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError(null);
 
-    try {
-      await loginAsAdminSupremo(email, password);
-      router.push("/supremo");
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Ocurrió un error inesperado.";
-      setError(message);
-    } finally {
-      setIsLoading(false);
-    }
+    startTransition(async () => {
+      try {
+        await loginAsAdminSupremo(email, password);
+        router.push("/supremo");
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Ocurrió un error inesperado.";
+        setError(message);
+      }
+    });
   };
 
   return (
@@ -85,8 +84,8 @@ export function LoginAdminForm({
                 />
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? "Logging in..." : "Login"}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">

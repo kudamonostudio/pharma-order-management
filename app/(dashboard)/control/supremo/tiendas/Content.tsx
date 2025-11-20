@@ -9,14 +9,7 @@ import Link from "next/link";
 import IsActiveButton from "../../../components/IsActiveButton";
 import { CreateStoreModal } from "./CreateStoreModal";
 import { StoreConfigModal } from "./components/StoreConfigModal";
-
-interface Store {
-  id: number;
-  name: string;
-  slug: string;
-  address: string | null;
-  phone: string | null;
-}
+import { Store } from "@prisma/client";
 
 interface TiendasContentProps {
   stores: Store[];
@@ -51,11 +44,7 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
             </span>
 
             <div className="absolute top-3 left-3">
-              <IsActiveButton
-                isActive={/* store.isActive */ true}
-                variant="small"
-              />
-              {/* TODO: AGREGAR ISACTIVE AL SCHEMA DE TIENDA */}
+              <IsActiveButton isActive={store.isActive} variant="small" />
             </div>
 
             <div className="flex flex-col items-center gap-4 pt-8 pb-4">

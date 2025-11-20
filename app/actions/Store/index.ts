@@ -23,17 +23,16 @@ export async function createStore(formData: FormData) {
 }
 
 export async function updateStore(id: number, formData: FormData) {
-  const name = formData.get("name") as string;
-  const address = formData.get("address") as string;
-  const phone = formData.get("phone") as string | null;
+  const data: any = {};
+  
+  if (formData.has("name")) data.name = formData.get("name") as string;
+  if (formData.has("address")) data.address = formData.get("address") as string;
+  if (formData.has("phone")) data.phone = formData.get("phone") as string | null;
+  if (formData.has("isActive")) data.isActive = formData.get("isActive") === "true";
 
   await prisma.store.update({
     where: { id },
-    data: {
-      name,
-      address,
-      phone,
-    },
+    data,
   });
 
   revalidatePath("/supremo");

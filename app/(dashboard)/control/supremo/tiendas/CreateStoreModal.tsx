@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +24,7 @@ export function CreateStoreModal({
   onOpenChange,
 }: CreateStoreModalProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [formData, setFormData] = useState({
     name: "",
     address: "",
@@ -42,38 +42,36 @@ export function CreateStoreModal({
       .replace(/^-+|-+$/g, "");
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    setIsLoading(true);
+    startTransition(async () => {
+      try {
+        const formDataToSend = new FormData();
+        formDataToSend.append("name", formData.name);
+        formDataToSend.append("address", formData.address);
+        formDataToSend.append("phone", formData.phone);
+        formDataToSend.append("slug", generateSlug(formData.name));
 
-    try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("name", formData.name);
-      formDataToSend.append("address", formData.address);
-      formDataToSend.append("phone", formData.phone);
-      formDataToSend.append("slug", generateSlug(formData.name));
+        await createStore(formDataToSend);
 
-      await createStore(formDataToSend);
+        onOpenChange(false);
 
-      onOpenChange(false);
+        setFormData({
+          name: "",
+          address: "",
+          phone: "",
+          /* image: "", */
+          /* TODO: AGREGAR CUANDO ESTE LA IMAGEN EN EL SCHEMA DE TIENDA */
+        });
 
-      setFormData({
-        name: "",
-        address: "",
-        phone: "",
-        /* image: "", */
-        /* TODO: AGREGAR CUANDO ESTE LA IMAGEN EN EL SCHEMA DE TIENDA */
-      });
-
-      // Refresh para ver los cambios
-      router.refresh();
-    } catch (error) {
-      console.error("Error creating store:", error);
-      // TODO: Mostrar error al usuario (puedes usar toast)
-    } finally {
-      setIsLoading(false);
-    }
+        // Refresh para ver los cambios
+        router.refresh();
+      } catch (error) {
+        console.error("Error creating store:", error);
+        // TODO: Mostrar error al usuario (puedes usar toast)
+      }
+    });
   };
 
   return (
@@ -136,12 +134,12 @@ export function CreateStoreModal({
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
-              disabled={isLoading}
+              disabled={isPending}
             >
               Cancelar
             </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Creando..." : "Crear tienda"}
+            <Button type="submit" disabled={isPending}>
+              {isPending ? "Creando..." : "Crear tienda"}
             </Button>
           </div>
         </form>

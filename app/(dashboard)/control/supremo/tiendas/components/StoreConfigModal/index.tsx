@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import {
   Dialog,
   DialogContent,
@@ -15,13 +15,9 @@ import { updateStore } from "@/app/actions/Store";
 import { useRouter } from "next/navigation";
 import { Pencil, Power, Trash2 } from "lucide-react";
 import { DeleteStoreModal } from "./DeleteStoreModal";
-
-interface Store {
-  id: number;
-  name: string;
-  address: string | null;
-  phone: string | null;
-}
+import { ToggleStoreActiveModal } from "./ToggleStoreActiveModal";
+import { Store } from "@prisma/client";
+import { cn } from "@/lib/utils";
 
 interface StoreConfigModalProps {
   open: boolean;
@@ -37,9 +33,10 @@ export function StoreConfigModal({
   store,
 }: StoreConfigModalProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [view, setView] = useState<ModalView>("menu");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isToggleActiveModalOpen, setIsToggleActiveModalOpen] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -63,30 +60,26 @@ export function StoreConfigModal({
     }
   }, [store]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!store) return;
 
-    setIsLoading(true);
-    try {
-      const formDataToSend = new FormData();
-      formDataToSend.append("name", formData.name);
-      formDataToSend.append("address", formData.address);
-      formDataToSend.append("phone", formData.phone);
+    startTransition(async () => {
+      try {
+        const formDataToSend = new FormData();
+        formDataToSend.append("name", formData.name);
+        formDataToSend.append("address", formData.address);
+        formDataToSend.append("phone", formData.phone);
 
-      await updateStore(store.id, formDataToSend);
+        await updateStore(store.id, formDataToSend);
 
-      onOpenChange(false);
-      router.refresh();
-    } catch (error) {
-      console.error("Error updating store:", error);
-    } finally {
-      setIsLoading(false);
-    }
+        onOpenChange(false);
+        router.refresh();
+      } catch (error) {
+        console.error("Error updating store:", error);
+      }
+    });
   };
-
-  //TODO: Asumimos que está inactiva por ahora
-  const isStoreActive = false;
 
   if (!store) return null;
 
@@ -118,13 +111,16 @@ export function StoreConfigModal({
               </Button>
 
               {/* Opción 2: Inactivar/Activar */}
-              <Button 
+              <Button
                 variant="outline"
-                className="justify-start gap-2 h-12"
-                onClick={() => {}}
+                className={cn(
+                  "justify-start gap-2 h-12",
+                  store.isActive ? "bg-gray-100" : ""
+                )}
+                onClick={() => setIsToggleActiveModalOpen(true)}
               >
                 <Power className="h-4 w-4" />
-                {isStoreActive ? "Inactivar tienda" : "Activar tienda"}
+                {store.isActive ? "Inactivar tienda" : "Activar tienda"}
               </Button>
 
               {/* Opción 3: Eliminar */}
@@ -182,24 +178,31 @@ export function StoreConfigModal({
                   type="button"
                   variant="ghost"
                   onClick={() => setView("menu")}
-                  disabled={isLoading}
+                  disabled={isPending}
                 >
                   Atrás
                 </Button>
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? "Guardando..." : "Guardar cambios"}
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? "Guardando..." : "Guardar cambios"}
                 </Button>
               </div>
             </form>
           )}
         </DialogContent>
       </Dialog>
-
-      {/* Modal de Confirmación de Eliminación */}
       <DeleteStoreModal
         open={isDeleteModalOpen}
         onOpenChange={setIsDeleteModalOpen}
         storeId={store.id}
+        onSuccess={() => {
+          onOpenChange(false);
+        }}
+      />
+      <ToggleStoreActiveModal
+        open={isToggleActiveModalOpen}
+        onOpenChange={setIsToggleActiveModalOpen}
+        storeId={store.id}
+        isActive={store.isActive}
         onSuccess={() => {
           onOpenChange(false);
         }}
