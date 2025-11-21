@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
-import TiendasContent from "./Content";
+import TiendasContent from "../(dashboard)/control/supremo/tiendas/Content";
 
 
 export default async function ProtectedPage() {
