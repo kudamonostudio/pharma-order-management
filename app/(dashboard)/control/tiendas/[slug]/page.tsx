@@ -1,4 +1,3 @@
-// import { getStoreBySlug } from "@/app/(dashboard)/utils/mockData";
 import { redirect } from "next/navigation";
 import { OrderList } from "./components/OrderList";
 import IsActiveButton from "@/app/(dashboard)/components/IsActiveButton";

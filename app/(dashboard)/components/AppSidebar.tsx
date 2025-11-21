@@ -30,7 +30,6 @@ import {
 import { usePathname } from "next/navigation";
 import type { Store } from "../types";
 import Link from "next/link";
-import { getStoreBySlug } from "../utils/mockData";
 
 interface AppSidebarProps {
   userRole: string;
@@ -41,16 +40,9 @@ interface AppSidebarProps {
 export function AppSidebar({
   userRole,
   user,
-  store: storeProp,
+  store,
 }: AppSidebarProps) {
   const pathname = usePathname();
-
-  // Extraer el slug de la URL si estamos en /control/tiendas/[slug]
-  const storeMatch = pathname.match(/\/control\/tiendas\/([^\/\?]+)/);
-  const storeSlug = storeMatch ? storeMatch[1] : null;
-
-  // Obtener datos de la tienda desde mock data si hay slug
-  const store = storeSlug ? getStoreBySlug(storeSlug) : storeProp;
 
   // Determinar qué items mostrar
   const showAdminItems = userRole === "ADMIN_SUPREMO";
@@ -112,7 +104,7 @@ export function AppSidebar({
           <SidebarGroup>
             <SidebarGroupLabel className="flex items-center gap-2">
               <Avatar className="h-6 w-6">
-                <AvatarImage src={store.logo} alt={store.name} />
+                <AvatarImage src={store.logo || "/fakeLogo.webp"} alt={store.name} />
                 <AvatarFallback className="text-xs">
                   {store.name.substring(0, 2).toUpperCase()}
                 </AvatarFallback>

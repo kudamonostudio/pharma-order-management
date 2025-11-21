@@ -1,4 +1,3 @@
-import { getStoreBySlug } from "@/app/(dashboard)/utils/mockData";
 import { redirect } from "next/navigation";
 
 export default async function ColaboradoresPage({ 
@@ -7,12 +6,16 @@ export default async function ColaboradoresPage({
   params: Promise<{ slug: string }> 
 }) {
   const { slug } = await params;
-  const store = getStoreBySlug(slug);
+  
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+  const res = await fetch(`${baseUrl}/api/stores/${slug}`, { cache: 'no-store' });
 
-  if (!store) {
+  if (!res.ok) {
     redirect("/control/supremo/tiendas");
   }
 
+  const store = await res.json();
+  //TODO: Reemplazar con datos reales de colaboradores
   const mockCollaborators = [
     { id: 1, name: "Juan Pérez", role: "Vendedor", email: "juan@example.com" },
     { id: 2, name: "María García", role: "Supervisor", email: "maria@example.com" },
