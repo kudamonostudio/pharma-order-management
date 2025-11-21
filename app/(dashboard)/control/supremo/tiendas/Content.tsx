@@ -6,9 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, MapPin, Phone, Settings } from "lucide-react";
 import Link from "next/link";
-import IsActiveButton from "../../../components/IsActiveButton";
 import { CreateStoreModal } from "./CreateStoreModal";
 import { StoreConfigModal } from "./components/StoreConfigModal";
+import IsActiveButton from "../../../components/IsActiveButton";
 
 interface Store {
   id: number;
@@ -16,6 +16,7 @@ interface Store {
   slug: string;
   address: string | null;
   phone: string | null;
+  isActive: boolean;
 }
 
 interface TiendasContentProps {
@@ -46,16 +47,11 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
             key={store.id}
             className="relative rounded-2xl border border-neutral-200 shadow-md hover:shadow-lg transition p-6 flex flex-col items-center text-center"
           >
-            <span className="absolute top-3 left-3 bg-gray-100 text-gray-600 text-xs font-medium px-3 py-1 rounded-full">
-              Offline
-            </span>
-
             <div className="absolute top-3 left-3">
               <IsActiveButton
-                isActive={/* store.isActive */ true}
+                isActive={store.isActive}
                 variant="small"
               />
-              {/* TODO: AGREGAR ISACTIVE AL SCHEMA DE TIENDA */}
             </div>
 
             <div className="flex flex-col items-center gap-4 pt-8 pb-4">
