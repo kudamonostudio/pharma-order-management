@@ -13,55 +13,45 @@ import { Input } from "@/components/ui/auth/input";
 import { Label } from "@/components/ui/auth/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { loginAsCollaborator } from "@/lib/auth/login";
+import { useState, useTransition } from "react";
+import { loginUnique } from "@/lib/auth/login";
 
-type Store = {
-  id: number;
-  name: string;
-  slug: string;
-  phone?: string | null;
-};
-
-type LoginCollaboratorFormProps = React.ComponentPropsWithoutRef<"div"> & {
-  store: Store;
-};
-
-export function LoginCollaboratorForm({
+export function LoginForm({
   className,
-  store,
   ...props
-}: LoginCollaboratorFormProps) {
+}: React.ComponentPropsWithoutRef<"div">) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError(null);
 
-    try {
-      await loginAsCollaborator(email, password, store.id); // TODO hacer esta validacion en server
-      router.push("/control/" + store.slug);
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Ocurrió un error inesperado.";
-      setError(message);
-    } finally {
-      setIsLoading(false);
-    }
+    startTransition(async () => {
+      try {
+        const { profile, storeSlug } = await loginUnique(email, password);
+        
+        if (profile?.role === "ADMIN_SUPREMO") {
+          router.push("/supremo");
+        } else {
+          router.push(`/control/tiendas/${storeSlug}`);
+        }
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Ocurrió un error inesperado.";
+        setError(message);
+      }
+    });
   };
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">
-            Login Colaborador - {store.name}
-          </CardTitle>
+          <CardTitle className="text-2xl">Login Supremo</CardTitle>
           <CardDescription>
             Enter your email below to login to your account
           </CardDescription>
@@ -99,8 +89,8 @@ export function LoginCollaboratorForm({
                 />
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? "Logging in..." : "Login"}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">

@@ -1,6 +1,9 @@
+import { SidebarProvider } from "@/components/ui/sidebar";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
+import { AppSidebar } from "../(dashboard)/components/AppSidebar";
+import { AdminNavbar } from "../(dashboard)/components/AdminNavbar";
 
 export default async function ProtectedLayout({
   children,
@@ -28,8 +31,12 @@ export default async function ProtectedLayout({
   }
   
   return (
-    <main className="min-h-screen flex flex-col w-full">
-      {children}
-    </main>
+    <SidebarProvider>
+      <AppSidebar userRole={profile.role} user={user} />
+      <main className="min-h-screen flex flex-col w-full">
+        <AdminNavbar /> 
+        {children}
+      </main>
+    </SidebarProvider>
   );
 }
