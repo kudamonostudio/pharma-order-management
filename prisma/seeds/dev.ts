@@ -1,5 +1,11 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 const { PrismaClient } = require('@prisma/client');
+const { createClient } = require('@supabase/supabase-js');
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 require('dotenv').config();
 
 const prisma = new PrismaClient();
@@ -57,14 +63,93 @@ const executeAuthRLS = async () => {
   `);
 }
 
+async function createBucket() {
+  const bucketName = process.env.NEXT_PUBLIC_BUCKET_NAME;
+  const { data: buckets } = await supabase.storage.listBuckets();
+  const exists = buckets?.some((b: { name: string }) => b.name === bucketName);
+
+  if (!exists) {
+    console.log(`⏳️ Creando bucket '${bucketName}'...`);
+    const { error } = await supabase.storage.createBucket(bucketName, {
+      public: true,
+    });
+    if (error) throw error;
+  } else {
+    console.log(`⛔️ Bucket '${bucketName}' ya existe.`);
+  }
+}
+
+async function createBucketPolicies() {
+  const bucketName = process.env.NEXT_PUBLIC_BUCKET_NAME;
+  console.log(`🔐 Creando policies de Storage ${bucketName}...`);
+
+  // SELECT pública
+  await prisma.$executeRawUnsafe(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_policies WHERE policyname = '${bucketName}.select.public'
+      ) THEN
+        CREATE POLICY "${bucketName}.select.public"
+        ON storage.objects
+        FOR SELECT
+        USING (bucket_id = '${bucketName}');
+      END IF;
+    END $$;
+  `);
+
+  // INSERT (solo usuarios autenticados)
+  await prisma.$executeRawUnsafe(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_policies WHERE policyname = '${bucketName}.insert.authenticated'
+      ) THEN
+        CREATE POLICY "${bucketName}.insert.authenticated"
+        ON storage.objects
+        FOR INSERT
+        TO authenticated
+        WITH CHECK (bucket_id = '${bucketName}');
+      END IF;
+    END $$;
+  `);
+
+  // UPDATE (solo autenticados)
+  await prisma.$executeRawUnsafe(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_policies WHERE policyname = '${bucketName}.update.authenticated'
+      ) THEN
+        CREATE POLICY "${bucketName}.update.authenticated"
+        ON storage.objects
+        FOR UPDATE
+        TO authenticated
+        USING (bucket_id = '${bucketName}')
+        WITH CHECK (bucket_id = '${bucketName}');
+      END IF;
+    END $$;
+  `);
+
+  // DELETE (solo autenticados)
+  await prisma.$executeRawUnsafe(`
+    DO $$
+    BEGIN
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_policies WHERE policyname = '${bucketName}.delete.authenticated'
+      ) THEN
+        CREATE POLICY "${bucketName}.delete.authenticated"
+        ON storage.objects
+        FOR DELETE
+        TO authenticated
+        USING (bucket_id = '${bucketName}');
+      END IF;
+    END $$;
+  `);
+}
 
 
-async function main() {
-
-  // functions and triggers
-  await createFunctions();
-  // await executeAuthRLS();
-
+async function insertData() {
   // Crea Admin Supremo
   // const admin = await prisma.user.create({
   //   data: {
@@ -163,6 +248,17 @@ async function main() {
       },
     ],
   });
+}
+
+
+
+async function main() {
+  // Functions and triggers:
+  // await createFunctions();
+  // await executeAuthRLS();
+  // await insertData();
+  // await createBucket();
+  // await createBucketPolicies();
 
   console.log("✅ Seed completado con éxito")
 }

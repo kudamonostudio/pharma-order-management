@@ -21,7 +21,7 @@ export async function createStore(formData: FormData) {
     slug = `${slug}-${hash}`;
   }
 
-  await prisma.store.create({
+  const store = await prisma.store.create({
     data: {
       name,
       address,
@@ -31,6 +31,7 @@ export async function createStore(formData: FormData) {
   });
 
   revalidatePath("/supremo");
+  return store;
 }
 
 export async function updateStore(id: number, formData: FormData) {
@@ -48,6 +49,15 @@ export async function updateStore(id: number, formData: FormData) {
   });
 
   revalidatePath("/supremo");
+}
+
+export async function updateLogo(id: number, logoUrl: string) {
+  const updatedStore = await prisma.store.update({
+    where: { id },
+    data: { logo: logoUrl },
+  });
+
+  return updatedStore;
 }
 
 export async function deleteStore(id: number) {
