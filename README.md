@@ -20,6 +20,8 @@ docker compose up -d
 cp .env.example .env
 npx prisma migrate dev
 npx prisma db seed
+npx prisma db pull (in case manual changes)
+npx prisma generate (sync)
 ```
 
 3. Deploy new migrations (update db) (Optional)
