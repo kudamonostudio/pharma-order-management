@@ -214,7 +214,7 @@ export function StoreConfigModal({
               </div>
 
               <div className="space-y-2">
-                <Label>Logo</Label>
+                <Label>Logo (opcional)</Label>
                 <div
                   {...getRootProps()}
                   className="border border-dashed rounded-md p-4 cursor-pointer text-center text-sm text-neutral-600 hover:bg-neutral-50"
@@ -223,10 +223,10 @@ export function StoreConfigModal({
                   {logoFile ? (
                     previewUrl && (
                       <img
-                      src={previewUrl}
-                      alt="Vista previa"
-                      className="mx-auto h-32 w-32 object-cover rounded-md"
-                    />
+                        src={previewUrl}
+                        alt="Vista previa"
+                        className="mx-auto h-32 w-32 object-cover rounded-md"
+                      />
                     )
                   ) : isDragActive ? (
                     <p>Suelta la imagen aquí…</p>
@@ -234,7 +234,6 @@ export function StoreConfigModal({
                     <p>Arrastra una imagen o haz click para seleccionar</p>
                   )}
                 </div>
-
                 <p className="text-xs text-neutral-500">
                   Máx. 1MB — formatos permitidos: JPG, PNG, WEBP
                 </p>
@@ -243,11 +242,11 @@ export function StoreConfigModal({
               <div className="flex justify-end gap-3 pt-4">
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="outline"
                   onClick={() => setView("menu")}
                   disabled={isLoading}
                 >
-                  Atrás
+                  Volver
                 </Button>
                 <Button type="submit" disabled={isLoading}>
                   {isLoading ? "Guardando..." : "Guardar cambios"}
@@ -257,21 +256,27 @@ export function StoreConfigModal({
           )}
         </DialogContent>
       </Dialog>
+
       <DeleteStoreModal
         open={isDeleteModalOpen}
         onOpenChange={setIsDeleteModalOpen}
         storeId={store.id}
         onSuccess={() => {
+          setIsDeleteModalOpen(false);
           onOpenChange(false);
+          router.refresh();
         }}
       />
+
       <ToggleStoreActiveModal
         open={isToggleActiveModalOpen}
         onOpenChange={setIsToggleActiveModalOpen}
         storeId={store.id}
         isActive={store.isActive}
         onSuccess={() => {
+          setIsToggleActiveModalOpen(false);
           onOpenChange(false);
+          router.refresh();
         }}
       />
     </>

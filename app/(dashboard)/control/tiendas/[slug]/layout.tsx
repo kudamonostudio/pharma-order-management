@@ -42,7 +42,7 @@ export default async function StoreLayout({
   });
 
   if (!store) {
-    redirect("/control/supremo/tiendas");
+    redirect("/supremo");
   }
   
   return (

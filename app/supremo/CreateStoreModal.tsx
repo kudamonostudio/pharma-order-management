@@ -163,7 +163,7 @@ export function CreateStoreModal({
               value={formData.image}
               onChange={(e) => setFormData({ ...formData, image: e.target.value })}
             />
-          </div> */}{" "}
+          </div> */}
           {/* TODO: AGREGAR CUANDO ESTE LA IMAGEN EN EL SCHEMA DE TIENDA */}
           <div className="space-y-2">
             <Label>Logo (opcional)</Label>

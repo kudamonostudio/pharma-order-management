@@ -11,7 +11,7 @@ export default async function ProductosPage({
   const res = await fetch(`${baseUrl}/api/stores/${slug}`, { cache: 'no-store' });
 
   if (!res.ok) {
-    redirect("/control/supremo/tiendas");
+    redirect("/supremo");
   }
 
   const store = await res.json();

@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
-import TiendasContent from "../(dashboard)/control/supremo/tiendas/Content";
+import TiendasContent from "./Content";
 
 
 export default async function ProtectedPage() {
@@ -11,9 +11,6 @@ export default async function ProtectedPage() {
   const stores = await prisma.store.findMany({
     where: {
       deletedAt: null,
-    },
-    omit: {
-      deletedAt: true,
     },
   });
 
