@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect } from "react";
+import { useDropzone } from "react-dropzone";
 import {
   Dialog,
   DialogContent,
@@ -14,10 +15,12 @@ import { Label } from "@/components/ui/label";
 import { updateStore } from "@/app/actions/Store";
 import { useRouter } from "next/navigation";
 import { Pencil, Power, Trash2 } from "lucide-react";
+import { updateLogo } from "@/app/actions/Store";
 import { DeleteStoreModal } from "./DeleteStoreModal";
 import { ToggleStoreActiveModal } from "./ToggleStoreActiveModal";
 import { Store } from "@prisma/client";
 import { cn } from "@/lib/utils";
+import { uploadStoreLogo } from "@/lib/supabase/client/uploadLogo";
 
 interface StoreConfigModalProps {
   open: boolean;
@@ -33,10 +36,12 @@ export function StoreConfigModal({
   store,
 }: StoreConfigModalProps) {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
+  const [isLoading, setIsLoading] = useState(false);
   const [view, setView] = useState<ModalView>("menu");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isToggleActiveModalOpen, setIsToggleActiveModalOpen] = useState(false);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -44,11 +49,38 @@ export function StoreConfigModal({
     phone: "",
   });
 
+    const onDrop = (acceptedFiles: File[]) => {
+      const file = acceptedFiles[0];
+      if (!file) return;
+  
+      if (file.size > 1024 * 1024) {
+        alert("La imagen no puede pesar más de 1MB");
+        return;
+      }
+  
+      setLogoFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    };
+  
+    const { getRootProps, getInputProps, isDragActive } = useDropzone({
+      onDrop,
+      accept: { "image/*": [] },
+      maxFiles: 1,
+    });
+
   useEffect(() => {
     if (open) {
       setView("menu");
     }
   }, [open]);
+
+  useEffect(() => {
+    if (!open) {
+      setPreviewUrl(null);
+      setLogoFile(null);
+    }
+  }, [open]);
+
 
   useEffect(() => {
     if (store) {
@@ -60,25 +92,33 @@ export function StoreConfigModal({
     }
   }, [store]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!store) return;
+    setIsLoading(true);
 
-    startTransition(async () => {
-      try {
-        const formDataToSend = new FormData();
-        formDataToSend.append("name", formData.name);
-        formDataToSend.append("address", formData.address);
-        formDataToSend.append("phone", formData.phone);
+    try {
+      const formDataToSend = new FormData();
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("address", formData.address);
+      formDataToSend.append("phone", formData.phone);
 
-        await updateStore(store.id, formDataToSend);
+      await updateStore(store.id, formDataToSend);
 
-        onOpenChange(false);
-        router.refresh();
-      } catch (error) {
-        console.error("Error updating store:", error);
+      // Se sube la imagen directamente a supabase, luego de actualiza DB
+      if (logoFile) {
+        const logoUrl = await uploadStoreLogo(store.id, logoFile);
+        await updateLogo(store.id, logoUrl);
+        URL.revokeObjectURL(previewUrl as string);
       }
-    });
+
+      onOpenChange(false);
+      router.refresh();
+    } catch (error) {
+      console.error("Error updating store:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!store) return null;
@@ -173,17 +213,44 @@ export function StoreConfigModal({
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label>Logo</Label>
+                <div
+                  {...getRootProps()}
+                  className="border border-dashed rounded-md p-4 cursor-pointer text-center text-sm text-neutral-600 hover:bg-neutral-50"
+                >
+                  <input {...getInputProps()} />
+                  {logoFile ? (
+                    previewUrl && (
+                      <img
+                      src={previewUrl}
+                      alt="Vista previa"
+                      className="mx-auto h-32 w-32 object-cover rounded-md"
+                    />
+                    )
+                  ) : isDragActive ? (
+                    <p>Suelta la imagen aquí…</p>
+                  ) : (
+                    <p>Arrastra una imagen o haz click para seleccionar</p>
+                  )}
+                </div>
+
+                <p className="text-xs text-neutral-500">
+                  Máx. 1MB — formatos permitidos: JPG, PNG, WEBP
+                </p>
+              </div>
+
               <div className="flex justify-end gap-3 pt-4">
                 <Button
                   type="button"
                   variant="ghost"
                   onClick={() => setView("menu")}
-                  disabled={isPending}
+                  disabled={isLoading}
                 >
                   Atrás
                 </Button>
-                <Button type="submit" disabled={isPending}>
-                  {isPending ? "Guardando..." : "Guardar cambios"}
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? "Guardando..." : "Guardar cambios"}
                 </Button>
               </div>
             </form>

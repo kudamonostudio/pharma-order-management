@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,47 +7,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN_SUPREMO
-  TIENDA_ADMIN
-  COLABORADOR
-}
-
-enum OrderStatus {
-  PENDING
-  COMPLETE
-  CANCELLED
-}
-
 model Profile {
-  id      String  @id @db.Uuid // mismo id que auth.users
-  role    Role    @default(COLABORADOR) // ADMIN_SUPREMO | TIENDA_ADMIN | COLABORADOR
-  email   String? @unique
-  phone   String?
-  store   Store?  @relation(fields: [storeId], references: [id])
-  storeId Int?
-
+  id        String    @id @db.Uuid // mismo id que auth.users
+  role      Role      @default(COLABORADOR)
   createdAt DateTime  @default(now())
   deletedAt DateTime?
-
-  orders Order[]
+  email     String?   @unique
+  phone     String?
+  storeId   Int?
+  orders    Order[]
+  store     Store?    @relation(fields: [storeId], references: [id])
 
   @@map("profiles")
 }
 
 model Store {
-  id        Int       @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   name      String
-  address   String
+  address   String?
   phone     String?
-  logo      String?
-  banner    String?
-  slug      String    @unique
-  isActive  Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
   deletedAt DateTime?
-
+  slug      String     @unique
+  banner    String?
+  logo      String?
+  isActive  Boolean    @default(true)
   locations Location[]
   Profile   Profile[]
 
@@ -65,13 +45,12 @@ model Location {
   name      String
   address   String
   phone     String?
-  store     Store     @relation(fields: [storeId], references: [id])
   storeId   Int
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
-
-  orders Order[]
+  store     Store     @relation(fields: [storeId], references: [id])
+  orders    Order[]
 
   @@map("locations")
 }
@@ -82,15 +61,13 @@ model Order {
   date       DateTime
   status     OrderStatus
   total      Decimal
-  location   Location    @relation(fields: [locationId], references: [id])
   locationId Int
-  // user       User        @relation(fields: [userId], references: [id])
-  // userId     Int
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   deletedAt  DateTime?
-  profile    Profile?    @relation(fields: [profileId], references: [id])
   profileId  String?     @db.Uuid
+  location   Location    @relation(fields: [locationId], references: [id])
+  profile    Profile?    @relation(fields: [profileId], references: [id])
 
   @@map("orders")
 }
@@ -102,8 +79,7 @@ model Category {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
-
-  products Product[]
+  products    Product[]
 
   @@map("categories")
 }
@@ -115,12 +91,24 @@ model Product {
   price       Decimal   @db.Decimal(10, 2)
   imageUrl    String?
   brand       String?
-  unit        String? // Ej: "5 L", "1 Kg", "1 L"
-  category    Category  @relation(fields: [categoryId], references: [id])
+  unit        String?
   categoryId  Int
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
+  category    Category  @relation(fields: [categoryId], references: [id])
 
   @@map("products")
+}
+
+enum Role {
+  ADMIN_SUPREMO
+  TIENDA_ADMIN
+  COLABORADOR
+}
+
+enum OrderStatus {
+  PENDING
+  COMPLETE
+  CANCELLED
 }

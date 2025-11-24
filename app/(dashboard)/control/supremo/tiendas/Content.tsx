@@ -46,7 +46,8 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
             <div className="flex flex-col items-center gap-4 pt-8 pb-4">
               {/* Logo */}
               <Image
-                src="/fakeLogo.webp" /* TODO: AGREGAR IMAGE AL SCHEMA DE TIENDA */
+                // src="/fakeLogo.webp" /* TODO: AGREGAR IMAGE AL SCHEMA DE TIENDA */
+                src={store.logo ?? "/fakeLogo.webp"} /* TODO: AGREGAR IMAGE AL SCHEMA DE TIENDA */
                 alt={store.name}
                 width={100}
                 height={100}
