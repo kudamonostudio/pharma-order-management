@@ -13,7 +13,7 @@ export default async function SucursalesPage({
   });
 
   if (!res.ok) {
-    redirect("/control/supremo/tiendas");
+    redirect("/supremo");
   }
 
   const store = await res.json();

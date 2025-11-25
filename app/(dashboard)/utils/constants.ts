@@ -9,12 +9,12 @@ import {
 export const ADMIN_SUPREMO_DASHBOARD_ITEMS = [
   {
     title: "Inicio",
-    url: "/control/supremo/",
+    url: "/supremo",
     icon: House,
   },
   {
     title: "Tiendas",
-    url: "/control/supremo/tiendas",
+    url: "/supremo",
     icon: Store,
   },
 ];

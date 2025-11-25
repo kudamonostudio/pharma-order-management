@@ -6,19 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, MapPin, Phone, Settings } from "lucide-react";
 import Link from "next/link";
-import { CreateStoreModal } from "./CreateStoreModal";
 import { StoreConfigModal } from "./components/StoreConfigModal";
-import IsActiveButton from "../../../components/IsActiveButton";
-
-interface Store {
-  id: number;
-  name: string;
-  slug: string;
-  address: string | null;
-  phone: string | null;
-  isActive: boolean;
-  logo: string | null;
-}
+import { Store } from "@prisma/client";
+import IsActiveButton from "../(dashboard)/components/IsActiveButton";
+import { CreateStoreModal } from "./CreateStoreModal";
 
 interface TiendasContentProps {
   stores: Store[];
@@ -49,17 +40,15 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
             className="relative rounded-2xl border border-neutral-200 shadow-md hover:shadow-lg transition p-6 flex flex-col items-center text-center"
           >
             <div className="absolute top-3 left-3">
-              <IsActiveButton
-                isActive={store.isActive}
-                variant="small"
-              />
+              <IsActiveButton isActive={store.isActive} variant="small" />
             </div>
 
             <div className="flex flex-col items-center gap-4 pt-8 pb-4">
               {/* Logo */}
               <Image
-                // src="/fakeLogo.webp" /* TODO: AGREGAR IMAGE AL SCHEMA DE TIENDA */
-                src={store.logo ?? "/fakeLogo.webp"} /* TODO: AGREGAR IMAGE AL SCHEMA DE TIENDA */
+                src={
+                  store.logo ?? "/fakeLogo.webp"
+                } /* TODO: AGREGAR PLACEHOLDER IMAGE */
                 alt={store.name}
                 width={100}
                 height={100}

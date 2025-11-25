@@ -17,14 +17,10 @@ import { useRouter } from "next/navigation";
 import { Pencil, Power, Trash2 } from "lucide-react";
 import { updateLogo } from "@/app/actions/Store";
 import { DeleteStoreModal } from "./DeleteStoreModal";
+import { ToggleStoreActiveModal } from "./ToggleStoreActiveModal";
+import { Store } from "@prisma/client";
+import { cn } from "@/lib/utils";
 import { uploadStoreLogo } from "@/lib/supabase/client/uploadLogo";
-
-interface Store {
-  id: number;
-  name: string;
-  address: string | null;
-  phone: string | null;
-}
 
 interface StoreConfigModalProps {
   open: boolean;
@@ -43,6 +39,7 @@ export function StoreConfigModal({
   const [isLoading, setIsLoading] = useState(false);
   const [view, setView] = useState<ModalView>("menu");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isToggleActiveModalOpen, setIsToggleActiveModalOpen] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -98,8 +95,8 @@ export function StoreConfigModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!store) return;
-
     setIsLoading(true);
+
     try {
       const formDataToSend = new FormData();
       formDataToSend.append("name", formData.name);
@@ -123,9 +120,6 @@ export function StoreConfigModal({
       setIsLoading(false);
     }
   };
-
-  //TODO: Asumimos que está inactiva por ahora
-  const isStoreActive = false;
 
   if (!store) return null;
 
@@ -157,13 +151,16 @@ export function StoreConfigModal({
               </Button>
 
               {/* Opción 2: Inactivar/Activar */}
-              <Button 
+              <Button
                 variant="outline"
-                className="justify-start gap-2 h-12"
-                onClick={() => {}}
+                className={cn(
+                  "justify-start gap-2 h-12",
+                  store.isActive ? "bg-gray-100" : ""
+                )}
+                onClick={() => setIsToggleActiveModalOpen(true)}
               >
                 <Power className="h-4 w-4" />
-                {isStoreActive ? "Inactivar tienda" : "Activar tienda"}
+                {store.isActive ? "Inactivar tienda" : "Activar tienda"}
               </Button>
 
               {/* Opción 3: Eliminar */}
@@ -217,7 +214,7 @@ export function StoreConfigModal({
               </div>
 
               <div className="space-y-2">
-                <Label>Logo</Label>
+                <Label>Logo (opcional)</Label>
                 <div
                   {...getRootProps()}
                   className="border border-dashed rounded-md p-4 cursor-pointer text-center text-sm text-neutral-600 hover:bg-neutral-50"
@@ -226,10 +223,10 @@ export function StoreConfigModal({
                   {logoFile ? (
                     previewUrl && (
                       <img
-                      src={previewUrl}
-                      alt="Vista previa"
-                      className="mx-auto h-32 w-32 object-cover rounded-md"
-                    />
+                        src={previewUrl}
+                        alt="Vista previa"
+                        className="mx-auto h-32 w-32 object-cover rounded-md"
+                      />
                     )
                   ) : isDragActive ? (
                     <p>Suelta la imagen aquí…</p>
@@ -237,7 +234,6 @@ export function StoreConfigModal({
                     <p>Arrastra una imagen o haz click para seleccionar</p>
                   )}
                 </div>
-
                 <p className="text-xs text-neutral-500">
                   Máx. 1MB — formatos permitidos: JPG, PNG, WEBP
                 </p>
@@ -246,11 +242,11 @@ export function StoreConfigModal({
               <div className="flex justify-end gap-3 pt-4">
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="outline"
                   onClick={() => setView("menu")}
                   disabled={isLoading}
                 >
-                  Atrás
+                  Volver
                 </Button>
                 <Button type="submit" disabled={isLoading}>
                   {isLoading ? "Guardando..." : "Guardar cambios"}
@@ -261,13 +257,26 @@ export function StoreConfigModal({
         </DialogContent>
       </Dialog>
 
-      {/* Modal de Confirmación de Eliminación */}
       <DeleteStoreModal
         open={isDeleteModalOpen}
         onOpenChange={setIsDeleteModalOpen}
         storeId={store.id}
         onSuccess={() => {
+          setIsDeleteModalOpen(false);
           onOpenChange(false);
+          router.refresh();
+        }}
+      />
+
+      <ToggleStoreActiveModal
+        open={isToggleActiveModalOpen}
+        onOpenChange={setIsToggleActiveModalOpen}
+        storeId={store.id}
+        isActive={store.isActive}
+        onSuccess={() => {
+          setIsToggleActiveModalOpen(false);
+          onOpenChange(false);
+          router.refresh();
         }}
       />
     </>

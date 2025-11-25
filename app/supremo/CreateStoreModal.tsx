@@ -21,6 +21,13 @@ interface CreateStoreModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
+function generateSlug(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "");
+}
+
 export function CreateStoreModal({
   open,
   onOpenChange,
@@ -29,7 +36,6 @@ export function CreateStoreModal({
   const [isLoading, setIsLoading] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
   const [formData, setFormData] = useState({
     name: "",
     address: "",
@@ -66,6 +72,7 @@ export function CreateStoreModal({
       formDataToSend.append("name", formData.name);
       formDataToSend.append("address", formData.address);
       formDataToSend.append("phone", formData.phone);
+      formDataToSend.append("slug", generateSlug(formData.name));
 
       const newStore = await createStore(formDataToSend);
 
@@ -78,21 +85,19 @@ export function CreateStoreModal({
         URL.revokeObjectURL(previewUrl as string);
       }
 
-      onOpenChange(false);
-
       setFormData({
         name: "",
         address: "",
         phone: "",
-        /* image: "", */
-        /* TODO: AGREGAR CUANDO ESTE LA IMAGEN EN EL SCHEMA DE TIENDA */
       });
+      setLogoFile(null);
+      setPreviewUrl(null);
 
-      // Refresh para ver los cambios
+      onOpenChange(false);
       router.refresh();
     } catch (error) {
       console.error("Error creating store:", error);
-      // TODO: Mostrar error al usuario (puedes usar toast)
+      // TODO: Mostrar error al usuario
     } finally {
       setIsLoading(false);
     }
@@ -158,7 +163,7 @@ export function CreateStoreModal({
               value={formData.image}
               onChange={(e) => setFormData({ ...formData, image: e.target.value })}
             />
-          </div> */}{" "}
+          </div> */}
           {/* TODO: AGREGAR CUANDO ESTE LA IMAGEN EN EL SCHEMA DE TIENDA */}
           <div className="space-y-2">
             <Label>Logo (opcional)</Label>
@@ -171,10 +176,10 @@ export function CreateStoreModal({
               {logoFile ? (
                 previewUrl && (
                   <img
-                  src={previewUrl}
-                  alt="Vista previa"
-                  className="mx-auto h-32 w-32 object-cover rounded-md"
-                />
+                    src={previewUrl}
+                    alt="Vista previa"
+                    className="mx-auto h-32 w-32 object-cover rounded-md"
+                  />
                 )
               ) : isDragActive ? (
                 <p>Suelta la imagen aquí…</p>

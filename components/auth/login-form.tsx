@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/auth/input";
 import { Label } from "@/components/ui/auth/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { loginUnique } from "@/lib/auth/login";
 
 export function LoginForm({
@@ -23,29 +23,28 @@ export function LoginForm({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError(null);
 
-    try {
-      const { user, profile, storeSlug } = await loginUnique(email, password);
-      console.log({ user, profile, storeSlug })
-      if( profile?.role === "ADMIN_SUPREMO" ) {
-        router.push('/supremo'); // TODO
-      } else {
-        router.push(`/control/tiendas/${storeSlug}`);
+    startTransition(async () => {
+      try {
+        const { profile, storeSlug } = await loginUnique(email, password);
+        
+        if (profile?.role === "ADMIN_SUPREMO") {
+          router.push("/supremo");
+        } else {
+          router.push(`/control/tiendas/${storeSlug}`);
+        }
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Ocurrió un error inesperado.";
+        setError(message);
       }
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Ocurrió un error inesperado.";
-      setError(message);
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
 
   return (
@@ -90,8 +89,8 @@ export function LoginForm({
                 />
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging in..." : "Login"}
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? "Logging in..." : "Login"}
               </Button>
             </div>
             <div className="mt-4 text-center text-sm">
