@@ -40,8 +40,7 @@ export function CreateStoreModal({
     name: "",
     address: "",
     phone: "",
-    /* image: "", */
-    /* TODO: AGREGAR CUANDO ESTE LA IMAGEN EN EL SCHEMA DE TIENDA */
+    image: "",
   });
 
   const onDrop = (acceptedFiles: File[]) => {
@@ -89,6 +88,7 @@ export function CreateStoreModal({
         name: "",
         address: "",
         phone: "",
+        image: "",
       });
       setLogoFile(null);
       setPreviewUrl(null);
@@ -155,16 +155,7 @@ export function CreateStoreModal({
               }
             />
           </div>
-          {/* <div className="space-y-2">
-            <Label htmlFor="image">URL de imagen</Label>
-            <Input
-              id="image"
-              placeholder="https://..."
-              value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-            />
-          </div> */}
-          {/* TODO: AGREGAR CUANDO ESTE LA IMAGEN EN EL SCHEMA DE TIENDA */}
+          {/* TODO: MOSTRAR IMAGEN SI YA TIENE UNA IMAGEN PARA PODER CAMBIARLA */}
           <div className="space-y-2">
             <Label>Logo (opcional)</Label>
 

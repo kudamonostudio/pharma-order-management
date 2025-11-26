@@ -11,6 +11,7 @@ import { Store } from "@prisma/client";
 import IsActiveButton from "../(dashboard)/components/IsActiveButton";
 import { CreateStoreModal } from "./CreateStoreModal";
 import { LogoPlaceholder } from "../(dashboard)/components/LogoPlaceholder";
+import { StoreFilter } from "./components/StoreFilter";
 
 interface TiendasContentProps {
   stores: Store[];
@@ -20,7 +21,16 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedStore, setSelectedStore] = useState<Store | null>(null);
-  const displayStores = stores.length > 0 ? stores : [];
+  const [filter, setFilter] = useState<"all" | "active" | "inactive">("all");
+
+  const filteredStores = stores.filter((store) => {
+    if (filter === "all") return true;
+    if (filter === "active") return store.isActive;
+    if (filter === "inactive") return !store.isActive;
+    return true;
+  });
+
+  const displayStores = filteredStores.length > 0 ? filteredStores : [];
 
   const handleEditClick = (store: Store) => {
     setSelectedStore(store);
@@ -34,17 +44,30 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
         <Button onClick={() => setIsModalOpen(true)}>Crear nueva tienda</Button>
       </div>
 
+      <div className="flex justify-start mb-6">
+        <StoreFilter value={filter} onChange={setFilter} />
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6 gap-6">
         {displayStores.map((store) => (
           <Card
             key={store.id}
-            className="relative rounded-2xl border border-neutral-200 shadow-md hover:shadow-lg transition p-6 flex flex-col items-center text-center"
+            className="relative rounded-2xl border border-neutral-200 shadow-md hover:shadow-lg transition p-6 flex flex-col items-center text-center overflow-hidden justify-between"
           >
-            <div className="absolute top-3 left-3">
+            {/* Background Gradient */}
+            <div
+              className={`absolute top-2 left-2 right-2 h-24 rounded-t-xl ${
+                store.isActive
+                  ? "bg-gradient-to-br from-emerald-800 to-emerald-400 opacity-30"
+                  : "bg-gradient-to-br from-neutral-600 to-neutral-400 opacity-20"
+              }`}
+            />
+
+            <div className="absolute top-3 left-3 z-10">
               <IsActiveButton isActive={store.isActive} variant="small" />
             </div>
 
-            <div className="flex flex-col items-center gap-4 pt-8 pb-4">
+            <div className="flex flex-col items-center gap-4 pt-8 pb-4 relative z-10">
               {/* Logo */}
               {store.logo ? (
                 <Image
@@ -52,29 +75,29 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
                   alt={store.name}
                   width={100}
                   height={100}
-                  className="w-20 h-20 rounded-full border border-neutral-200 shadow-sm object-cover"
+                  className="w-20 h-20 rounded-full object-cover"
                 />
               ) : (
-                <LogoPlaceholder
-                  variant="store"
-                  isActive={store.isActive}
-                  className="border border-neutral-200 shadow-sm"
-                />
+                <LogoPlaceholder variant="store" isActive={store.isActive} />
               )}
 
               {/* Info */}
               <div className="space-y-1 w-full">
                 <h3 className="text-lg font-semibold truncate">{store.name}</h3>
 
-                <div className="flex items-center justify-center gap-1 text-sm text-neutral-600">
-                  <MapPin className="h-4 w-4" />
-                  <span className="truncate">{store.address}</span>
-                </div>
+                {store.address && (
+                  <div className="flex items-center justify-center gap-1 text-sm text-neutral-600">
+                    <MapPin className="h-4 w-4" />
+                    <span className="truncate">{store.address}</span>
+                  </div>
+                )}
 
-                <div className="flex items-center justify-center gap-1 text-sm text-neutral-600">
-                  <Phone className="h-4 w-4" />
-                  <span>{store.phone}</span>
-                </div>
+                {store.phone && (
+                  <div className="flex items-center justify-center gap-1 text-sm text-neutral-600">
+                    <Phone className="h-4 w-4" />
+                    <span>{store.phone}</span>
+                  </div>
+                )}
               </div>
             </div>
 

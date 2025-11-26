@@ -228,6 +228,12 @@ export function StoreConfigModal({
                         className="mx-auto h-32 w-32 object-cover rounded-md"
                       />
                     )
+                  ) : store.logo ? (
+                    <img
+                      src={store.logo}
+                      alt="Logo actual"
+                      className="mx-auto h-32 w-32 object-cover rounded-md"
+                    />
                   ) : isDragActive ? (
                     <p>Suelta la imagen aquí…</p>
                   ) : (
