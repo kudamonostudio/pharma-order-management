@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { AppSidebar } from "../../../components/AppSidebar";
 import { AdminNavbar } from "../../../components/AdminNavbar";
+import { CreateBranchModal } from "./sucursales/CreateBranchModal";
+import { StoreHeader } from "./components/StoreHeader";
 
 export default async function StoreLayout({
   children,
@@ -54,7 +56,11 @@ export default async function StoreLayout({
       />
       <main className="w-full">
         <AdminNavbar />
+        <div className="px-8 pt-4">
+          <StoreHeader store={store} />
+        </div>
         {children}
+        <CreateBranchModal storeId={store.id} storeSlug={store.slug} />
       </main>
     </SidebarProvider>
   );
