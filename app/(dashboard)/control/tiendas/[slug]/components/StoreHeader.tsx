@@ -2,15 +2,10 @@ import IsActiveButton from "@/app/(dashboard)/components/IsActiveButton";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import { Store } from "@prisma/client";
+import { LogoPlaceholder } from "../../../../components/LogoPlaceholder";
 
 interface StoreHeaderProps {
-  store: {
-    name: string;
-    logo: string | null;
-    isActive: boolean;
-    address: string;
-    phone: string | null;
-  };
+  store: Store;
 }
 
 export async function StoreHeader({ store }: StoreHeaderProps) {
@@ -27,11 +22,15 @@ export async function StoreHeader({ store }: StoreHeaderProps) {
 
   return (
     <div className="flex items-center gap-4 py-4">
-      <img
-        src={store.logo ?? "/default-store-logo.png"} //TODO: REEMPAZAR POR PLACEHOLDER
-        alt={store.name}
-        className="w-20 h-20 rounded-full object-cover"
-      />
+      {store.logo ? (
+        <img
+          src={store.logo}
+          alt={store.name}
+          className="w-20 h-20 rounded-full object-cover"
+        />
+      ) : (
+        <LogoPlaceholder variant="store" isActive={store.isActive} />
+      )}
       <div>
         <div className="flex justify-center items-center gap-4">
           <h1 className="font-bold text-3xl">{store.name}</h1>

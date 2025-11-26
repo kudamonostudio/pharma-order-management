@@ -1,6 +1,6 @@
 "use client";
 
-import BranchCard from "@/app/(dashboard)/components/BranchCard";
+import BranchCard from "@/app/(dashboard)/control/tiendas/[slug]/components/BranchCard";
 import { CreateBranchButton } from "./CreateBranchButton";
 import { Location, Store } from "@prisma/client";
 import { useState } from "react";

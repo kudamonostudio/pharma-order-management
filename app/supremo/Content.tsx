@@ -10,6 +10,7 @@ import { StoreConfigModal } from "./components/StoreConfigModal";
 import { Store } from "@prisma/client";
 import IsActiveButton from "../(dashboard)/components/IsActiveButton";
 import { CreateStoreModal } from "./CreateStoreModal";
+import { LogoPlaceholder } from "../(dashboard)/components/LogoPlaceholder";
 
 interface TiendasContentProps {
   stores: Store[];
@@ -45,15 +46,21 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
 
             <div className="flex flex-col items-center gap-4 pt-8 pb-4">
               {/* Logo */}
-              <Image
-                src={
-                  store.logo ?? "/fakeLogo.webp"
-                } /* TODO: AGREGAR PLACEHOLDER IMAGE */
-                alt={store.name}
-                width={100}
-                height={100}
-                className="w-20 h-20 rounded-full border border-neutral-200 shadow-sm object-cover"
-              />
+              {store.logo ? (
+                <Image
+                  src={store.logo}
+                  alt={store.name}
+                  width={100}
+                  height={100}
+                  className="w-20 h-20 rounded-full border border-neutral-200 shadow-sm object-cover"
+                />
+              ) : (
+                <LogoPlaceholder
+                  variant="store"
+                  isActive={store.isActive}
+                  className="border border-neutral-200 shadow-sm"
+                />
+              )}
 
               {/* Info */}
               <div className="space-y-1 w-full">

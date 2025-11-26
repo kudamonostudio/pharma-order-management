@@ -30,6 +30,7 @@ import {
 import { usePathname } from "next/navigation";
 import type { Store } from "../types";
 import Link from "next/link";
+import { LogoPlaceholder } from "./LogoPlaceholder";
 
 interface AppSidebarProps {
   userRole: string;
@@ -37,11 +38,7 @@ interface AppSidebarProps {
   store?: Store | null;
 }
 
-export function AppSidebar({
-  userRole,
-  user,
-  store,
-}: AppSidebarProps) {
+export function AppSidebar({ userRole, user, store }: AppSidebarProps) {
   const pathname = usePathname();
 
   // Determinar qué items mostrar
@@ -103,12 +100,20 @@ export function AppSidebar({
         {showStoreItems && store && (
           <SidebarGroup>
             <SidebarGroupLabel className="flex items-center gap-2">
-              <Avatar className="h-6 w-6">
-                <AvatarImage src={store.logo || "/fakeLogo.webp"} alt={store.name} />
-                <AvatarFallback className="text-xs">
-                  {store.name.substring(0, 2).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              {store.logo ? (
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={store.logo} alt={store.name} />
+                  <AvatarFallback className="text-xs">
+                    {store.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
+                <LogoPlaceholder
+                  variant="store"
+                  isActive={store.isActive}
+                  className="h-6 w-6"
+                />
+              )}
               <span className="truncate">{store.name}</span>
             </SidebarGroupLabel>
             <SidebarGroupContent>

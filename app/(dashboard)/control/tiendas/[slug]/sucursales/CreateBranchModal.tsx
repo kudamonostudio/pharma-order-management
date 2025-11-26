@@ -35,8 +35,11 @@ export function CreateBranchModal({
     if (!open) close();
   };
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsLoading(true);
+    const formData = new FormData(e.currentTarget);
+
     try {
       await createLocation(formData);
       close();
@@ -58,7 +61,7 @@ export function CreateBranchModal({
           </DialogDescription>
         </DialogHeader>
 
-        <form action={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input type="hidden" name="storeId" value={storeId} />
           <input type="hidden" name="slug" value={storeSlug} />
 
@@ -79,6 +82,10 @@ export function CreateBranchModal({
               placeholder="Ej: Av. Principal 123"
               required
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone">Telefono *</Label>
+            <Input id="phone" name="phone" placeholder="099 123 456" required />
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
