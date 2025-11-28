@@ -31,6 +31,13 @@ npx prisma migrate reset
 npx prisma migrate deploy
 ```
 
+4. If you modify to the prisma.schema:
+
+```bash
+npx prisma migrate dev -n add_new_columns
+npx prisma generate
+```
+
 4. Run dev
 
 ```bash

@@ -391,19 +391,19 @@
         }
       }
     },
-    "/api/stores/{id}": {
+    "/api/stores/{slug}": {
       "get": {
-        "summary": "Obtener tienda por ID",
+        "summary": "Obtener tienda por slug",
         "tags": [
           "Stores"
         ],
         "parameters": [
           {
-            "name": "id",
+            "name": "slug",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "integer"
+              "type": "string"
             }
           }
         ],

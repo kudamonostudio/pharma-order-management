@@ -215,7 +215,7 @@ async function insertData() {
   // Crear categoría Limpieza
   const limpieza = await prisma.category.create({
     data: {
-      name: 'Limpieza',
+      name: 'Otros',
     },
   });
 
