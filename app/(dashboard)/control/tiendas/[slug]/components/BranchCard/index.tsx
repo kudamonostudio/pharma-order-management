@@ -1,4 +1,5 @@
 import { LogoPlaceholder } from "@/app/(dashboard)/components/LogoPlaceholder";
+import { mockCollaborators } from "@/app/mocks/collaborators";
 import { ShowAvatars } from "@/components/show-avatars";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,29 +12,6 @@ interface BranchCardProps {
   store: Store;
   onEdit?: (branch: Location) => void;
 }
-
-const mockCollaborators = [
-  {
-    id: 1,
-    imageUrl:
-      "https://images.pexels.com/photos/5025492/pexels-photo-5025492.jpeg",
-  },
-  {
-    id: 2,
-    imageUrl:
-      "https://images.pexels.com/photos/6170091/pexels-photo-6170091.jpeg",
-  },
-  {
-    id: 3,
-    imageUrl:
-      "https://images.pexels.com/photos/4484072/pexels-photo-4484072.jpeg",
-  },
-  {
-    id: 4,
-    imageUrl:
-      "https://images.pexels.com/photos/4484071/pexels-photo-4484071.jpeg",
-  },
-];
 
 function index({ branch, store, onEdit }: BranchCardProps) {
   return (
@@ -49,7 +27,11 @@ function index({ branch, store, onEdit }: BranchCardProps) {
             className="w-20 h-20 rounded-full object-cover m-auto"
           />
         ) : (
-          <LogoPlaceholder variant="store" isActive={store.isActive} className="m-auto"/>
+          <LogoPlaceholder
+            variant="store"
+            isActive={store.isActive}
+            className="m-auto"
+          />
         )}
         <div className="flex flex-col justify-center">
           <h1 className="font-bold text-xl">{branch.name}</h1>
@@ -70,7 +52,10 @@ function index({ branch, store, onEdit }: BranchCardProps) {
           <Settings className="w-4 h-4" />
         </Button>
 
-        <Link href={`/control/tiendas/${store.slug}/sucursales/${branch.id}`} className="w-full">
+        <Link
+          href={`/control/tiendas/${store.slug}/sucursales/${branch.id}`}
+          className="w-full"
+        >
           <Button className="w-full flex items-center justify-center rounded-xl">
             Ir a la sucursal
             <ArrowRight className="w-4 h-4" />
