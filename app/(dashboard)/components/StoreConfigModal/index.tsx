@@ -49,24 +49,24 @@ export function StoreConfigModal({
     phone: "",
   });
 
-    const onDrop = (acceptedFiles: File[]) => {
-      const file = acceptedFiles[0];
-      if (!file) return;
-  
-      if (file.size > 1024 * 1024) {
-        alert("La imagen no puede pesar más de 1MB");
-        return;
-      }
-  
-      setLogoFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
-    };
-  
-    const { getRootProps, getInputProps, isDragActive } = useDropzone({
-      onDrop,
-      accept: { "image/*": [] },
-      maxFiles: 1,
-    });
+  const onDrop = (acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (!file) return;
+
+    if (file.size > 1024 * 1024) {
+      alert("La imagen no puede pesar más de 1MB");
+      return;
+    }
+
+    setLogoFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { "image/*": [] },
+    maxFiles: 1,
+  });
 
   useEffect(() => {
     if (open) {
@@ -80,7 +80,6 @@ export function StoreConfigModal({
       setLogoFile(null);
     }
   }, [open]);
-
 
   useEffect(() => {
     if (store) {

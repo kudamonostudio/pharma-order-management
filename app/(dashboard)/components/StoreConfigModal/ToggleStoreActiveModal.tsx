@@ -1,6 +1,5 @@
 "use client";
 
-import { useTransition } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,45 +9,58 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { deleteStore } from "@/app/actions/Store";
+import { updateStore } from "@/app/actions/Store";
+import { useTransition } from "react";
+import { useRouter } from "next/navigation";
 
-interface DeleteStoreModalProps {
+interface ToggleStoreActiveModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   storeId: number;
+  isActive: boolean;
   onSuccess?: () => void;
 }
 
-export function DeleteStoreModal({
+export function ToggleStoreActiveModal({
   open,
   onOpenChange,
   storeId,
+  isActive,
   onSuccess,
-}: DeleteStoreModalProps) {
+}: ToggleStoreActiveModalProps) {
   const [isPending, startTransition] = useTransition();
+  const router = useRouter();
 
-  const handleDelete = () => {
+  const handleToggle = () => {
     startTransition(async () => {
       try {
-        await deleteStore(storeId);
+        const formData = new FormData();
+        formData.append("isActive", String(!isActive));
+
+        await updateStore(storeId, formData);
+
+        router.refresh();
         onOpenChange(false);
-        if (onSuccess) onSuccess();
+        onSuccess?.();
       } catch (error) {
-        console.error("Error deleting store:", error);
+        console.error("Error toggling store status:", error);
       }
     });
   };
+
+  const actionText = isActive ? "inactivar" : "activar";
+  const ActionText = isActive ? "Inactivar" : "Activar";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>¿Estás seguro que quieres eliminar esta tienda?</DialogTitle>
+          <DialogTitle>{ActionText} tienda</DialogTitle>
           <DialogDescription>
-            Una vez eliminada no podrás revertir el cambio.
+            ¿Confirmas que quieres {actionText} esta tienda?
           </DialogDescription>
         </DialogHeader>
-        <DialogFooter className="gap-2">
+        <DialogFooter>
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
@@ -57,11 +69,15 @@ export function DeleteStoreModal({
             Cancelar
           </Button>
           <Button
-            variant="destructive"
-            onClick={handleDelete}
+            variant={"default"}
+            onClick={handleToggle}
             disabled={isPending}
           >
-            {isPending ? "Eliminando..." : "Eliminar"}
+            {isPending
+              ? isActive
+                ? "Inactivando..."
+                : "Activando..."
+              : "Confirmar"}
           </Button>
         </DialogFooter>
       </DialogContent>

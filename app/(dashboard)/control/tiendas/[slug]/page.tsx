@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { OrderList } from "./components/OrderList";
 import { getStoreBySlug } from "@/app/actions/Store";
-import { CreateBranchButton } from "./sucursales/CreateBranchButton";
 
 export default async function StorePage({
   params,
@@ -56,20 +55,13 @@ export default async function StorePage({
   return (
     <div className="px-8 py-8 w-full max-w-5xl">
       <div className="flex flex-col gap-6">
-        <section className="mt-10">
-          <div className="flex items-center gap-4 mb-3">
-            <h2 className="text-2xl font-semibold">Sucursales</h2>
-            <CreateBranchButton />
-          </div>
-        </section>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="p-6 border rounded-lg">
             <h3 className="font-semibold mb-2">Órdenes pendientes</h3>
             <p className="text-3xl font-bold">12</p>
           </div>
           <div className="p-6 border rounded-lg">
-            <h3 className="font-semibold mb-2">Órdenes concretadas</h3>
+            <h3 className="font-semibold mb-2">Órdenes concretadas este mes</h3>
             <p className="text-3xl font-bold">234</p>
           </div>
         </div>
