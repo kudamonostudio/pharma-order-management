@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, MapPin, Phone, Settings } from "lucide-react";
 import Link from "next/link";
-import { StoreConfigModal } from "./components/StoreConfigModal";
+import { StoreConfigModal } from "../(dashboard)/components/StoreConfigModal";
 import { Store } from "@prisma/client";
 import IsActiveButton from "../(dashboard)/components/IsActiveButton";
 import { CreateStoreModal } from "./CreateStoreModal";
 import { LogoPlaceholder } from "../(dashboard)/components/LogoPlaceholder";
 import { StoreFilter } from "./components/StoreFilter";
+
+import { StoreConfigButton } from "../(dashboard)/components/StoreConfigButton";
 
 interface TiendasContentProps {
   stores: Store[];
@@ -31,11 +33,6 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
   });
 
   const displayStores = filteredStores.length > 0 ? filteredStores : [];
-
-  const handleEditClick = (store: Store) => {
-    setSelectedStore(store);
-    setIsEditModalOpen(true);
-  };
 
   return (
     <div className="px-8 py-4 w-full">
@@ -103,14 +100,11 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
 
             {/* Botones */}
             <div className="w-full space-y-2">
-              <Button
+              <StoreConfigButton
+                store={store}
                 variant="secondary"
                 className="w-full flex items-center justify-center gap-2 rounded-xl"
-                onClick={() => handleEditClick(store)}
-              >
-                <Settings className="w-4 h-4" />
-                Configuración
-              </Button>
+              />
 
               <Link href={`/control/tiendas/${store.slug}`} className="w-full">
                 <Button className="w-full flex items-center justify-center rounded-xl">

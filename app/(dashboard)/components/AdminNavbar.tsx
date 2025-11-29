@@ -1,23 +1,34 @@
-"use client"
+"use client";
 
-import { Bell, Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Bell, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { SidebarTrigger } from "@/components/ui/sidebar"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/auth/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/auth/dropdown-menu";
 
 export function AdminNavbar() {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/6">
+    <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="flex h-14 items-center gap-4 px-4">
         <SidebarTrigger />
 
         <div className="flex-1 max-w-md">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input type="search" placeholder="Buscar..." className="w-full pl-8" />
+            <Input
+              type="search"
+              placeholder="Buscar..."
+              className="w-full pl-8"
+            />
           </div>
         </div>
 
@@ -37,13 +48,17 @@ export function AdminNavbar() {
               <DropdownMenuItem>
                 <div className="flex flex-col gap-1">
                   <p className="text-sm font-medium">Nueva actualización</p>
-                  <p className="text-xs text-muted-foreground">Hay una nueva versión disponible</p>
+                  <p className="text-xs text-muted-foreground">
+                    Hay una nueva versión disponible
+                  </p>
                 </div>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <div className="flex flex-col gap-1">
                   <p className="text-sm font-medium">Usuario registrado</p>
-                  <p className="text-xs text-muted-foreground">Un nuevo usuario se ha registrado</p>
+                  <p className="text-xs text-muted-foreground">
+                    Un nuevo usuario se ha registrado
+                  </p>
                 </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -71,5 +86,5 @@ export function AdminNavbar() {
         </div>
       </div>
     </header>
-  )
+  );
 }

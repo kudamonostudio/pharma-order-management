@@ -31,6 +31,8 @@ export default function SucursalesContent({
         <CreateBranchButton />
       </div>
       <div className="grid grid-cols-2 gap-4">
+        {branches.length === 0 && (<p className="text-base text-muted-foreground italic">No hay sucursales creadas aún.</p>
+        )}
         {branches.map((branch) => (
           <BranchCard
             branch={branch}

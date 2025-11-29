@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { OrderList } from "./components/OrderList";
 import { getStoreBySlug } from "@/app/actions/Store";
-import { CreateBranchButton } from "./sucursales/CreateBranchButton";
 
 export default async function StorePage({
   params,
@@ -18,58 +17,64 @@ export default async function StorePage({
   const mockLastOrders = [
     {
       id: 1,
-      code: "ORD-001",
-      date: "2025-11-06",
-      status: "PENDIENTE" as const,
-      total: 150.0,
+      orderCode: "ORD-751",
+      date: new Date().toDateString(),
+      status: "PENDIENTE",
+      locationId: 8,
+      profileId: 0,
     },
     {
       id: 2,
-      code: "ORD-002",
-      date: "2025-11-06",
-      status: "LISTO_PARA_RETIRO" as const,
-      total: 180.0,
+      orderCode: "ORD-752",
+      date: new Date().toDateString(),
+      status: "LISTO_PARA_RETIRO",
+      locationId: 8,
+      profileId: 1,
     },
     {
       id: 3,
-      code: "ORD-003",
-      date: "2025-11-06",
-      status: "ENTREGADA" as const,
-      total: 250.5,
+      orderCode: "ORD-753",
+      date: new Date().toDateString(),
+      status: "ENTREGADA",
+      locationId: 10,
+      profileId: 2,
     },
     {
       id: 4,
-      code: "ORD-004",
-      date: "2025-11-05",
-      status: "CANCELADA" as const,
-      total: 75.0,
+      orderCode: "ORD-722",
+      date: new Date().toDateString(),
+      status: "CANCELADA",
+      locationId: 10,
+      profileId: null,
     },
     {
       id: 5,
-      code: "ORD-005",
-      date: "2025-11-05",
-      status: "EN_PROCESO" as const,
-      total: 75.0,
+      orderCode: "ORD-754",
+      date: new Date().toDateString(),
+      status: "CANCELADA",
+      locationId: 10,
+      profileId: 4,
+    },
+    {
+      id: 6,
+      orderCode: "ORD-755",
+      date: new Date().toDateString(),
+      status: "EN_PROCESO",
+      locationId: 8,
+      profileId: 3,
     },
   ];
 
   return (
     <div className="px-8 py-8 w-full max-w-5xl">
       <div className="flex flex-col gap-6">
-        <section className="mt-10">
-          <div className="flex items-center gap-4 mb-3">
-            <h2 className="text-2xl font-semibold">Sucursales</h2>
-            <CreateBranchButton />
-          </div>
-        </section>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="p-6 border rounded-lg">
             <h3 className="font-semibold mb-2">Órdenes pendientes</h3>
             <p className="text-3xl font-bold">12</p>
           </div>
           <div className="p-6 border rounded-lg">
-            <h3 className="font-semibold mb-2">Órdenes concretadas</h3>
+            <h3 className="font-semibold mb-2">Órdenes concretadas este mes</h3>
             <p className="text-3xl font-bold">234</p>
           </div>
         </div>
