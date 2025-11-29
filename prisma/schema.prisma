@@ -97,13 +97,13 @@ model Product {
   sku         String?   @db.VarChar(50)
   stock       Int?
   categoryId  Int?
-  locationId  Int
+  locationId  Int?
   storeId     Int
   isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
-  location    Location  @relation(fields: [locationId], references: [id])
+  location    Location?  @relation(fields: [locationId], references: [id])
   store       Store  @relation(fields: [storeId], references: [id])
   category    Category? @relation(fields: [categoryId], references: [id])
 

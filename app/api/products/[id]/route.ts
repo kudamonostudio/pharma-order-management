@@ -47,26 +47,3 @@ export async function PUT(
     )
   }
 }
-
-export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const product = await prisma.product.update({
-      where: { id: Number(params.id) },
-      data: { deletedAt: new Date() },
-    });
-
-    return NextResponse.json({
-      message: 'Product deleted successfully',
-      product,
-    });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { error: 'Error deleting order' },
-      { status: 500 }
-    );
-  }
-}

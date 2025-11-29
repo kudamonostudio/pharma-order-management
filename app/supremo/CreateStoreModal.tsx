@@ -14,18 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { createStore, updateLogo } from "@/app/actions/Store";
 import { useRouter } from "next/navigation";
-import { uploadStoreLogo } from "@/lib/supabase/client/uploadLogo";
+import { uploadStoreLogo } from "@/lib/supabase/client/uploadImage";
 
 interface CreateStoreModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-}
-
-function generateSlug(name: string) {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)+/g, "");
 }
 
 export function CreateStoreModal({
@@ -71,7 +64,6 @@ export function CreateStoreModal({
       formDataToSend.append("name", formData.name);
       formDataToSend.append("address", formData.address);
       formDataToSend.append("phone", formData.phone);
-      formDataToSend.append("slug", generateSlug(formData.name));
 
       const newStore = await createStore(formDataToSend);
 
