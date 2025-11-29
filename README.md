@@ -24,11 +24,25 @@ npx prisma db pull (in case manual changes)
 npx prisma generate (sync)
 ```
 
+3. First deploy
+
+```bash
+npx prisma migrate deploy
+npx prisma db seed
+```
+
 3. Deploy new migrations (update db) (Optional)
 
 ```bash
 npx prisma migrate reset
 npx prisma migrate deploy
+```
+
+4. If you modify to the prisma.schema:
+
+```bash
+npx prisma migrate dev -n add_new_columns
+npx prisma generate
 ```
 
 4. Run dev

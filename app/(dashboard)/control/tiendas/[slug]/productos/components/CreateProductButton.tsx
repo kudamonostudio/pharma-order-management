@@ -1,23 +1,23 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useStoresStore } from "@/app/zustand/storesStore";
 import { Plus } from "lucide-react";
 import { PrimaryButtonProps } from "@/shared/types/ui";
+import { useProductStore } from "@/app/zustand/productStore";
 
-export function CreateBranchButton({
+export function CreateProductButton({
   className,
   variant = "default",
   size = "default",
   children,
 }: PrimaryButtonProps) {
-  const openCreateBranchModal = useStoresStore(
-    (state) => state.openCreateBranchModal
+  const openCreateProductModal = useProductStore(
+    (state) => state.openCreateProductModal
   );
 
   return (
     <Button
-      onClick={openCreateBranchModal}
+      onClick={openCreateProductModal}
       className={className}
       variant={variant}
       size={size}
@@ -25,7 +25,7 @@ export function CreateBranchButton({
       {children || (
         <>
           <Plus className="w-4 h-4 mr-2" />
-          Crear nueva sucursal
+          Crear nuevo producto
         </>
       )}
     </Button>

@@ -213,9 +213,9 @@ async function insertData() {
   });
 
   // Crear categoría Limpieza
-  const limpieza = await prisma.category.create({
+  const otherCategory = await prisma.category.create({
     data: {
-      name: 'Limpieza',
+      name: 'Otros',
     },
   });
 
@@ -228,7 +228,9 @@ async function insertData() {
         brand: 'Drogueria Paysandu',
         unit: '5 L',
         imageUrl: 'https://picsum.photos/seed/limpiadorlavanda/200/200',
-        categoryId: limpieza.id,
+        categoryId: otherCategory.id,
+        locationId: location.id,
+        storeId: store.id,
       },
       {
         name: 'Bicarbonato de Sodio',
@@ -236,7 +238,9 @@ async function insertData() {
         brand: 'Drogueria Paysandu',
         unit: '1 Kg',
         imageUrl: 'https://picsum.photos/seed/bicarbonato/200/200',
-        categoryId: limpieza.id,
+        categoryId: otherCategory.id,
+        locationId: location.id,
+        storeId: store.id,
       },
       {
         name: 'Limpiador Pino Fresh',
@@ -244,7 +248,9 @@ async function insertData() {
         brand: 'Drogueria Paysandu',
         unit: '1 L',
         imageUrl: 'https://picsum.photos/seed/limpiadorpino/200/200',
-        categoryId: limpieza.id,
+        categoryId: otherCategory.id,
+        locationId: location.id,
+        storeId: store.id,
       },
     ],
   });
@@ -254,11 +260,11 @@ async function insertData() {
 
 async function main() {
   // Functions and triggers:
-  // await createFunctions();
-  // await executeAuthRLS();
-  // await insertData();
-  // await createBucket();
-  // await createBucketPolicies();
+  await executeAuthRLS();
+  await createFunctions();
+  await insertData();
+  await createBucket();
+  await createBucketPolicies();
 
   console.log("✅ Seed completado con éxito")
 }
