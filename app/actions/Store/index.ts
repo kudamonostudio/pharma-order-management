@@ -5,6 +5,7 @@ import crypto from "crypto";
 import { generateSlug } from "@/lib/helpers";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { Store } from "@prisma/client";
 
 export async function createStore(formData: FormData) {
   const name = formData.get("name") as string;
@@ -35,7 +36,7 @@ export async function createStore(formData: FormData) {
 }
 
 export async function updateStore(id: number, formData: FormData) {
-  const data: any = {};
+  const data: Partial<Store> = {};
   
   if (formData.has("name")) data.name = formData.get("name") as string;
   if (formData.has("address")) data.address = formData.get("address") as string;

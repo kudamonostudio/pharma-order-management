@@ -1,5 +1,6 @@
 // Vamos a usar server actions para el CUD (Create, Update, Delete), es decir, para mutaciones. Para el GET usaremos API routes.
 "use server";
+import { Location } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
@@ -11,9 +12,7 @@ export async function createLocation(formData: FormData) {
   const phone = (formData.get("phone") as string) || null;
 
   if (!storeId || !name || !address) {
-    // puedes arrojar un Error si quieres manejarlo en UI o logs
-    console.warn("createLocation: missing fields", { storeId, name, address });
-    return;
+    throw new Error(`createLocation: missing fields ${JSON.stringify({ storeId, name, address })}`);
   }
 
   await prisma.location.create({
@@ -28,34 +27,22 @@ export async function createLocation(formData: FormData) {
   revalidatePath(`/control/tiendas/${slug}`);
 }
 
-export async function updateLocation(formData: FormData) {
-  const id = Number(formData.get("id"));
-  const slug = (formData.get("slug") as string) || "";
-  const name = (formData.get("name") as string) || "";
-  const address = (formData.get("address") as string) || "";
-  const phone = (formData.get("phone") as string) || null;
-
-  if (!id || !name || !address) {
-    console.warn("updateLocation: missing fields", { id, name, address });
-    return;
-  }
+export async function updateLocation(id: number, storeSlug: string, formData: FormData) {
+  const data: Partial<Location> = {};
+  
+  if (formData.has("name")) data.name = formData.get("name") as string;
+  if (formData.has("address")) data.address = formData.get("address") as string;
+  if (formData.has("phone")) data.phone = formData.get("phone") as string | null;
 
   await prisma.location.update({
     where: { id },
-    data: {
-      name,
-      address,
-      phone,
-    },
+    data,
   });
 
-  revalidatePath(`/control/tiendas/${slug}`);
+  revalidatePath(`/control/tiendas/${storeSlug}`);
 }
 
-export async function deleteLocation(formData: FormData) {
-  const id = Number(formData.get("id"));
-  const slug = (formData.get("slug") as string) || "";
-
+export async function deleteLocation(id: number, storeSlug: string) {
   if (!id) {
     console.warn("deleteLocation: missing id");
     return;
@@ -66,5 +53,5 @@ export async function deleteLocation(formData: FormData) {
     data: { deletedAt: new Date() },
   });
 
-  revalidatePath(`/control/tiendas/${slug}`);
+  revalidatePath(`/control/tiendas/${storeSlug}`);
 }

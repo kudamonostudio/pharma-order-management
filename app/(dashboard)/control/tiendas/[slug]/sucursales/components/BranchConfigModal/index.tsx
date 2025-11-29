@@ -66,13 +66,11 @@ export function BranchConfigModal({
 
     try {
       const formDataToSend = new FormData();
-      formDataToSend.append("id", String(branch.id));
-      formDataToSend.append("slug", storeSlug);
       formDataToSend.append("name", formData.name);
       formDataToSend.append("address", formData.address);
       formDataToSend.append("phone", formData.phone);
 
-      await updateLocation(formDataToSend);
+      await updateLocation(branch.id, storeSlug, formDataToSend);
 
       onOpenChange(false);
       router.refresh();

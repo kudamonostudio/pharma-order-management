@@ -32,11 +32,7 @@ export function DeleteBranchModal({
   const handleDelete = () => {
     startTransition(async () => {
       try {
-        const formData = new FormData();
-        formData.append("id", String(branchId));
-        formData.append("slug", storeSlug);
-
-        await deleteLocation(formData);
+        await deleteLocation(branchId, storeSlug);
         onOpenChange(false);
         if (onSuccess) onSuccess();
       } catch (error) {

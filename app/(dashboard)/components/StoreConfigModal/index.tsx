@@ -20,7 +20,7 @@ import { DeleteStoreModal } from "./DeleteStoreModal";
 import { ToggleStoreActiveModal } from "./ToggleStoreActiveModal";
 import { Store } from "@prisma/client";
 import { cn } from "@/lib/utils";
-import { uploadStoreLogo } from "@/lib/supabase/client/uploadLogo";
+import { uploadStoreLogo } from "@/lib/supabase/client/uploadImage";
 
 interface StoreConfigModalProps {
   open: boolean;
