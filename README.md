@@ -24,6 +24,13 @@ npx prisma db pull (in case manual changes)
 npx prisma generate (sync)
 ```
 
+3. First deploy
+
+```bash
+npx prisma migrate deploy
+npx prisma db seed
+```
+
 3. Deploy new migrations (update db) (Optional)
 
 ```bash
