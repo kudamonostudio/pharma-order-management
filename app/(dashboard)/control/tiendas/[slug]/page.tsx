@@ -20,7 +20,10 @@ export default async function StorePage({
       orderCode: "ORD-751",
       date: new Date().toDateString(),
       status: "PENDIENTE",
-      locationId: 8,
+      branch: {
+        id: 1,
+        name: "Sucursal Centro",
+      },
       profileId: 0,
     },
     {
@@ -28,7 +31,10 @@ export default async function StorePage({
       orderCode: "ORD-752",
       date: new Date().toDateString(),
       status: "LISTO_PARA_RETIRO",
-      locationId: 8,
+      branch: {
+        id: 1,
+        name: "Sucursal Centro",
+      },
       profileId: 1,
     },
     {
@@ -36,7 +42,10 @@ export default async function StorePage({
       orderCode: "ORD-753",
       date: new Date().toDateString(),
       status: "ENTREGADA",
-      locationId: 10,
+      branch: {
+        id: 2,
+        name: "Sucursal Paso Molino",
+      },
       profileId: 2,
     },
     {
@@ -44,7 +53,10 @@ export default async function StorePage({
       orderCode: "ORD-722",
       date: new Date().toDateString(),
       status: "CANCELADA",
-      locationId: 10,
+      branch: {
+        id: 2,
+        name: "Sucursal Paso Molino",
+      },
       profileId: null,
     },
     {
@@ -52,7 +64,7 @@ export default async function StorePage({
       orderCode: "ORD-754",
       date: new Date().toDateString(),
       status: "CANCELADA",
-      locationId: 10,
+      branch: { id: 1, name: "Sucursal Centro" },
       profileId: 4,
     },
     {
@@ -60,7 +72,7 @@ export default async function StorePage({
       orderCode: "ORD-755",
       date: new Date().toDateString(),
       status: "EN_PROCESO",
-      locationId: 8,
+      branch: { id: 3, name: "Sucursal Atlántida" },
       profileId: 3,
     },
   ];

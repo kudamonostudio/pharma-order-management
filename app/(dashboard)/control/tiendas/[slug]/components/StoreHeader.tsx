@@ -1,9 +1,8 @@
 import IsActiveButton from "@/app/(dashboard)/components/IsActiveButton";
-import { createClient } from "@/lib/supabase/server";
-import { prisma } from "@/lib/prisma";
 import { Store } from "@prisma/client";
 import { LogoPlaceholder } from "../../../../components/LogoPlaceholder";
 import { StoreHeaderActions } from "./StoreHeaderActions";
+import { getCurrentProfile } from "@/lib/auth/session";
 
 interface StoreHeaderProps {
   store: Store;
@@ -11,13 +10,7 @@ interface StoreHeaderProps {
 
 export async function StoreHeader({ store }: StoreHeaderProps) {
   // Get user profile to check role
-  const supabase = await createClient();
-  const { data } = await supabase.auth.getClaims();
-  const userId = data?.claims.sub as string;
-
-  const profile = await prisma.profile.findUnique({
-    where: { id: userId },
-  });
+  const profile = await getCurrentProfile();
 
   const isAdminSupremo = profile?.role === "ADMIN_SUPREMO";
 
