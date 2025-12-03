@@ -12,6 +12,7 @@ interface OrderDetailModalProps {
     status: OrderStatusType | string;
     createdAt: Date;
     branch: { id: string; name: string };
+    profileId?: string | number | null;
   };
   products: Array<{
     id: string;
@@ -29,9 +30,9 @@ export function OrderDetailModal({
 }: OrderDetailModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="h-screen w-full sm:max-w-4xl p-0 gap-0">
+      <DialogContent className="h-screen w-full sm:max-w-4xl p-0 gap-0 border-none outline-none">
         <div className="bg-background h-full overflow-y-auto">
-          <div className="min-h-full flex flex-col justify-center max-w-4xl mx-auto px-4 sm:px-6">
+          <div className="min-h-full max-w-4xl mx-auto">
             <OrderDetailModalContent order={order} products={products} />
           </div>
         </div>

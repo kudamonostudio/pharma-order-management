@@ -1,20 +1,22 @@
 "use client";
 
 import { useState } from "react";
-import { Order } from "@prisma/client";
 import { getOrderStatusColor, getOrderStatusLabel } from "../../../constants";
 import { formatDate } from "@/app/(dashboard)/utils/dates";
 import { OrderCollab } from "./OrderCollab";
 import { mockCollaborators } from "@/app/mocks/collaborators";
-import { OrderDetailModal } from "../../OrderDetailModal/OrderDetailModal";
+import { OrderDetailModal } from "./OrderDetailModal/OrderDetailModal";
 import { useOrderStore } from "@/app/zustand/orderStore";
 
 type OrderCardClientProps = {
-  order: Order;
+  order: any /* TODO: Usar el tipado de prisma. Por ahora usamos ANY */;
   isAdminSupremo: boolean;
 };
 
-export function OrderCardClient({ order, isAdminSupremo }: OrderCardClientProps) {
+export function OrderCardClient({
+  order,
+  isAdminSupremo,
+}: OrderCardClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { order: mockProducts } = useOrderStore();
 
@@ -57,13 +59,14 @@ export function OrderCardClient({ order, isAdminSupremo }: OrderCardClientProps)
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         order={{
-          id: "order_12345",
+          id: order.orderCode,
           status: order.status,
-          createdAt: new Date(),
+          createdAt: order.date,
           branch: {
-            id: "3",
-            name: "Sucursal 1",
+            id: String(order.locationId),
+            name: order.branch.name /* TODO: CARGAR NOMBRE DE LA UBICACIÓN */,
           },
+          profileId: order.profileId,
         }}
         products={mockProducts}
       />

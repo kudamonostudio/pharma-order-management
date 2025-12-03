@@ -21,6 +21,6 @@ export const mockCollaborators = [
     id: 4,
     imageUrl:
       "https://images.pexels.com/photos/4484071/pexels-photo-4484071.jpeg",
-    name: "Ana Martinez",
+    name: "Diego Martinez",
   },
 ];
