@@ -8,14 +8,10 @@ export async function createProduct(formData: FormData) {
   const priceRaw = formData.get("price");
   const storeSlug = formData.get("storeSlug");
 
-  if (!priceRaw) {
-    throw new Error("Price is required");
-  }
-
   const data = {
     name: toNullable(formData.get("name")) ?? "",
     description: toNullable(formData.get("description")),
-    price: String(priceRaw),
+    price: priceRaw ? String(priceRaw) : null,
     brand: toNullable(formData.get("brand")),
     unit: toNullable(formData.get("unit")),
     sku: toNullable(formData.get("sku")),

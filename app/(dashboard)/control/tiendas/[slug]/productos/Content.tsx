@@ -90,10 +90,17 @@ export default function ProductsContent({
                     {product.brand ?? ''}
                   </p>
                 </div>
-
-                <p className="font-bold text-green-700 mt-2">
-                  ${Number(product.price).toFixed(2)}
-                </p>
+                {
+                  product.price ? (
+                    <p className="font-bold text-green-700 mt-2">
+                      ${Number(product.price).toFixed(2)}
+                    </p>
+                    ) : (
+                      <i className="text-sm text-green-700 mt-2">
+                      Sin precio disponible
+                    </i>
+                    )
+                }
               </div>
             ))}
           </div>

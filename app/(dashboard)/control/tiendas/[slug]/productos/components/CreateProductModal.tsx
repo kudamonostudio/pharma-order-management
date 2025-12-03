@@ -117,14 +117,13 @@ export function CreateProductModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="price">Precio *</Label>
+            <Label htmlFor="price">Precio</Label>
             <Input
               id="price"
               type="number"
               step="0.01"
               name="price"
               placeholder="Ej: 2.50"
-              required
             />
           </div>
 
