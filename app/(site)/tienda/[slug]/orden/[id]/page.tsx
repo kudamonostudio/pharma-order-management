@@ -1,9 +1,9 @@
 "use client";
 import { useOrderStore } from "@/app/zustand/orderStore";
-import SelectedProducts from "../../components/SelectedProducts";
 import StoreContainer from "../../components/StoreContainer";
 import StoreLogo from "../../components/StoreLogo";
-import OrderStatus, { type OrderStatusVariant } from "./OrderStatus";
+import { OrderDetailContent } from "./OrderDetailContent";
+import { type OrderStatus as OrderStatusType } from "@/app/(dashboard)/control/tiendas/[slug]/constants";
 
 // Esta página muestra la orden creada, el listado de productos, la sucursal y el estado de la orden
 const Page = () => {
@@ -11,14 +11,14 @@ const Page = () => {
     useOrderStore(); /* TODO: Esto debe quitarse, es la orden para la creacion */
   const mockOrder: {
     id: string;
-    status: OrderStatusVariant;
+    status: OrderStatusType;
     totalQuantity: number;
     items: Array<{ quantity: number }>;
     branch: { id: string; name: string };
-    createdAt?: Date;
+    createdAt: Date;
   } = {
     id: "order_12345",
-    status: "preparing",
+    status: "EN_PROCESO",
     createdAt: new Date(),
     branch: {
       id: "3",
@@ -45,25 +45,7 @@ const Page = () => {
           Nombre de la tienda
         </h1>
       </div>
-      <div className="flex flex-col py-8 gap-2">
-        <div className="flex justify-between">
-          <div>
-            <h1 className="text-xl font-normal text-gray-600">
-              Detalles de la orden: #{mockOrder.id}
-            </h1>
-            <small>Creada el {mockOrder.createdAt?.toLocaleDateString()}</small>
-          </div>
-          {/* TODO: Cambiar el estado según la orden */}
-          <div className="flex flex-col items-end">
-            <OrderStatus status={mockOrder.status} />
-            <h3 className="text-lg font-normal mt-4">
-              Retira en la sucursal: {mockOrder.branch.name}
-            </h3>
-          </div>
-        </div>
-        <SelectedProducts order={order} />
-        {/* TODO: Este componente debe recibir una orden como prop, en este caso los datos de la orden creada*/}
-      </div>
+      <OrderDetailContent order={mockOrder} products={order} showBranchInfo={true} />
     </StoreContainer>
   );
 };

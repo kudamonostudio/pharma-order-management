@@ -20,7 +20,7 @@ function SelectedProducts({ order }: { order: Array<{
         >
           <div className="flex items-center gap-4 min-w-md justify-between">
             {/* Cantidad */}
-            <div className="shrink-0 bg-emerald-600 rounded-full px-4 py-2">
+            <div className="shrink-0 bg-blue-400 rounded-full px-4 py-2">
               <span className="text-2xl font-bold text-white">
                 {product.quantity}
               </span>
