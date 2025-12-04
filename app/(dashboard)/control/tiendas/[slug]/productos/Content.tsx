@@ -4,11 +4,12 @@ import Image from "next/image";
 import { Product, Store } from "@prisma/client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ProductConfigModal } from "./components/ProductConfigModal";
+import { ProductConfigModal } from "./components/modals/ProductConfigModal";
 import { CreateProductButton } from "./components/CreateProductButton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
+import ProductIsActiveButton from "@/app/(dashboard)/control/tiendas/[slug]/productos/components/modals/ProductConfigModal/ProductIsActiveButton";
 
 type ProductWithNumberPrice = Omit<Product, "price"> & { price: number };
 
@@ -54,8 +55,11 @@ export default function ProductsContent({
           {initialProducts.map((product) => (
             <div
               key={product.id}
-              className="border rounded-md shadow-sm bg-white hover:shadow-md transition flex flex-col"
+              className="border rounded-md shadow-sm bg-white hover:shadow-md transition flex flex-col relative"
             >
+              <div className="absolute top-2 left-2 z-10">
+                <ProductIsActiveButton isActive={product.isActive} variant="small" />
+              </div>
               <div className="w-full h-40 bg-gray-100 rounded-t-md flex items-center justify-center overflow-hidden relative">
                 {product.imageUrl ? (
                   <Image

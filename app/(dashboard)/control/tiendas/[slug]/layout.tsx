@@ -6,7 +6,7 @@ import { AppSidebar } from "../../../components/AppSidebar";
 import { AdminNavbar } from "../../../components/AdminNavbar";
 import { CreateBranchModal } from "./sucursales/CreateBranchModal";
 import { StoreHeader } from "./components/StoreHeader";
-import { CreateProductModal } from "./productos/components/CreateProductModal";
+import { CreateProductModal } from "./productos/components/modals/CreateProductModal";
 
 export default async function StoreLayout({
   children,

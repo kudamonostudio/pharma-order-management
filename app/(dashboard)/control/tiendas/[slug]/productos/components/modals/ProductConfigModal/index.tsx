@@ -14,11 +14,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/text-area";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Power } from "lucide-react";
 import { Product } from "@prisma/client";
 import { DeleteProductModal } from "./DeleteProductModal";
+import { ToggleProductActiveModal } from "./ToggleProductActiveModal";
 import { updateProduct, updateProductImage } from "@/app/actions/Products";
 import { uploadProductImage } from "@/lib/supabase/client/uploadImage";
+import { cn } from "@/lib/utils";
 
 type ProductWithNumberPrice = Omit<Product, "price"> & { price: number };
 
@@ -43,6 +45,7 @@ export function ProductConfigModal({
   const [isLoading, setIsLoading] = useState(false);
   const [view, setView] = useState<ModalView>("menu");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isToggleActiveModalOpen, setIsToggleActiveModalOpen] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -157,7 +160,20 @@ export function ProductConfigModal({
                 Editar información
               </Button>
 
-              {/* Opción 2: Eliminar */}
+              {/* Opción 2: Inactivar/Activar */}
+              <Button
+                variant="outline"
+                className={cn(
+                  "justify-start gap-2 h-12",
+                  product.isActive ? "bg-gray-100" : ""
+                )}
+                onClick={() => setIsToggleActiveModalOpen(true)}
+              >
+                <Power className="h-4 w-4" />
+                {product.isActive ? "Inactivar producto" : "Activar producto"}
+              </Button>
+
+              {/* Opción 3: Eliminar */}
               <Button
                 variant="destructive"
                 className="justify-start gap-2 h-12"
@@ -269,6 +285,18 @@ export function ProductConfigModal({
         storeSlug={storeSlug}
         onSuccess={() => {
           setIsDeleteModalOpen(false);
+          onOpenChange(false);
+          router.refresh();
+        }}
+      />
+
+      <ToggleProductActiveModal
+        open={isToggleActiveModalOpen}
+        onOpenChange={setIsToggleActiveModalOpen}
+        productId={product.id}
+        isActive={product.isActive}
+        onSuccess={() => {
+          setIsToggleActiveModalOpen(false);
           onOpenChange(false);
           router.refresh();
         }}

@@ -52,6 +52,7 @@ export async function updateProduct(
     sku?: string;
     stock?: number;
     categoryId?: number | null;
+    isActive?: boolean;
   }
 ) {
   await prisma.product.update({
@@ -84,7 +85,6 @@ export async function getProductsByStore(storeId: number, page = 1, limit = 12) 
     prisma.product.findMany({
       where: {
         storeId,
-        isActive: true,
         deletedAt: null,
       },
       orderBy: { createdAt: "desc" },
@@ -95,7 +95,6 @@ export async function getProductsByStore(storeId: number, page = 1, limit = 12) 
     prisma.product.count({
       where: {
         storeId,
-        isActive: true,
         deletedAt: null,
       },
     }),
@@ -129,7 +128,6 @@ export async function getStoreWithProducts(slug: string, page = 1, limit = 12) {
     prisma.product.findMany({
       where: {
         storeId: store.id,
-        isActive: true,
         deletedAt: null,
       },
       orderBy: { createdAt: "desc" },
@@ -140,7 +138,6 @@ export async function getStoreWithProducts(slug: string, page = 1, limit = 12) {
     prisma.product.count({
       where: {
         storeId: store.id,
-        isActive: true,
         deletedAt: null,
       },
     }),
