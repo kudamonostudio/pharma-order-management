@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useDropzone } from "react-dropzone";
 import {
   Dialog,
   DialogContent,
@@ -11,17 +12,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/text-area";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2 } from "lucide-react";
 import { Product } from "@prisma/client";
 import { DeleteProductModal } from "./DeleteProductModal";
-import { updateProduct } from "@/app/actions/Products";
+import { updateProduct, updateProductImage } from "@/app/actions/Products";
+import { uploadProductImage } from "@/lib/supabase/client/uploadImage";
+
+type ProductWithNumberPrice = Omit<Product, "price"> & { price: number };
 
 interface ProductConfigModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  product: Product | null;
+  product: ProductWithNumberPrice | null;
   storeSlug: string;
+  withPrices: boolean;
 }
 
 type ModalView = "menu" | "edit";
@@ -31,15 +37,38 @@ export function ProductConfigModal({
   onOpenChange,
   product,
   storeSlug,
+  withPrices,
 }: ProductConfigModalProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [view, setView] = useState<ModalView>("menu");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: "",
+    description: "",
     price: "",
+  });
+
+  const onDrop = (acceptedFiles: File[]) => {
+    const file = acceptedFiles[0];
+    if (!file) return;
+
+    if (file.size > 1024 * 1024) {
+      alert("La imagen no puede pesar más de 1MB");
+      return;
+    }
+
+    setImageFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { "image/*": [] },
+    maxFiles: 1,
   });
 
   useEffect(() => {
@@ -49,9 +78,17 @@ export function ProductConfigModal({
   }, [open]);
 
   useEffect(() => {
+    if (!open) {
+      setPreviewUrl(null);
+      setImageFile(null);
+    }
+  }, [open]);
+
+  useEffect(() => {
     if (product) {
       setFormData({
         name: product.name,
+        description: product.description || "",
         price: product.price.toString(),
       });
     }
@@ -63,17 +100,29 @@ export function ProductConfigModal({
     setIsLoading(true);
 
     try {
-      // const formDataToSend = new FormData();
-      // formDataToSend.append("id", String(product.id));
-      // formDataToSend.append("name", formData.name);
-      // formDataToSend.append("price", formData.price);
+      const updateData: any = {
+        name: formData.name,
+        description: formData.description || null,
+        price: Number(formData.price),
+      };
 
-      // await updateProduct(formDataToSend); // TODO
+      await updateProduct(product.id, updateData);
+
+      // Se sube la imagen directamente a supabase, luego se actualiza DB
+      if (imageFile) {
+        const imageUrl = await uploadProductImage(
+          product.storeId,
+          product.id,
+          imageFile
+        );
+        await updateProductImage(product.id, imageUrl);
+        URL.revokeObjectURL(previewUrl as string);
+      }
 
       onOpenChange(false);
       router.refresh();
     } catch (error) {
-      console.error("Error updating branch:", error);
+      console.error("Error updating product:", error);
     } finally {
       setIsLoading(false);
     }
@@ -87,7 +136,7 @@ export function ProductConfigModal({
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
-              {view === "menu" ? "Gestionar Product" : "Editar Producto"}
+              {view === "menu" ? "Gestionar Producto" : "Editar Producto"}
             </DialogTitle>
             <DialogDescription>
               {view === "menu"
@@ -115,7 +164,7 @@ export function ProductConfigModal({
                 onClick={() => setIsDeleteModalOpen(true)}
               >
                 <Trash2 className="h-4 w-4" />
-                Eliminar sucursal
+                Eliminar producto
               </Button>
             </div>
           ) : (
@@ -125,7 +174,7 @@ export function ProductConfigModal({
                 <Label htmlFor="edit-name">Nombre *</Label>
                 <Input
                   id="edit-name"
-                  placeholder="Ej: Sucursal Centro"
+                  placeholder="Ej: Suavizante para Ropa 500ml"
                   value={formData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
@@ -134,19 +183,66 @@ export function ProductConfigModal({
                 />
               </div>
 
+              {withPrices && (
+                <div className="space-y-2">
+                  <Label htmlFor="edit-price">Precio *</Label>
+                  <Input
+                    id="edit-price"
+                    type="number"
+                    step="0.01"
+                    placeholder="Ej: 2.50"
+                    value={formData.price}
+                    onChange={(e) =>
+                      setFormData({ ...formData, price: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+              )}
+
               <div className="space-y-2">
-                <Label htmlFor="edit-address">Precio</Label>
-                <Input
-                  id="edit-address"
-                  placeholder="500"
-                  value={formData.price}
+                <Label htmlFor="edit-description">Descripción</Label>
+                <Textarea
+                  id="edit-description"
+                  placeholder="Escribe una descripción (opcional)"
+                  value={formData.description}
                   onChange={(e) =>
-                    setFormData({ ...formData, price: e.target.value })
+                    setFormData({ ...formData, description: e.target.value })
                   }
-                  required
                 />
               </div>
 
+              <div className="space-y-2">
+                <Label>Imagen</Label>
+                <div
+                  {...getRootProps()}
+                  className="border border-dashed rounded-md p-4 cursor-pointer text-center text-sm text-neutral-600 hover:bg-neutral-50"
+                >
+                  <input {...getInputProps()} />
+                  {imageFile ? (
+                    previewUrl && (
+                      <img
+                        src={previewUrl}
+                        alt="Vista previa"
+                        className="mx-auto h-32 w-32 object-cover rounded-md"
+                      />
+                    )
+                  ) : product.imageUrl ? (
+                    <img
+                      src={product.imageUrl}
+                      alt="Imagen actual"
+                      className="mx-auto h-32 w-32 object-cover rounded-md"
+                    />
+                  ) : isDragActive ? (
+                    <p>Suelta la imagen aquí…</p>
+                  ) : (
+                    <p>Arrastra una imagen o haz click para seleccionar</p>
+                  )}
+                </div>
+                <p className="text-xs text-neutral-500">
+                  Máx. 1MB — formatos permitidos: JPG, PNG, WEBP
+                </p>
+              </div>
 
               <div className="flex justify-end gap-3 pt-4">
                 <Button

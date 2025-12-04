@@ -16,7 +16,7 @@ import { useProductStore } from "@/app/zustand/productStore";
 import { createProduct, updateProductImage } from "@/app/actions/Products";
 import { Textarea } from "@/components/ui/text-area";
 import { useDropzone } from "react-dropzone";
-import { uploadImage } from "@/lib/supabase/client/uploadImage";
+import { uploadProductImage } from "@/lib/supabase/client/uploadImage";
 
 interface CreateProductModalProps {
   storeId: number;
@@ -70,11 +70,12 @@ export function CreateProductModal({
       if (!newProductId) throw new Error("No se creó el producto");
 
       if (productImage) {
-        const path = `stores/${storeId}/products/${newProductId}/${crypto.randomUUID()}-${
-          productImage.name
-        }`;
-        const logoUrl = await uploadImage(path, productImage);
-        await updateProductImage(newProductId, logoUrl);
+        const imageUrl = await uploadProductImage(
+          storeId,
+          newProductId,
+          productImage
+        );
+        await updateProductImage(newProductId, imageUrl);
         URL.revokeObjectURL(previewUrl as string);
       }
 
@@ -137,7 +138,7 @@ export function CreateProductModal({
             <Textarea
               id="description"
               name="description"
-              placeholder="Opcional"
+              placeholder="Escribe una descripción (opcional)"
             />
           </div>
 

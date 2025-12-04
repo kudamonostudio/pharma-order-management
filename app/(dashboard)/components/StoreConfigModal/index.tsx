@@ -141,6 +141,16 @@ export function StoreConfigModal({
 
           {view === "menu" ? (
             <div className="flex flex-col gap-3 py-4">
+              {/* Editar */}
+              <Button
+                variant="outline"
+                className="justify-start gap-2 h-12"
+                onClick={() => setView("edit")}
+              >
+                <Pencil className="h-4 w-4" />
+                Editar información
+              </Button>
+
               {/* Habilitar/Deshabilitar Precios */}
               <Button
                 variant="outline"
@@ -151,15 +161,6 @@ export function StoreConfigModal({
                 {store.withPrices
                   ? "Deshabilitar precios"
                   : "Habilitar precios"}
-              </Button>
-              {/* Editar */}
-              <Button
-                variant="outline"
-                className="justify-start gap-2 h-12"
-                onClick={() => setView("edit")}
-              >
-                <Pencil className="h-4 w-4" />
-                Editar información
               </Button>
 
               {/* Inactivar/Activar */}

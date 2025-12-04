@@ -7,8 +7,10 @@ import { useRouter } from "next/navigation";
 import { ProductConfigModal } from "./components/ProductConfigModal";
 import { CreateProductButton } from "./components/CreateProductButton";
 import { EmptyState } from "@/components/ui/empty-state";
+import { Button } from "@/components/ui/button";
+import { Pencil } from "lucide-react";
 
-type ProductWithNumberPrice = Omit<Product, 'price'> & { price: number };
+type ProductWithNumberPrice = Omit<Product, "price"> & { price: number };
 
 interface ProductsContentProps {
   store: Store;
@@ -25,9 +27,9 @@ export default function ProductsContent({
 }: ProductsContentProps) {
   const router = useRouter();
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductWithNumberPrice | null>(null);
 
-  const handleEditClick = (product: Product) => {
+  const handleEditClick = (product: ProductWithNumberPrice) => {
     setSelectedProduct(product);
     setIsEditModalOpen(true);
   };
@@ -52,37 +54,44 @@ export default function ProductsContent({
           {initialProducts.map((product) => (
             <div
               key={product.id}
-              className="border rounded-md shadow-sm bg-white hover:shadow-md transition"
+              className="border rounded-md shadow-sm bg-white hover:shadow-md transition flex flex-col"
             >
-              <div className="w-full h-48 bg-gray-100 rounded-t-md flex items-center justify-center overflow-hidden relative">
+              <div className="w-full h-40 bg-gray-100 rounded-t-md flex items-center justify-center overflow-hidden relative">
                 {product.imageUrl ? (
                   <Image
                     src={product.imageUrl}
                     alt={product.name}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, (max-width: 1536px) 25vw, 16vw"
-                    quality={85}
+                    quality={75}
                     className="object-cover"
                   />
                 ) : (
                   <span className="text-gray-400">Sin imagen</span>
                 )}
               </div>
-              <div className="p-4">
-                <div className="mt-3">
+              <div className="p-4 flex flex-col justify-between flex-1 gap-3">
+                <div className="flex-1">
                   <h3 className="font-semibold line-clamp-1">{product.name}</h3>
                   {product.description && (
                     <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
                       {product.description}
                     </p>
                   )}
+                  {store.withPrices && (
+                    <p className="font-bold text-green-700 mt-2">
+                      ${Number(product.price).toFixed(2)}
+                    </p>
+                  )}
                 </div>
 
-                {store.withPrices && (
-                  <p className="font-bold text-green-700 mt-2">
-                    ${Number(product.price).toFixed(2)}
-                  </p>
-                )}
+                <Button
+                  onClick={() => handleEditClick(product)}
+                  className="w-full"
+                >
+                  <Pencil className="h-4 w-4" />
+                  Editar
+                </Button>
               </div>
             </div>
           ))}
@@ -115,6 +124,7 @@ export default function ProductsContent({
         onOpenChange={setIsEditModalOpen}
         product={selectedProduct}
         storeSlug={store.slug}
+        withPrices={store.withPrices}
       />
     </div>
   );

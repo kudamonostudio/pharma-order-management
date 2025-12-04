@@ -42,6 +42,7 @@ export async function updateStore(id: number, formData: FormData) {
   if (formData.has("address")) data.address = formData.get("address") as string;
   if (formData.has("phone")) data.phone = formData.get("phone") as string | null;
   if (formData.has("isActive")) data.isActive = formData.get("isActive") === "true";
+  if (formData.has("withPrices")) data.withPrices = formData.get("withPrices") === "true";
 
   await prisma.store.update({
     where: { id },

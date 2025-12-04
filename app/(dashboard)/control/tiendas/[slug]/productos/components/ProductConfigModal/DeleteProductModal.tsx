@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { deleteProduct } from "@/app/actions/Products";
 
-interface DeleteBranchModalProps {
+interface DeleteProductModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   productId: number;
@@ -26,21 +26,17 @@ export function DeleteProductModal({
   productId,
   storeSlug,
   onSuccess,
-}: DeleteBranchModalProps) {
+}: DeleteProductModalProps) {
   const [isPending, startTransition] = useTransition();
 
   const handleDelete = () => {
     startTransition(async () => {
       try {
-        const formData = new FormData();
-        formData.append("id", String(productId));
-        // formData.append("slug", storeSlug);
-
-        await deleteProduct(formData);
+        await deleteProduct(productId, storeSlug);
         onOpenChange(false);
         if (onSuccess) onSuccess();
       } catch (error) {
-        console.error("Error deleting branch:", error);
+        console.error("Error deleting product:", error);
       }
     });
   };
@@ -50,10 +46,10 @@ export function DeleteProductModal({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>
-            ¿Estás seguro que quieres eliminar esta sucursal?
+            ¿Estás seguro que quieres eliminar este producto?
           </DialogTitle>
           <DialogDescription>
-            Una vez eliminada no podrás revertir el cambio.
+            Una vez eliminado no podrás revertir el cambio.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-2">
