@@ -14,10 +14,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateStore } from "@/app/actions/Store";
 import { useRouter } from "next/navigation";
-import { Pencil, Power, Trash2 } from "lucide-react";
+import { Pencil, Power, Trash2, DollarSign } from "lucide-react";
 import { updateLogo } from "@/app/actions/Store";
 import { DeleteStoreModal } from "./DeleteStoreModal";
 import { ToggleStoreActiveModal } from "./ToggleStoreActiveModal";
+import { ToggleStorePricesModal } from "./ToggleStorePricesModal";
 import { Store } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { uploadStoreLogo } from "@/lib/supabase/client/uploadImage";
@@ -40,6 +41,7 @@ export function StoreConfigModal({
   const [view, setView] = useState<ModalView>("menu");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isToggleActiveModalOpen, setIsToggleActiveModalOpen] = useState(false);
+  const [isTogglePricesModalOpen, setIsTogglePricesModalOpen] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -139,7 +141,18 @@ export function StoreConfigModal({
 
           {view === "menu" ? (
             <div className="flex flex-col gap-3 py-4">
-              {/* Opción 1: Editar */}
+              {/* Habilitar/Deshabilitar Precios */}
+              <Button
+                variant="outline"
+                className="justify-start gap-2 h-12"
+                onClick={() => setIsTogglePricesModalOpen(true)}
+              >
+                <DollarSign className="h-4 w-4" />
+                {store.withPrices
+                  ? "Deshabilitar precios"
+                  : "Habilitar precios"}
+              </Button>
+              {/* Editar */}
               <Button
                 variant="outline"
                 className="justify-start gap-2 h-12"
@@ -149,7 +162,7 @@ export function StoreConfigModal({
                 Editar información
               </Button>
 
-              {/* Opción 2: Inactivar/Activar */}
+              {/* Inactivar/Activar */}
               <Button
                 variant="outline"
                 className={cn(
@@ -162,7 +175,7 @@ export function StoreConfigModal({
                 {store.isActive ? "Inactivar tienda" : "Activar tienda"}
               </Button>
 
-              {/* Opción 3: Eliminar */}
+              {/* Eliminar */}
               <Button
                 variant="destructive"
                 className="justify-start gap-2 h-12"
@@ -280,6 +293,18 @@ export function StoreConfigModal({
         isActive={store.isActive}
         onSuccess={() => {
           setIsToggleActiveModalOpen(false);
+          onOpenChange(false);
+          router.refresh();
+        }}
+      />
+
+      <ToggleStorePricesModal
+        open={isTogglePricesModalOpen}
+        onOpenChange={setIsTogglePricesModalOpen}
+        storeId={store.id}
+        withPrices={store.withPrices}
+        onSuccess={() => {
+          setIsTogglePricesModalOpen(false);
           onOpenChange(false);
           router.refresh();
         }}

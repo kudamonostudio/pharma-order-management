@@ -1,6 +1,6 @@
 "use server";
 
-import { serialize, toNullable, toNumberOrNull } from "@/lib/helpers";
+import { toNullable, toNumberOrNull } from "@/lib/helpers";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
@@ -8,20 +8,14 @@ export async function createProduct(formData: FormData) {
   const priceRaw = formData.get("price");
   const storeSlug = formData.get("storeSlug");
 
-  if (!priceRaw) {
-    throw new Error("Price is required");
-  }
-
   const data = {
     name: toNullable(formData.get("name")) ?? "",
     description: toNullable(formData.get("description")),
-    price: String(priceRaw),
+    price: priceRaw ? Number(priceRaw) : 0,
     brand: toNullable(formData.get("brand")),
     unit: toNullable(formData.get("unit")),
     sku: toNullable(formData.get("sku")),
     stock: toNumberOrNull(formData.get("stock")),
-    // categoryId: toNumberOrNull(formData.get("categoryId")), // opc
-    // locationId: toNumberOrNull(formData.get("locationId")),// opc
     storeId: Number(formData.get("storeId")),
   };
 
@@ -108,9 +102,57 @@ export async function getProductsByStore(storeId: number, page = 1, limit = 12) 
   ]);
 
   return {
-    products: serialize(products),
+    products,
     total,
     page,
+    pages: Math.ceil(total / limit),
+  };
+}
+
+// Obtener store con productos (optimizado - una sola operación)
+export async function getStoreWithProducts(slug: string, page = 1, limit = 12) {
+  const skip = (page - 1) * limit;
+
+  const store = await prisma.store.findUnique({
+    where: { slug },
+    include: {
+      locations: {
+        where: { deletedAt: null },
+        orderBy: { id: "desc" },
+      },
+    },
+  });
+
+  if (!store) return null;
+
+  const [products, total] = await Promise.all([
+    prisma.product.findMany({
+      where: {
+        storeId: store.id,
+        isActive: true,
+        deletedAt: null,
+      },
+      orderBy: { createdAt: "desc" },
+      skip,
+      take: limit,
+    }),
+
+    prisma.product.count({
+      where: {
+        storeId: store.id,
+        isActive: true,
+        deletedAt: null,
+      },
+    }),
+  ]);
+
+  return {
+    store,
+    products: products.map(p => ({
+      ...p,
+      price: Number(p.price),
+    })),
+    total,
     pages: Math.ceil(total / limit),
   };
 }

@@ -33,6 +33,7 @@ model Store {
   banner    String?
   logo      String?
   isActive  Boolean    @default(true)
+  withPrices Boolean   @default(true)
   locations Location[]
   products  Product[]
   profile   Profile[]
@@ -90,7 +91,7 @@ model Product {
   id          Int       @id @default(autoincrement())
   name        String    @db.VarChar(150)
   description String?
-  price       Decimal   @db.Decimal(10, 2)
+  price       Decimal   @default(0) @db.Decimal(10, 2)
   imageUrl    String?
   brand       String?   @db.VarChar(50)
   unit        String?   @db.VarChar(50)

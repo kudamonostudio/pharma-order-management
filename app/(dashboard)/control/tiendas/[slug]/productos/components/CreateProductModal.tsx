@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-
 import { useProductStore } from "@/app/zustand/productStore";
 import { createProduct, updateProductImage } from "@/app/actions/Products";
 import { Textarea } from "@/components/ui/text-area";
@@ -22,11 +21,13 @@ import { uploadImage } from "@/lib/supabase/client/uploadImage";
 interface CreateProductModalProps {
   storeId: number;
   storeSlug: string;
+  withPrices: boolean;
 }
 
 export function CreateProductModal({
   storeId,
   storeSlug,
+  withPrices,
 }: CreateProductModalProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -66,10 +67,12 @@ export function CreateProductModal({
 
     try {
       const newProductId = await createProduct(formData);
-      if (!newProductId) throw new Error("No se creó la tienda");
+      if (!newProductId) throw new Error("No se creó el producto");
 
       if (productImage) {
-        const path = `stores/${storeId}/products/${newProductId}/${crypto.randomUUID()}-${productImage.name}`;
+        const path = `stores/${storeId}/products/${newProductId}/${crypto.randomUUID()}-${
+          productImage.name
+        }`;
         const logoUrl = await uploadImage(path, productImage);
         await updateProductImage(newProductId, logoUrl);
         URL.revokeObjectURL(previewUrl as string);
@@ -102,7 +105,6 @@ export function CreateProductModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* REQUIRED */}
           <input type="hidden" name="storeId" value={storeId} />
           <input type="hidden" name="storeSlug" value={storeSlug} />
 
@@ -111,24 +113,25 @@ export function CreateProductModal({
             <Input
               id="name"
               name="name"
-              placeholder="Ej: Gaseosa 500ml"
+              placeholder="Ej: Suavizante para Ropa 500ml"
               required
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="price">Precio *</Label>
-            <Input
-              id="price"
-              type="number"
-              step="0.01"
-              name="price"
-              placeholder="Ej: 2.50"
-              required
-            />
-          </div>
+          {withPrices && (
+            <div className="space-y-2">
+              <Label htmlFor="price">Precio *</Label>
+              <Input
+                id="price"
+                type="number"
+                step="0.01"
+                name="price"
+                placeholder="Ej: 2.50"
+                required
+              />
+            </div>
+          )}
 
-          {/* OPTIONAL */}
           <div className="space-y-2">
             <Label htmlFor="description">Descripción</Label>
             <Textarea
@@ -137,55 +140,6 @@ export function CreateProductModal({
               placeholder="Opcional"
             />
           </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="brand">Marca</Label>
-            <Input id="brand" name="brand" placeholder="Opcional" />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="unit">Unidad</Label>
-            <Input
-              id="unit"
-              name="unit"
-              placeholder="Ej: kg, litro, paquete"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="sku">SKU</Label>
-            <Input id="sku" name="sku" placeholder="Opcional" />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="stock">Stock</Label>
-            <Input
-              id="stock"
-              type="number"
-              name="stock"
-              placeholder="Ej: 100"
-            />
-          </div>
-
-          {/* <div className="space-y-2">
-            <Label htmlFor="categoryId">Categoría</Label>
-            <Input
-              id="categoryId"
-              type="number"
-              name="categoryId"
-              placeholder="ID categoría (opcional)"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="locationId">Sucursal</Label>
-            <Input
-              id="locationId"
-              type="number"
-              name="locationId"
-              placeholder="ID ubicación (opcional)"
-            />
-          </div> */}
 
           <div className="space-y-2">
             <Label>Imagen</Label>

@@ -62,7 +62,7 @@ export default async function StoreLayout({
         </div>
         {children}
         <CreateBranchModal storeId={store.id} storeSlug={store.slug} />
-        <CreateProductModal storeId={store.id} storeSlug={store.slug} />
+        <CreateProductModal storeId={store.id} storeSlug={store.slug} withPrices={store.withPrices} />
       </main>
     </SidebarProvider>
   );
