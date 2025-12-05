@@ -41,7 +41,6 @@ export default async function StoreLayout({
   // Fetch store data from database
   const store = await prisma.store.findUnique({
     where: { slug },
-    omit: { deletedAt: true },
   });
 
   if (!store) {

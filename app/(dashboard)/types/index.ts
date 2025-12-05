@@ -1,17 +1,7 @@
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus, Store } from "@prisma/client";
 
-export interface Store {
-  id: number;
-  name: string;
-  slug: string;
-  logo: string | null;
-  address: string;
-  phone: string | null;
-  banner?: string | null;
-  createdAt?: Date;
-  updatedAt?: Date;
-  isActive?: boolean;
-}
+// Re-export Store from Prisma for convenience
+export type { Store };
 
 export interface User {
   name: string;

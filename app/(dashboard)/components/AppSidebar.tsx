@@ -28,7 +28,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/auth/dropdown-menu";
 import { usePathname } from "next/navigation";
-import type { Store } from "../types";
+import { Store } from "@prisma/client";
 import Link from "next/link";
 import { LogoPlaceholder } from "./LogoPlaceholder";
 
