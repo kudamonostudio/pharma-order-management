@@ -1,0 +1,56 @@
+"use client";
+
+import { useState } from "react";
+import { Store } from "@prisma/client";
+import { ColabCard } from "./ColabCard";
+import { ColabModal, Collaborator, Branch } from "./ColabModal";
+import { EmptyState } from "@/components/ui/empty-state";
+
+interface ColaboradoresContentProps {
+  store: Store;
+  collaborators: Collaborator[];
+  locations: Branch[];
+}
+
+export default function ColaboradoresContent({
+  store,
+  collaborators,
+  locations,
+}: ColaboradoresContentProps) {
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedCollaborator, setSelectedCollaborator] = useState<Collaborator | null>(null);
+
+  const handleEditClick = (collaborator: Collaborator) => {
+    setSelectedCollaborator(collaborator);
+    setIsEditModalOpen(true);
+  };
+
+  return (
+    <div className="px-8 py-4 w-full">
+      <h1 className="font-bold text-2xl mb-6">Colaboradores de {store.name}</h1>
+
+      <div className="space-y-4">
+        {collaborators.length === 0 && (
+          <EmptyState text="No hay colaboradores registrados." />
+        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
+          {collaborators.map((collab) => (
+            <ColabCard 
+              key={collab.id} 
+              {...collab} 
+              onEditClick={() => handleEditClick(collab)}
+            />
+          ))}
+        </div>
+      </div>
+
+      <ColabModal
+        open={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        collaborator={selectedCollaborator}
+        storeSlug={store.slug}
+        locations={locations}
+      />
+    </div>
+  );
+}

@@ -1,5 +1,8 @@
 import { mockCollaborators } from "@/app/mocks/collaborators";
+import { getStoreBySlug } from "@/app/actions/Store";
 import { redirect } from "next/navigation";
+import ColaboradoresContent from "./Content";
+import { prisma } from "@/lib/prisma";
 
 export default async function ColaboradoresPage({
   params,
@@ -8,34 +11,36 @@ export default async function ColaboradoresPage({
 }) {
   const { slug } = await params;
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/stores/${slug}`, {
-    cache: "no-store",
-  });
+  const store = await getStoreBySlug(slug);
 
-  if (!res.ok) {
+  if (!store) {
     redirect("/supremo");
   }
 
-  const store = await res.json();
+  // Obtener las sucursales de la tienda
+  const locations = await prisma.location.findMany({
+    where: {
+      storeId: store.id,
+      deletedAt: null,
+    },
+    orderBy: { name: "asc" },
+    select: {
+      id: true,
+      name: true,
+    },
+  });
+
   //TODO: Reemplazar mockCollaborators con datos reales de colaboradores
+  const collaborators = mockCollaborators.map((c) => ({
+    ...c,
+    isActive: true,
+  }));
 
   return (
-    <div className="px-8 py-4 w-full">
-      <h1 className="font-bold text-2xl mb-6">Colaboradores de {store.name}</h1>
-
-      <div className="space-y-4">
-        {mockCollaborators.map((collab) => (
-          <div
-            key={collab.id}
-            className="p-4 border rounded-lg flex justify-between items-center"
-          >
-            <div>
-              <h3 className="font-semibold">{collab.name}</h3>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+    <ColaboradoresContent
+      store={store}
+      collaborators={collaborators}
+      locations={locations}
+    />
   );
 }
