@@ -55,8 +55,8 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
             <div
               className={`absolute top-2 left-2 right-2 h-24 rounded-t-xl ${
                 store.isActive
-                  ? "bg-gradient-to-br from-emerald-800 to-emerald-400 opacity-30"
-                  : "bg-gradient-to-br from-neutral-600 to-neutral-400 opacity-20"
+                  ? "bg-linear-to-br from-emerald-800 to-emerald-400 opacity-30"
+                  : "bg-linear-to-br from-neutral-600 to-neutral-400 opacity-20"
               }`}
             />
 
