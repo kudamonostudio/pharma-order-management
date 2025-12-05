@@ -10,11 +10,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { deleteCollaborator } from "@/app/actions/Collaborators";
 
 interface DeleteColabModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  collaboratorId: number;
+  collaboratorId: string;
   storeSlug: string;
   onSuccess?: () => void;
 }
@@ -31,10 +32,8 @@ export function DeleteColabModal({
   const handleDelete = () => {
     startTransition(async () => {
       try {
-        // TODO: Implementar deleteCollaborator action cuando existan datos reales
-        // await deleteCollaborator(collaboratorId, storeSlug);
-        console.log("Eliminando colaborador:", collaboratorId);
-        
+        await deleteCollaborator(collaboratorId, storeSlug);
+
         onOpenChange(false);
         if (onSuccess) onSuccess();
       } catch (error) {

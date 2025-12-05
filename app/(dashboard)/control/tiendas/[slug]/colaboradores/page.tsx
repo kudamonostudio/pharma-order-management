@@ -1,5 +1,5 @@
-import { mockCollaborators } from "@/app/mocks/collaborators";
 import { getStoreBySlug } from "@/app/actions/Store";
+import { getCollaboratorsByStore } from "@/app/actions/Collaborators";
 import { redirect } from "next/navigation";
 import ColaboradoresContent from "./Content";
 import { prisma } from "@/lib/prisma";
@@ -30,11 +30,8 @@ export default async function ColaboradoresPage({
     },
   });
 
-  //TODO: Reemplazar mockCollaborators con datos reales de colaboradores
-  const collaborators = mockCollaborators.map((c) => ({
-    ...c,
-    isActive: true,
-  }));
+  // Obtener colaboradores reales de la base de datos
+  const collaborators = await getCollaboratorsByStore(store.id);
 
   return (
     <ColaboradoresContent

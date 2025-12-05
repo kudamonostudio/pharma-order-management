@@ -11,12 +11,14 @@ import {
 import { Button } from "@/components/ui/button";
 import { useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { toggleCollaboratorActive } from "@/app/actions/Collaborators";
 
 interface ToggleColabActiveModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  collaboratorId: number;
+  collaboratorId: string;
   isActive: boolean;
+  storeSlug: string;
   onSuccess?: () => void;
 }
 
@@ -25,6 +27,7 @@ export function ToggleColabActiveModal({
   onOpenChange,
   collaboratorId,
   isActive,
+  storeSlug,
   onSuccess,
 }: ToggleColabActiveModalProps) {
   const [isPending, startTransition] = useTransition();
@@ -33,9 +36,7 @@ export function ToggleColabActiveModal({
   const handleToggle = () => {
     startTransition(async () => {
       try {
-        // TODO: Implementar updateCollaborator action cuando existan datos reales
-        // await updateCollaborator(collaboratorId, { isActive: !isActive });
-        console.log("Toggling colaborador:", collaboratorId, "-> isActive:", !isActive);
+        await toggleCollaboratorActive(collaboratorId, !isActive, storeSlug);
 
         router.refresh();
         onOpenChange(false);

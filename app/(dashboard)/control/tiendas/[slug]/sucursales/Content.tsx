@@ -6,9 +6,19 @@ import { Location, Store } from "@prisma/client";
 import { useState } from "react";
 import { BranchConfigModal } from "./components/BranchConfigModal";
 
+interface Collaborator {
+  id: string;
+  name: string | null;
+  imageUrl: string | null;
+}
+
+interface LocationWithCollaborators extends Location {
+  profiles: Collaborator[];
+}
+
 interface SucursalesContentProps {
   store: Store;
-  branches: Location[];
+  branches: LocationWithCollaborators[];
 }
 
 export default function SucursalesContent({
@@ -16,9 +26,10 @@ export default function SucursalesContent({
   branches,
 }: SucursalesContentProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedBranch, setSelectedBranch] = useState<Location | null>(null);
+  const [selectedBranch, setSelectedBranch] =
+    useState<LocationWithCollaborators | null>(null);
 
-  const handleEditClick = (branch: Location) => {
+  const handleEditClick = (branch: LocationWithCollaborators) => {
     setSelectedBranch(branch);
     setIsEditModalOpen(true);
   };
@@ -31,7 +42,10 @@ export default function SucursalesContent({
         <CreateBranchButton />
       </div>
       <div className="grid grid-cols-2 gap-4">
-        {branches.length === 0 && (<p className="text-base text-muted-foreground italic">No hay sucursales creadas aún.</p>
+        {branches.length === 0 && (
+          <p className="text-base text-muted-foreground italic">
+            No hay sucursales creadas aún.
+          </p>
         )}
         {branches.map((branch) => (
           <BranchCard

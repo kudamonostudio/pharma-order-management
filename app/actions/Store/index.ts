@@ -1,4 +1,3 @@
-// Vamos a usar server actions para el CUD (Create, Update, Delete), es decir, para mutaciones. Para el GET usaremos API routes.
 "use server";
 
 import crypto from "crypto";
@@ -106,6 +105,19 @@ export async function getStoreBySlug(slug: string) {
       locations: {
         where: { deletedAt: null },
         orderBy: { id: "desc" },
+        include: {
+          profiles: {
+            where: {
+              deletedAt: null,
+              isActive: true,
+            },
+            select: {
+              id: true,
+              name: true,
+              imageUrl: true,
+            },
+          },
+        },
       },
     },
   });

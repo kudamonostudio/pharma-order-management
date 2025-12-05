@@ -1,5 +1,4 @@
 import { LogoPlaceholder } from "@/app/(dashboard)/components/LogoPlaceholder";
-import { mockCollaborators } from "@/app/mocks/collaborators";
 import { ShowAvatars } from "@/components/show-avatars";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -7,10 +6,20 @@ import { Store, Location } from "@prisma/client";
 import { ArrowRight, Settings } from "lucide-react";
 import Link from "next/link";
 
+interface Collaborator {
+  id: string;
+  name: string | null;
+  imageUrl: string | null;
+}
+
+interface LocationWithCollaborators extends Location {
+  profiles: Collaborator[];
+}
+
 interface BranchCardProps {
-  branch: Location;
+  branch: LocationWithCollaborators;
   store: Store;
-  onEdit?: (branch: Location) => void;
+  onEdit?: (branch: LocationWithCollaborators) => void;
 }
 
 function index({ branch, store, onEdit }: BranchCardProps) {
@@ -34,14 +43,21 @@ function index({ branch, store, onEdit }: BranchCardProps) {
           />
         )}
         <div className="flex flex-col justify-center">
-          <h1 className="font-bold text-xl">{branch.name}</h1>
+          <h1 className="font-bold text-xl">Sucursal {branch.name}</h1>
           <p className="text-base text-muted-foreground">{branch.address}</p>
           <p className="text-base text-muted-foreground font-semibold">
             {branch.phone}
           </p>
         </div>
       </div>
-      <ShowAvatars items={mockCollaborators} className="m-auto" />
+      <ShowAvatars
+        items={branch.profiles.map((p) => ({
+          id: p.id,
+          name: p.name ?? "Sin nombre",
+          imageUrl: p.imageUrl ?? "",
+        }))}
+        className="m-auto"
+      />
       <div className=" space-y-2 p-2 gap-2">
         <Button
           variant="secondary"

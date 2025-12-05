@@ -5,7 +5,7 @@ import { Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface collaborator {
-  id: number;
+  id: string;
   imageUrl: string;
   name: string;
   isActive?: boolean;
@@ -20,15 +20,14 @@ export const ColabCard = ({ onEditClick, ...collaborator }: collaborator) => {
   const isActive = collaborator.isActive ?? true;
 
   return (
-    <div
-      key={collaborator.id}
-      className="p-4 flex flex-col relative gap-6"
-    >
+    <div key={collaborator.id} className="p-4 flex flex-col relative gap-6">
       <div className="absolute top-2 right-2">
         <Badge
           className={cn(
             "gap-1.5 text-xs font-medium px-3 rounded-full",
-            isActive ? "bg-emerald-600/70 text-white" : "bg-gray-100 text-gray-600",
+            isActive
+              ? "bg-emerald-600/70 text-white"
+              : "bg-gray-100 text-gray-600",
             "hover:bg-opacity-80 backdrop-blur-sm"
           )}
         >
@@ -51,14 +50,16 @@ export const ColabCard = ({ onEditClick, ...collaborator }: collaborator) => {
         </Avatar>
         <div className="flex-1">
           <h3 className="font-semibold text-lg">{collaborator.name}</h3>
-          <h4 className="text-sm text-muted-foreground">{collaborator.branch.name}</h4>
+          <h4 className="text-sm text-muted-foreground">
+            Sucursal{" "}
+            <span className="font-semibold">
+              {collaborator.branch.name.toLocaleUpperCase()}
+            </span>
+          </h4>
         </div>
       </div>
       {onEditClick && (
-        <Button
-          onClick={onEditClick}
-          className="w-full mt-3"
-        >
+        <Button onClick={onEditClick} className="w-full mt-3">
           <Pencil className="h-4 w-4" />
           Editar
         </Button>

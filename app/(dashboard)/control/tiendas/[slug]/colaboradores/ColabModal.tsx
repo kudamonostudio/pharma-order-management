@@ -24,6 +24,8 @@ import { Pencil, Trash2, Power } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DeleteColabModal } from "./DeleteColabModal";
 import { ToggleColabActiveModal } from "./ToggleColabActiveModal";
+import { updateCollaborator } from "@/app/actions/Collaborators";
+import { uploadCollaboratorImage } from "@/lib/supabase/client/uploadImage";
 
 export interface Branch {
   id: number;
@@ -31,7 +33,7 @@ export interface Branch {
 }
 
 export interface Collaborator {
-  id: number;
+  id: string;
   imageUrl: string;
   name: string;
   isActive?: boolean;
@@ -43,6 +45,7 @@ interface ColabModalProps {
   onOpenChange: (open: boolean) => void;
   collaborator: Collaborator | null;
   storeSlug: string;
+  storeId?: number;
   locations: Branch[];
 }
 
@@ -53,6 +56,7 @@ export function ColabModal({
   onOpenChange,
   collaborator,
   storeSlug,
+  storeId,
   locations,
 }: ColabModalProps) {
   const router = useRouter();
@@ -115,21 +119,28 @@ export function ColabModal({
     setIsLoading(true);
 
     try {
-      // TODO: Implementar updateCollaborator action cuando existan datos reales
-      // const updateData = {
-      //   name: formData.name,
-      // };
-      // await updateCollaborator(collaborator.id, updateData);
+      let imageUrl = collaborator.imageUrl;
 
-      // TODO: Subir imagen si se seleccionó una nueva
-      // if (imageFile) {
-      //   const imageUrl = await uploadCollaboratorImage(collaborator.id, imageFile);
-      //   await updateCollaboratorImage(collaborator.id, imageUrl);
-      //   URL.revokeObjectURL(previewUrl as string);
-      // }
+      // Subir imagen si se seleccionó una nueva
+      if (imageFile && storeId) {
+        imageUrl = await uploadCollaboratorImage(
+          storeId,
+          collaborator.id,
+          imageFile
+        );
+        URL.revokeObjectURL(previewUrl as string);
+      }
 
-      console.log("Guardando colaborador:", formData);
-      
+      await updateCollaborator(
+        collaborator.id,
+        {
+          name: formData.name,
+          locationId: Number(formData.branchId),
+          imageUrl,
+        },
+        storeSlug
+      );
+
       onOpenChange(false);
       router.refresh();
     } catch (error) {
@@ -222,7 +233,10 @@ export function ColabModal({
                   </SelectTrigger>
                   <SelectContent>
                     {locations.map((location) => (
-                      <SelectItem key={location.id} value={location.id.toString()}>
+                      <SelectItem
+                        key={location.id}
+                        value={location.id.toString()}
+                      >
                         {location.name}
                       </SelectItem>
                     ))}
@@ -297,6 +311,7 @@ export function ColabModal({
         onOpenChange={setIsToggleActiveModalOpen}
         collaboratorId={collaborator.id}
         isActive={isActive}
+        storeSlug={storeSlug}
         onSuccess={() => {
           setIsToggleActiveModalOpen(false);
           onOpenChange(false);

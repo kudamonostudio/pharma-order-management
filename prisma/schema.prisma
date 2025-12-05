@@ -8,15 +8,20 @@ datasource db {
 }
 
 model Profile {
-  id        String    @id @db.Uuid // mismo id que auth.users
-  role      Role      @default(COLABORADOR)
-  createdAt DateTime  @default(now())
-  deletedAt DateTime?
-  email     String?   @unique
-  phone     String?
-  storeId   Int?
-  orders    Order[]
-  store     Store?    @relation(fields: [storeId], references: [id])
+  id         String    @id @db.Uuid // mismo id que auth.users
+  role       Role      @default(COLABORADOR)
+  name       String?   @db.VarChar(100)
+  imageUrl   String?
+  createdAt  DateTime  @default(now())
+  deletedAt  DateTime?
+  email      String?   @unique
+  phone      String?
+  storeId    Int?
+  locationId Int?
+  isActive   Boolean   @default(true)
+  orders     Order[]
+  store      Store?    @relation(fields: [storeId], references: [id])
+  location   Location? @relation(fields: [locationId], references: [id])
 
   @@map("profiles")
 }
@@ -54,6 +59,7 @@ model Location {
   store     Store     @relation(fields: [storeId], references: [id])
   orders    Order[]
   products  Product[]
+  profiles  Profile[]
 
   @@map("locations")
 }
