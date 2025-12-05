@@ -1,10 +1,15 @@
 import ConfirmOrderModalContent from "./ConfirmOrderModalContent";
+import { StoreLocation } from "@/app/types/store";
 
 interface ConfirmOrderModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  storeId: number;
+  storeName: string;
+  storeLogo: string;
+  locations: StoreLocation[];
 }
 
-export default function ConfirmOrderModal({ open, onOpenChange }: ConfirmOrderModalProps) {
-  return <ConfirmOrderModalContent open={open} onOpenChange={onOpenChange} />;
+export default function ConfirmOrderModal({ open, onOpenChange, storeId, storeName, storeLogo, locations }: ConfirmOrderModalProps) {
+  return <ConfirmOrderModalContent open={open} onOpenChange={onOpenChange} storeId={storeId} storeName={storeName} storeLogo={storeLogo} locations={locations} />;
 }

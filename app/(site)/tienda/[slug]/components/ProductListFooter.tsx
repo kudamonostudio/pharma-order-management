@@ -5,18 +5,29 @@ import { useOrderStore } from "@/app/zustand/orderStore";
 import ConfirmOrderModal from "./ConfirmOrderModal";
 import { useState, useEffect } from "react";
 import { ShowAvatars } from "@/components/show-avatars";
+import { StoreLocation } from "@/app/types/store";
 
-const ProductListFooter = () => {
-  const { order, getOrderQuantity } = useOrderStore();
+interface ProductListFooterProps {
+  storeId: number;
+  storeName: string;
+  storeLogo: string;
+  locations: StoreLocation[];
+}
+
+const ProductListFooter = ({ storeId, storeName, storeLogo, locations }: ProductListFooterProps) => {
+  const { order, getOrderQuantity, setStoreId } = useOrderStore();
   const [confirmOrderOpen, setConfirmOrderOpen] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    setIsHydrated(true);
-  }, []);
+    setStoreId(storeId);
+    // Pequeño delay para asegurar que el store se actualizó
+    setTimeout(() => setIsHydrated(true), 0);
+  }, [storeId, setStoreId]);
 
   const areProductsInOrder = isHydrated && getOrderQuantity() > 0;
-  const emptyOrder = !isHydrated || getOrderQuantity() === 0;
+  const emptyOrder = isHydrated && getOrderQuantity() === 0;
+  const isLoading = !isHydrated;
 
   const handleConfirmOrderOpen = () => {
     // Abrir el modal de confirmación de orden
@@ -25,8 +36,19 @@ const ProductListFooter = () => {
 
   return (
     <>
-      <div className="min-h-24 md:h-24 w-full bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 shadow-[0_-1px_3px_rgba(0,0,0,0.05)] border-t fixed bottom-0 left-0 flex">
+      <div className="min-h-24 md:h-24 w-full bg-white shadow-[0_-1px_3px_rgba(0,0,0,0.05)] border-t fixed bottom-0 left-0 flex">
         <div className="max-w-4xl mx-auto px-6 h-full flex justify-center items-center w-full">
+          {isLoading && (
+            <div className="flex items-center gap-2.5">
+              <ShoppingCart
+                className="w-5 h-5 text-muted-foreground animate-pulse"
+                strokeWidth={2}
+              />
+              <h3 className="text-sm font-medium text-muted-foreground">
+                Cargando orden...
+              </h3>
+            </div>
+          )}
           {emptyOrder && (
             <div className="flex items-center gap-2.5">
               <ShoppingCart
@@ -41,7 +63,7 @@ const ProductListFooter = () => {
           {areProductsInOrder && (
             <div className="flex flex-wrap gap-4 items-center relative justify-between w-full">
               <div className="flex items-center gap-6 sm:gap-8">
-                <ShowAvatars items={order} />
+                <ShowAvatars items={order} type="product" />
                 <div className="flex items-baseline gap-2">
                   <span className="text-2xl font-semibold text-foreground">
                     {getOrderQuantity()}
@@ -66,6 +88,10 @@ const ProductListFooter = () => {
       <ConfirmOrderModal
         open={confirmOrderOpen}
         onOpenChange={setConfirmOrderOpen}
+        storeId={storeId}
+        storeName={storeName}
+        storeLogo={storeLogo}
+        locations={locations}
       />
     </>
   );

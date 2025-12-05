@@ -16,6 +16,7 @@ import StoreLogo from "../StoreLogo";
 import ConfirmOrderModalFooter from "./ConfirmOrderModalFooter";
 import ConfirmOrderModalForm from "./ConfirmOrderModalForm";
 import SelectedProductsTotal from "../SelectedProductsTotal";
+import { StoreLocation } from "@/app/types/store";
 
 const formSchema = z.object({
   fullName: z.string().min(3, "Mínimo 3 caracteres"),
@@ -28,11 +29,19 @@ type FormData = z.infer<typeof formSchema>;
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  storeId: number;
+  storeName: string;
+  storeLogo: string;
+  locations: StoreLocation[];
 }
 
 export default function ConfirmOrderModalContent({
   open,
   onOpenChange,
+  storeId,
+  storeName,
+  storeLogo,
+  locations,
 }: Props) {
   const [step, setStep] = useState<"products" | "form">("products");
   const { order, getOrderQuantity, clearOrder } = useOrderStore();
@@ -122,7 +131,7 @@ export default function ConfirmOrderModalContent({
         <div className="px-6 pt-6 pb-4">
           <DialogHeader>
             <div className="flex gap-6 items-center mb-2">
-              <StoreLogo logoUrl="https://i.pinimg.com/736x/c9/9d/0e/c99d0ec4d6f81c2e2592f41216d8fcd7.jpg" />
+              <StoreLogo logoUrl={storeLogo} />
               <DialogTitle className="text-2xl mb-2 font-normal">
                 Confirma la orden
               </DialogTitle>
@@ -150,6 +159,7 @@ export default function ConfirmOrderModalContent({
               register={register}
               errors={errors}
               branchId={branchId}
+              locations={locations}
               onBranchChange={(value: string) => {
                 setValue("branchId", value);
                 trigger("branchId");

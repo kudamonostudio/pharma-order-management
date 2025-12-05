@@ -8,12 +8,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
-
-const BRANCHES = [
-  { id: "1", name: "Sucursal 1" },
-  { id: "2", name: "Sucursal 2" },
-  { id: "3", name: "Sucursal 3" },
-];
+import { StoreLocation } from "@/app/types/store";
 
 interface FormData {
   fullName: string;
@@ -25,6 +20,7 @@ interface ConfirmOrderModalFormProps {
   register: UseFormRegister<FormData>;
   errors: FieldErrors<FormData>;
   branchId: string;
+  locations: StoreLocation[];
   onBranchChange: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
@@ -33,6 +29,7 @@ export default function ConfirmOrderModalForm({
   register,
   errors,
   branchId,
+  locations,
   onBranchChange,
   onSubmit,
 }: ConfirmOrderModalFormProps) {
@@ -87,11 +84,17 @@ export default function ConfirmOrderModalForm({
             <SelectValue placeholder="Selecciona una sucursal" />
           </SelectTrigger>
           <SelectContent>
-            {BRANCHES.map((branch) => (
-              <SelectItem key={branch.id} value={branch.id}>
-                {branch.name}
+            {locations.length === 0 ? (
+              <SelectItem value="no-locations" disabled>
+                No hay sucursales disponibles
               </SelectItem>
-            ))}
+            ) : (
+              locations.map((location) => (
+                <SelectItem key={location.id} value={location.id.toString()}>
+                  {location.name} - {location.address}
+                </SelectItem>
+              ))
+            )}
           </SelectContent>
         </Select>
         {errors.branchId && (

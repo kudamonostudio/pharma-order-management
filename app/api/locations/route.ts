@@ -1,9 +1,23 @@
 import { prisma } from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
-export async function GET() {
-  const locations = await prisma.location.findMany();
-  return NextResponse.json(locations);
+export async function GET(req: Request) {
+  const { searchParams } = new URL(req.url);
+  const storeId = searchParams.get('storeId');
+
+  const whereClause = storeId 
+    ? { 
+        storeId: parseInt(storeId),
+        deletedAt: null
+      }
+    : { deletedAt: null };
+
+  const locations = await prisma.location.findMany({
+    where: whereClause,
+    orderBy: { name: 'asc' }
+  });
+  
+  return NextResponse.json({ locations });
 }
 
 export async function POST(req: Request) {

@@ -4,6 +4,7 @@ import { Store, LayoutGrid, LayoutList } from "lucide-react";
 import { useState } from "react";
 import AddButton from "../AddButton";
 import type { StoreProductItem } from "@/app/types/store";
+import Image from "next/image";
 
 interface ProductListProps {
   products: StoreProductItem[];
@@ -37,65 +38,83 @@ const ProductList = ({ products }: ProductListProps) => {
 
       {viewMode === "grid" ? (
         // Grid View (New Vertical Design)
-        <div className="grid grid-cols-3 gap-4 max-w-4xl">
-          {products.map((product) => (
-            <Card
-              key={product.id}
-              className="p-0 bg-card hover:shadow-lg transition-all duration-300 border border-border rounded-2xl overflow-hidden group"
-            >
-              <div className="relative w-full h-48 bg-gradient-to-br from-muted to-muted/50 overflow-hidden">
-                <img
-                  src={product.image || "/placeholder.svg"}
-                  alt={product.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-              </div>
-
-              <div className="p-4 space-y-3">
-                <div>
-                  <h3 className="text-base font-semibold text-foreground mb-1.5 leading-tight line-clamp-1">
-                    {product.name}
-                  </h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
-                    {product.description}
-                  </p>
-                </div>
-                <AddButton product={product} />
-              </div>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        // List View (Original Horizontal Design)
-        <div className="space-y-3 max-w-2xl">
-          {products.map((product) => (
-            <Card
-              key={product.id}
-              className="p-0 bg-card border border-border rounded-xl overflow-hidden"
-            >
-              <div className="flex gap-4 p-3">
-                <div className="relative w-24 h-24 flex-shrink-0 bg-gradient-to-br from-muted to-muted/50 rounded-lg overflow-hidden">
-                  <img
-                    src={product.image || "/placeholder.svg"}
+        <div className="grid grid-cols-3 gap-4 max-w-4xl mb-2">
+          {products.map((product) => {
+            const isPlaceholder = !product.image;
+            return (
+              <Card
+                key={product.id}
+                className="p-0 bg-card hover:shadow-lg transition-all duration-300 border border-border rounded-2xl overflow-hidden group"
+              >
+                <div className="relative w-full h-48 bg-gray-100 overflow-hidden rounded-t-2xl flex items-center justify-center">
+                  <Image
+                    src={product.image || "/product-placeholder.webp"}
                     alt={product.name}
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    quality={75}
+                    className={
+                      isPlaceholder
+                        ? "object-contain p-8"
+                        : "object-cover group-hover:scale-110 transition-transform duration-500"
+                    }
                   />
                 </div>
 
-                <div className="flex-1 flex flex-col justify-between min-w-0">
+                <div className="p-4 space-y-3">
                   <div>
-                    <h3 className="text-base font-semibold text-foreground mb-1 leading-tight line-clamp-1">
+                    <h3 className="text-base font-semibold text-foreground mb-1.5 leading-tight line-clamp-1">
                       {product.name}
                     </h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-2">
+                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                       {product.description}
                     </p>
                   </div>
                   <AddButton product={product} />
                 </div>
-              </div>
-            </Card>
-          ))}
+              </Card>
+            );
+          })}
+        </div>
+      ) : (
+        // List View (Original Horizontal Design)
+        <div className="space-y-3 max-w-2xl">
+          {products.map((product) => {
+            const isPlaceholder = !product.image;
+            return (
+              <Card
+                key={product.id}
+                className="p-0 bg-card border border-border rounded-xl overflow-hidden"
+              >
+                <div className="flex gap-4 p-3">
+                  <div className="relative w-24 h-24 shrink-0 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center">
+                    <Image
+                      src={product.image || "/product-placeholder.webp"}
+                      alt={product.name}
+                      fill
+                      sizes="96px"
+                      quality={75}
+                      className={
+                        isPlaceholder ? "object-contain p-8" : "object-cover"
+                      }
+                    />
+                  </div>
+
+                  <div className="flex-1 flex flex-col justify-between min-w-0">
+                    <div>
+                      <h3 className="text-base font-semibold text-foreground mb-1 leading-tight line-clamp-1">
+                        {product.name}
+                      </h3>
+                      <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-2">
+                        {product.description}
+                      </p>
+                    </div>
+                    <AddButton product={product} />
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>

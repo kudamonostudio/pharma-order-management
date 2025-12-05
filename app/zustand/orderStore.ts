@@ -14,6 +14,8 @@ interface OrderProduct extends StoreProductItem {
 
 interface OrderState {
   order: OrderProduct[];
+  currentStoreId: number | null;
+  setStoreId: (storeId: number) => void;
   addProduct: (product: StoreProductItem) => void;
   removeProduct: (id: string) => void;
   increment: (id: string) => void;
@@ -22,14 +24,33 @@ interface OrderState {
   clearOrder: () => void;
 }
 
+const getStoreOrderKey = (storeId: number) => `order_store_${storeId}`;
+
+const getOrderForStore = (storeId: number): OrderProduct[] => {
+  if (typeof window === "undefined") return [];
+  const stored = localStorage.getItem(getStoreOrderKey(storeId));
+  return stored ? JSON.parse(stored) : [];
+};
+
+const saveOrderForStore = (storeId: number, order: OrderProduct[]) => {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(getStoreOrderKey(storeId), JSON.stringify(order));
+};
+
 export const useOrderStore = create<OrderState>((set, get) => ({
-  order:
-    typeof window !== "undefined"
-      ? JSON.parse(localStorage.getItem("order") || "[]")
-      : [],
+  order: [],
+  currentStoreId: null,
+
+  setStoreId: (storeId) =>
+    set(() => {
+      const order = getOrderForStore(storeId);
+      return { currentStoreId: storeId, order };
+    }),
 
   addProduct: (product) =>
     set((state) => {
+      if (!state.currentStoreId) return state;
+
       const exists = state.order.find((p) => p.id === product.id);
       let updatedOrder;
 
@@ -41,43 +62,52 @@ export const useOrderStore = create<OrderState>((set, get) => ({
         updatedOrder = [...state.order, { ...product, quantity: 1 }];
       }
 
-      localStorage.setItem("order", JSON.stringify(updatedOrder));
+      saveOrderForStore(state.currentStoreId, updatedOrder);
       return { order: updatedOrder };
     }),
 
   removeProduct: (id) =>
     set((state) => {
+      if (!state.currentStoreId) return state;
+
       const updatedOrder = state.order.filter((p) => p.id !== id);
-      localStorage.setItem("order", JSON.stringify(updatedOrder));
+      saveOrderForStore(state.currentStoreId, updatedOrder);
       return { order: updatedOrder };
     }),
 
   increment: (id) =>
     set((state) => {
+      if (!state.currentStoreId) return state;
+
       const updatedOrder = state.order.map((p) =>
         p.id === id ? { ...p, quantity: p.quantity + 1 } : p
       );
-      localStorage.setItem("order", JSON.stringify(updatedOrder));
+      saveOrderForStore(state.currentStoreId, updatedOrder);
       return { order: updatedOrder };
     }),
 
   decrement: (id) =>
     set((state) => {
+      if (!state.currentStoreId) return state;
+
       const updatedOrder = state.order
         .map((p) => (p.id === id ? { ...p, quantity: p.quantity - 1 } : p))
         .filter((p) => p.quantity > 0);
 
-      localStorage.setItem("order", JSON.stringify(updatedOrder));
+      saveOrderForStore(state.currentStoreId, updatedOrder);
       return { order: updatedOrder };
     }),
+
   getOrderQuantity: () => {
     const currentOrder = get().order;
     return currentOrder.reduce((total, item) => total + item.quantity, 0);
   },
 
   clearOrder: () =>
-    set(() => {
-      localStorage.setItem("order", JSON.stringify([]));
+    set((state) => {
+      if (!state.currentStoreId) return state;
+
+      saveOrderForStore(state.currentStoreId, []);
       return { order: [] };
     }),
 }));
