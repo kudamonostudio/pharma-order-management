@@ -20,7 +20,8 @@ export default function ColaboradoresContent({
   locations,
 }: ColaboradoresContentProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedCollaborator, setSelectedCollaborator] = useState<Collaborator | null>(null);
+  const [selectedCollaborator, setSelectedCollaborator] =
+    useState<Collaborator | null>(null);
 
   const handleEditClick = (collaborator: Collaborator) => {
     setSelectedCollaborator(collaborator);
@@ -30,7 +31,9 @@ export default function ColaboradoresContent({
   return (
     <div className="px-8 py-4 w-full">
       <div className="flex flex-col gap-2 items-start mt-4 justify-between sm:flex-row mb-4">
-        <h1 className="font-bold text-2xl mb-6">Colaboradores de {store.name}</h1>
+        <h1 className="font-bold text-2xl mb-6">
+          Colaboradores de {store.name}
+        </h1>
         <CreateCollaboratorButton />
       </div>
 
@@ -40,9 +43,9 @@ export default function ColaboradoresContent({
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
           {collaborators.map((collab) => (
-            <ColabCard 
-              key={collab.id} 
-              {...collab} 
+            <ColabCard
+              key={collab.id}
+              {...collab}
               onEditClick={() => handleEditClick(collab)}
             />
           ))}

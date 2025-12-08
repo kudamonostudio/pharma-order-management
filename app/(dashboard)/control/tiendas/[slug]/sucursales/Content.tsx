@@ -12,6 +12,14 @@ interface Collaborator {
   imageUrl: string | null;
 }
 
+interface StoreCollaborator {
+  id: string;
+  name: string;
+  imageUrl: string;
+  isActive: boolean;
+  branch: { id: number; name: string };
+}
+
 interface LocationWithCollaborators extends Location {
   profiles: Collaborator[];
 }
@@ -19,11 +27,13 @@ interface LocationWithCollaborators extends Location {
 interface SucursalesContentProps {
   store: Store;
   branches: LocationWithCollaborators[];
+  allCollaborators: StoreCollaborator[];
 }
 
 export default function SucursalesContent({
   store,
   branches,
+  allCollaborators,
 }: SucursalesContentProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedBranch, setSelectedBranch] =
@@ -33,6 +43,15 @@ export default function SucursalesContent({
     setSelectedBranch(branch);
     setIsEditModalOpen(true);
   };
+
+  // Convertir allCollaborators al formato esperado por el modal (con todos los campos)
+  const collaboratorsForModal = allCollaborators.map((c) => ({
+    id: c.id,
+    name: c.name,
+    imageUrl: c.imageUrl || null,
+    isActive: c.isActive,
+    branch: c.branch,
+  }));
 
   return (
     <div className="px-8 py-4 w-full">
@@ -62,6 +81,7 @@ export default function SucursalesContent({
         onOpenChange={setIsEditModalOpen}
         branch={selectedBranch}
         storeSlug={store.slug}
+        allCollaborators={collaboratorsForModal}
       />
     </div>
   );

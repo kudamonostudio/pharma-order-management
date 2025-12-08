@@ -109,12 +109,12 @@ export async function getStoreBySlug(slug: string) {
           profiles: {
             where: {
               deletedAt: null,
-              isActive: true,
             },
             select: {
               id: true,
               name: true,
               imageUrl: true,
+              isActive: true,
             },
           },
         },

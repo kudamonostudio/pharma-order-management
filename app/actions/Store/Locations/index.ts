@@ -55,3 +55,61 @@ export async function deleteLocation(id: number, storeSlug: string) {
 
   revalidatePath(`/control/tiendas/${storeSlug}`);
 }
+
+export async function assignCollaboratorsToLocation(
+  locationId: number,
+  collaboratorIds: string[],
+  storeSlug: string
+) {
+  if (!locationId) {
+    throw new Error("assignCollaboratorsToLocation: missing locationId");
+  }
+
+  // Obtener los colaboradores actualmente asignados a esta sucursal
+  const currentCollaborators = await prisma.profile.findMany({
+    where: {
+      locationId,
+      deletedAt: null,
+    },
+    select: { id: true },
+  });
+
+  const currentIds = new Set(currentCollaborators.map((c) => c.id));
+  const newIds = new Set(collaboratorIds);
+
+  // Colaboradores a quitar (están en current pero no en new)
+  const toRemove = currentCollaborators
+    .filter((c) => !newIds.has(c.id))
+    .map((c) => c.id);
+
+  // Colaboradores a agregar (están en new pero no en current)
+  const toAdd = collaboratorIds.filter((id) => !currentIds.has(id));
+
+  // Solo ejecutar si hay cambios
+  if (toRemove.length > 0) {
+    await prisma.profile.updateMany({
+      where: {
+        id: { in: toRemove },
+        deletedAt: null,
+      },
+      data: {
+        locationId: null,
+      },
+    });
+  }
+
+  if (toAdd.length > 0) {
+    await prisma.profile.updateMany({
+      where: {
+        id: { in: toAdd },
+        deletedAt: null,
+      },
+      data: {
+        locationId,
+      },
+    });
+  }
+
+  revalidatePath(`/control/tiendas/${storeSlug}/sucursales`);
+  revalidatePath(`/control/tiendas/${storeSlug}/colaboradores`);
+}

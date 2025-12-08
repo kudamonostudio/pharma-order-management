@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import SucursalesContent from "./Content";
 import { getStoreBySlug } from "@/app/actions/Store";
+import { getCollaboratorsByStore } from "@/app/actions/Collaborators";
 
 export default async function SucursalesPage({
   params,
@@ -14,5 +15,13 @@ export default async function SucursalesPage({
     redirect("/supremo");
   }
 
-  return <SucursalesContent store={store} branches={store.locations} />;
+  const allCollaborators = await getCollaboratorsByStore(store.id);
+
+  return (
+    <SucursalesContent
+      store={store}
+      branches={store.locations}
+      allCollaborators={allCollaborators}
+    />
+  );
 }

@@ -12,16 +12,36 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2 } from "lucide-react";
+import { Pencil, Trash2, Users } from "lucide-react";
 import { Location } from "@prisma/client";
 import { updateLocation } from "@/app/actions/Store/Locations";
 import { DeleteBranchModal } from "./DeleteBranchModal";
+import { AssignCollaboratorsModal } from "./AssignCollaboratorsModal";
+
+interface Collaborator {
+  id: string;
+  name: string | null;
+  imageUrl: string | null;
+  isActive: boolean;
+  branch: { id: number; name: string };
+}
+
+interface SimpleCollaborator {
+  id: string;
+  name: string | null;
+  imageUrl: string | null;
+}
+
+interface LocationWithCollaborators extends Location {
+  profiles: SimpleCollaborator[];
+}
 
 interface BranchConfigModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  branch: Location | null;
+  branch: LocationWithCollaborators | null;
   storeSlug: string;
+  allCollaborators: Collaborator[];
 }
 
 type ModalView = "menu" | "edit";
@@ -31,11 +51,14 @@ export function BranchConfigModal({
   onOpenChange,
   branch,
   storeSlug,
+  allCollaborators,
 }: BranchConfigModalProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [view, setView] = useState<ModalView>("menu");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isAssignCollaboratorsModalOpen, setIsAssignCollaboratorsModalOpen] =
+    useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -110,7 +133,17 @@ export function BranchConfigModal({
                 Editar información
               </Button>
 
-              {/* Opción 2: Eliminar */}
+              {/* Opción 2: Asignar Colaboradores */}
+              <Button
+                variant="outline"
+                className="justify-start gap-2 h-12"
+                onClick={() => setIsAssignCollaboratorsModalOpen(true)}
+              >
+                <Users className="h-4 w-4" />
+                Asignar Colaboradores
+              </Button>
+
+              {/* Opción 3: Eliminar */}
               <Button
                 variant="destructive"
                 className="justify-start gap-2 h-12"
@@ -189,6 +222,16 @@ export function BranchConfigModal({
           onOpenChange(false);
           router.refresh();
         }}
+      />
+
+      <AssignCollaboratorsModal
+        open={isAssignCollaboratorsModalOpen}
+        onOpenChange={setIsAssignCollaboratorsModalOpen}
+        locationId={branch.id}
+        locationName={branch.name}
+        storeSlug={storeSlug}
+        assignedCollaborators={branch.profiles}
+        allCollaborators={allCollaborators}
       />
     </>
   );

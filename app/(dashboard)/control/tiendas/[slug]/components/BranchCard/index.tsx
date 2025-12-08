@@ -10,6 +10,7 @@ interface Collaborator {
   id: string;
   name: string | null;
   imageUrl: string | null;
+  isActive?: boolean;
 }
 
 interface LocationWithCollaborators extends Location {
@@ -23,6 +24,9 @@ interface BranchCardProps {
 }
 
 function index({ branch, store, onEdit }: BranchCardProps) {
+  // Filtrar solo colaboradores activos para mostrar en la card
+  const activeProfiles = branch.profiles.filter((p) => p.isActive !== false);
+
   return (
     <Card
       key={branch.id}
@@ -51,7 +55,7 @@ function index({ branch, store, onEdit }: BranchCardProps) {
         </div>
       </div>
       <ShowAvatars
-        items={branch.profiles.map((p) => ({
+        items={activeProfiles.map((p) => ({
           id: p.id,
           name: p.name ?? "Sin nombre",
           imageUrl: p.imageUrl ?? "",
