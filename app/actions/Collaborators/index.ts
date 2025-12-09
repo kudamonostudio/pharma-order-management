@@ -59,30 +59,18 @@ export async function updateCollaboratorImage(id: number, url: string) {
 
 export async function updateCollaborator(
   collaboratorId: number,
-  assignmentId: number,
   data: {
     firstName?: string;
     lastName?: string;
-    locationId?: number | null;
     image?: string;
     code?: string | null;
   },
   storeSlug?: string
 ) {
-  const { locationId, ...collabAttibutes } = data;
   await prisma.collaborator.update({
     where: { id: collaboratorId },
-    data: collabAttibutes,
+    data,
   });
-
-  if(locationId) {
-    await prisma.collaboratorAssignment.update({
-      where: { id: assignmentId },
-      data: {
-        locationId,
-      },
-    });
-  }
 
   if (storeSlug) {
     revalidatePath(`/control/tiendas/${storeSlug}/colaboradores`);
@@ -97,21 +85,34 @@ export async function deleteCollaborator(id: number, storeSlug: string) {
     return;
   }
 
-  // await prisma.profile.update({
-  //   where: { id },
-  //   data: { deletedAt: new Date() },
-  // });
+  await prisma.collaborator.update({
+    where: { id },
+    data: { deletedAt: new Date() },
+  });
 
   revalidatePath(`/control/tiendas/${storeSlug}/colaboradores`);
 }
 
 export async function toggleCollaboratorActive(
-  assignmentId: number,
+  collaboratorId: number,
   isActive: boolean,
   storeSlug: string
 ) {
-  await prisma.collaboratorAssignment.update({
-    where: { id: assignmentId },
+  const store = await prisma.store.findFirst({
+    where: {
+      slug: storeSlug
+    },
+  });
+
+  if(!store) {
+    return;
+  }
+  
+  await prisma.collaboratorAssignment.updateMany({
+    where: {
+      collaboratorId,
+      storeId: store?.id,
+    },
     data: { isActive },
   });
 
@@ -123,8 +124,9 @@ export async function getCollaboratorsByStore(storeId: number) {
   const collaboratorAssignments = await prisma.collaboratorAssignment.findMany({
     where: {
       storeId,
-      // deletedAt: null,
-      // role: "SUCURSAL_ADMIN",
+      collaborator: {
+        deletedAt: null,
+      },
     },
     include: {
       collaborator: {

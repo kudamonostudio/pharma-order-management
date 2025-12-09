@@ -75,7 +75,6 @@ export function ColabModal({
     firstName: "",
     lastName: "",
     code: "",
-    branchId: "",
   });
 
   const onDrop = (acceptedFiles: File[]) => {
@@ -116,8 +115,6 @@ export function ColabModal({
         firstName: collaborator.firstName,
         lastName: collaborator.lastName,
         code: collaborator.code ?? '',
-        // branchId: collaborator.branch.id.toString(), // TODO
-        branchId: '1', // TODO HELP
       });
     }
   }, [collaborator]);
@@ -142,12 +139,11 @@ export function ColabModal({
 
       await updateCollaborator(
         collaborator.collaboratorId,
-        collaborator.assignmentId,
         {
           firstName: formData.firstName,
           lastName: formData.lastName,
           code: formData.code !== '' ? formData.code : null,
-          locationId: Number(formData.branchId),
+          // locationId: Number(formData.branchId),
           image: imageUrl,
         },
         storeSlug
@@ -255,10 +251,11 @@ export function ColabModal({
                 />
               </div>
 
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <Label htmlFor="edit-branch">Sucursal *</Label>
                 <Select
-                  value={formData.branchId}
+                  // value={formData.branchId}
+                  value=""
                   onValueChange={(value) =>
                     setFormData({ ...formData, branchId: value })
                   }
@@ -277,7 +274,7 @@ export function ColabModal({
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
 
               <div className="space-y-2">
                 <Label>Imagen</Label>
@@ -344,7 +341,7 @@ export function ColabModal({
       <ToggleColabActiveModal
         open={isToggleActiveModalOpen}
         onOpenChange={setIsToggleActiveModalOpen}
-        assignmentId={collaborator.assignmentId}
+        collaboratorId={collaborator.collaboratorId}
         isActive={isActive}
         storeSlug={storeSlug}
         onSuccess={() => {

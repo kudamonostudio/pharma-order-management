@@ -91,12 +91,6 @@ export function AssignCollaboratorsModal({
         storeSlug
       );
 
-      // console.log('@@@');
-      // console.log({
-      //   locationId,
-      //   selectedIds: Array.from(selectedIds),
-      //   storeSlug
-      // });
       onOpenChange(false);
       router.refresh();
     } catch (error) {
@@ -175,7 +169,7 @@ export function AssignCollaboratorsModal({
                           collaborator={collaborator}
                         />
                       </span>
-                      {!currentLocation?.isActive && (
+                      {currentLocation && !currentLocation?.isActive && (
                         <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-sm">
                           Inactivo
                         </span>
