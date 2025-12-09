@@ -10,15 +10,15 @@ interface collaborator {
   image: string;
   firstName: string;
   lastName: string;
-  isActive?: boolean;
+  isActive: boolean;
   branches: Branch[];
   onEditClick?: () => void;
 }
 
 export const ColabCard = ({ onEditClick, ...collaborator }: collaborator) => {
-  // const isActive = collaborator.isActive ?? true;
-  const isActive = collaborator.branches.every(b => b.isActive === true);
+  const isActive = collaborator.isActive ?? true;
 
+  const collaboratorActiveLocations = collaborator.branches.filter(b => b.isActive);
   return (
     <div key={collaborator.collaboratorId} className="p-4 flex flex-col relative gap-6">
       <div className="absolute top-2 right-2">
@@ -52,8 +52,8 @@ export const ColabCard = ({ onEditClick, ...collaborator }: collaborator) => {
           <h3 className="font-semibold text-lg">{collaborator.firstName} {collaborator.lastName}</h3>
           <h4 className="text-sm text-muted-foreground">
             <span className="font-semibold">
-              {collaborator.branches.filter(b => b.isActive).length > 0
-                ? collaborator.branches.map(b => b.name).join(", ")
+              {collaboratorActiveLocations.length > 0
+                ? collaboratorActiveLocations.map(b => b.name).join(", ")
                 : "Sin sucursal"}
             </span>
           </h4>
