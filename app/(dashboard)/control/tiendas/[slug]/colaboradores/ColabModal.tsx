@@ -26,18 +26,22 @@ import { DeleteColabModal } from "./DeleteColabModal";
 import { ToggleColabActiveModal } from "./ToggleColabActiveModal";
 import { updateCollaborator } from "@/app/actions/Collaborators";
 import { uploadCollaboratorImage } from "@/lib/supabase/client/uploadImage";
+import { Branch } from "@/shared/types/collaborator";
 
-export interface Branch {
+interface SimpleLocation {
   id: number;
   name: string;
 }
 
 export interface Collaborator {
-  id: string;
-  imageUrl: string;
-  name: string;
-  isActive?: boolean;
-  branch: Branch;
+  collaboratorId: number;
+  assignmentId: number;
+  image: string;
+  firstName: string;
+  lastName: string;
+  code: string | null;
+  // isActive?: boolean;
+  branches: Branch[];
 }
 
 interface ColabModalProps {
@@ -46,7 +50,7 @@ interface ColabModalProps {
   collaborator: Collaborator | null;
   storeSlug: string;
   storeId?: number;
-  locations: Branch[];
+  locations: SimpleLocation[];
 }
 
 type ModalView = "menu" | "edit";
@@ -68,7 +72,9 @@ export function ColabModal({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
+    code: "",
     branchId: "",
   });
 
@@ -107,8 +113,11 @@ export function ColabModal({
   useEffect(() => {
     if (collaborator) {
       setFormData({
-        name: collaborator.name,
-        branchId: collaborator.branch.id.toString(),
+        firstName: collaborator.firstName,
+        lastName: collaborator.lastName,
+        code: collaborator.code ?? '',
+        // branchId: collaborator.branch.id.toString(), // TODO
+        branchId: '1', // TODO HELP
       });
     }
   }, [collaborator]);
@@ -119,24 +128,27 @@ export function ColabModal({
     setIsLoading(true);
 
     try {
-      let imageUrl = collaborator.imageUrl;
+      let imageUrl = collaborator.image;
 
       // Subir imagen si se seleccionó una nueva
       if (imageFile && storeId) {
         imageUrl = await uploadCollaboratorImage(
           storeId,
-          collaborator.id,
+          collaborator.collaboratorId,
           imageFile
         );
         URL.revokeObjectURL(previewUrl as string);
       }
 
       await updateCollaborator(
-        collaborator.id,
+        collaborator.collaboratorId,
+        collaborator.assignmentId,
         {
-          name: formData.name,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          code: formData.code !== '' ? formData.code : null,
           locationId: Number(formData.branchId),
-          imageUrl,
+          image: imageUrl,
         },
         storeSlug
       );
@@ -152,7 +164,7 @@ export function ColabModal({
 
   if (!collaborator) return null;
 
-  const isActive = collaborator.isActive ?? true;
+  const isActive = collaborator.branches.every(b => b.isActive === true);
 
   return (
     <>
@@ -164,7 +176,7 @@ export function ColabModal({
             </DialogTitle>
             <DialogDescription>
               {view === "menu"
-                ? `Opciones para ${collaborator.name}`
+                ? `Opciones para ${collaborator.firstName} ${collaborator.lastName}`
                 : "Modifica la información del colaborador"}
             </DialogDescription>
           </DialogHeader>
@@ -211,12 +223,35 @@ export function ColabModal({
                 <Label htmlFor="edit-name">Nombre *</Label>
                 <Input
                   id="edit-name"
-                  placeholder="Ej: Juan Pérez"
-                  value={formData.name}
+                  placeholder="Ej: Luis"
+                  value={formData.firstName}
                   onChange={(e) =>
-                    setFormData({ ...formData, name: e.target.value })
+                    setFormData({ ...formData, firstName: e.target.value })
                   }
                   required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-lastname">Apellidos *</Label>
+                <Input
+                  id="edit-lastname"
+                  placeholder="Ej: Pérez"
+                  value={formData.lastName}
+                  onChange={(e) =>
+                    setFormData({ ...formData, lastName: e.target.value })
+                  }
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-code">Código</Label>
+                <Input
+                  id="edit-code"
+                  placeholder=""
+                  value={formData.code}
+                  onChange={(e) =>
+                    setFormData({ ...formData, code: e.target.value })
+                  }
                 />
               </div>
 
@@ -259,9 +294,9 @@ export function ColabModal({
                         className="mx-auto h-32 w-32 object-cover rounded-full"
                       />
                     )
-                  ) : collaborator.imageUrl ? (
+                  ) : collaborator.image ? (
                     <img
-                      src={collaborator.imageUrl}
+                      src={collaborator.image}
                       alt="Imagen actual"
                       className="mx-auto h-32 w-32 object-cover rounded-full"
                     />
@@ -297,7 +332,7 @@ export function ColabModal({
       <DeleteColabModal
         open={isDeleteModalOpen}
         onOpenChange={setIsDeleteModalOpen}
-        collaboratorId={collaborator.id}
+        collaboratorId={collaborator.collaboratorId}
         storeSlug={storeSlug}
         onSuccess={() => {
           setIsDeleteModalOpen(false);
@@ -309,7 +344,7 @@ export function ColabModal({
       <ToggleColabActiveModal
         open={isToggleActiveModalOpen}
         onOpenChange={setIsToggleActiveModalOpen}
-        collaboratorId={collaborator.id}
+        assignmentId={collaborator.assignmentId}
         isActive={isActive}
         storeSlug={storeSlug}
         onSuccess={() => {

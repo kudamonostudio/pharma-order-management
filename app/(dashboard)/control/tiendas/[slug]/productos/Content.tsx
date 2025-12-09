@@ -10,6 +10,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
 import { Pencil } from "lucide-react";
 import ProductIsActiveButton from "@/app/(dashboard)/control/tiendas/[slug]/productos/components/modals/ProductConfigModal/ProductIsActiveButton";
+import { MIN_DIGITS_FOR_SEARCH } from "@/lib/constants";
 
 type ProductWithNumberPrice = Omit<Product, "price"> & { price: number };
 
@@ -18,6 +19,7 @@ interface ProductsContentProps {
   initialProducts: ProductWithNumberPrice[];
   initialPages: number;
   initialPage: number;
+  initialSearch: string;
 }
 
 export default function ProductsContent({
@@ -25,8 +27,10 @@ export default function ProductsContent({
   initialProducts,
   initialPages,
   initialPage,
+  initialSearch,
 }: ProductsContentProps) {
   const router = useRouter();
+  const [search, setSearch] = useState(initialSearch);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductWithNumberPrice | null>(null);
 
@@ -36,16 +40,43 @@ export default function ProductsContent({
   };
 
   const handlePageChange = (page: number) => {
-    router.push(`/control/tiendas/${store.slug}/productos?page=${page}`);
+    router.push(
+      `/control/tiendas/${store.slug}/productos?page=${page}&search=${search}`
+    );
+  };
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.push(
+      `/control/tiendas/${store.slug}/productos?page=1&search=${search}`
+    );
   };
 
   return (
     <div className="px-8 py-4 w-full">
       <div className="flex flex-col gap-2 items-start mt-4 justify-between sm:flex-row mb-4">
         <h1 className="font-bold text-2xl mb-6">Productos de {store.name}</h1>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-2 mt-4 mb-4 items-center justify-between">
+        <form
+          onSubmit={handleSearchSubmit}
+          className="flex gap-2 w-full sm:w-auto flex-1 items-center"
+        >
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={`Buscar productos (mínimo ${MIN_DIGITS_FOR_SEARCH} letras)`}
+            className="border px-4 py-2 rounded-md w-full h-9"
+          />
+          <Button type="submit" className="h-9" disabled={search.trim().length < MIN_DIGITS_FOR_SEARCH && search !== ''}>
+            Buscar
+          </Button>
+        </form>
 
         <CreateProductButton />
       </div>
+
 
       <div className="space-y-4">
         {initialProducts.length === 0 && (

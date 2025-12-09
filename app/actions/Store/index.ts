@@ -106,15 +106,22 @@ export async function getStoreBySlug(slug: string) {
         where: { deletedAt: null },
         orderBy: { id: "desc" },
         include: {
-          profiles: {
+          collaboratorAssignments: {
             where: {
-              deletedAt: null,
-            },
-            select: {
-              id: true,
-              name: true,
-              imageUrl: true,
               isActive: true,
+            },
+            include: {
+              collaborator: true,
+              // collaborator: {
+              //   select: {
+              //     id: true,
+              //     firstName: true,
+              //     lastName: true,
+              //     // image: true,
+              //     // phone: true,
+              //     // email: true,
+              //   },
+              // },
             },
           },
         },

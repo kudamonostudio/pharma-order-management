@@ -1,3 +1,5 @@
+import { getOrdersByStore } from "@/app/actions/Orders";
+import { getStoreBySlug } from "@/app/actions/Store";
 import { redirect } from "next/navigation";
 
 export default async function OrdenesPage({
@@ -7,34 +9,40 @@ export default async function OrdenesPage({
 }) {
   const { slug } = await params;
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
-  const res = await fetch(`${baseUrl}/api/stores/${slug}`, { cache: 'no-store' });
+  const store = await getStoreBySlug(slug);
 
-  if (!res.ok) {
+  if (!store) {
     redirect("/supremo");
   }
+  
+  // TODO: TRAER ORDERS DEL ACTION "getOrdersByStore"
 
-  const store = await res.json();
+  const ordersResponse = await getOrdersByStore(store.id);
 
-  // TODO: Reemplazar con datos reales de órdenes
-  const mockOrders = [
-    { id: "ORD-001", customer: "Cliente A", total: 150.00, status: "Pendiente" },
-    { id: "ORD-002", customer: "Cliente B", total: 85.50, status: "Completada" },
-    { id: "ORD-003", customer: "Cliente C", total: 200.00, status: "En proceso" },
-  ];
+  if (!ordersResponse) {
+    return;
+  }
+
+  const {orders, total, pages} = ordersResponse;
+  
+  // const mockOrders = [
+  //   { id: "ORD-001", customer: "Cliente A", total: 150.00, status: "Pendiente" },
+  //   { id: "ORD-002", customer: "Cliente B", total: 85.50, status: "Completada" },
+  //   { id: "ORD-003", customer: "Cliente C", total: 200.00, status: "En proceso" },
+  // ];
 
   return (
     <div className="px-8 py-4 w-full">
       <h1 className="font-bold text-2xl mb-6">Órdenes de {store.name}</h1>
       <div className="space-y-4">
-        {mockOrders.map((order) => (
+        {orders.map((order) => (
           <div key={order.id} className="p-4 border rounded-lg flex justify-between items-center">
             <div>
               <h3 className="font-semibold">{order.id}</h3>
-              <p className="text-sm text-muted-foreground">{order.customer}</p>
+              <p className="text-sm text-muted-foreground">{order.fullname}</p>
             </div>
             <div className="text-right">
-                <p className="font-bold">${order.total}</p>
+                <p className="font-bold">${order.totalAmount}</p>
                 <p className="text-sm text-muted-foreground">{order.status}</p>
             </div>
           </div>

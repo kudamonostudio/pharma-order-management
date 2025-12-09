@@ -2,19 +2,20 @@ import { LogoPlaceholder } from "@/app/(dashboard)/components/LogoPlaceholder";
 import { ShowAvatars } from "@/components/show-avatars";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { AssignmentWithCollaborator } from "@/shared/types/store";
 import { Store, Location } from "@prisma/client";
 import { ArrowRight, Settings } from "lucide-react";
 import Link from "next/link";
 
-interface Collaborator {
-  id: string;
-  name: string | null;
-  imageUrl: string | null;
-  isActive?: boolean;
-}
+// interface Collaborator {
+//   id: string;
+//   name: string | null;
+//   imageUrl: string | null;
+//   isActive?: boolean;
+// }
 
 interface LocationWithCollaborators extends Location {
-  profiles: Collaborator[];
+  collaboratorAssignments: AssignmentWithCollaborator[];
 }
 
 interface BranchCardProps {
@@ -25,8 +26,8 @@ interface BranchCardProps {
 
 function index({ branch, store, onEdit }: BranchCardProps) {
   // Filtrar solo colaboradores activos para mostrar en la card
-  const activeProfiles = branch.profiles.filter((p) => p.isActive !== false);
-
+  // const activeProfiles = branch.profiles.filter((p) => p.isActive !== false); TEMPORAL
+  const activeProfiles = branch.collaboratorAssignments.filter((p) => p.isActive !== false);
   return (
     <Card
       key={branch.id}
@@ -56,9 +57,10 @@ function index({ branch, store, onEdit }: BranchCardProps) {
       </div>
       <ShowAvatars
         items={activeProfiles.map((p) => ({
+        // items={branch.collaboratorAssignments.map((p: AssignmentWithCollaborator) => ({ // MIO
           id: p.id,
-          name: p.name ?? "Sin nombre",
-          imageUrl: p.imageUrl ?? "",
+          name: `${p.collaborator.firstName} ${p.collaborator.lastName}`,
+          imageUrl: p.collaborator.image ?? "",
         }))}
         className="m-auto"
       />

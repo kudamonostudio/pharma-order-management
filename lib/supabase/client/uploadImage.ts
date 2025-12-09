@@ -52,7 +52,7 @@ export async function uploadProductImage(
 
 export async function uploadCollaboratorImage(
   storeId: number,
-  collaboratorId: string,
+  collaboratorId: number,
   file: File
 ) {
   const filePath = `stores/${storeId}/collaborators/${collaboratorId}/${crypto.randomUUID()}-${
@@ -77,9 +77,7 @@ export async function uploadCollaboratorImage(
 }
 
 export async function uploadImage(filePath: string, file: File) {
-  // const filePath = `stores/${storeId}/products/${productId}/${crypto.randomUUID()}-${file.name}`;
-
-  // Subir archivo
+  // Subir archivo a Supabase
   const { error: uploadError } = await supabase.storage
     .from(process.env.NEXT_PUBLIC_BUCKET_NAME!)
     .upload(filePath, file);

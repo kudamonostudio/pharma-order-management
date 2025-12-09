@@ -3,24 +3,24 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Branch } from "@/shared/types/collaborator";
 
 interface collaborator {
-  id: string;
-  imageUrl: string;
-  name: string;
+  collaboratorId: number;
+  image: string;
+  firstName: string;
+  lastName: string;
   isActive?: boolean;
-  branch: {
-    id: number;
-    name: string;
-  };
+  branches: Branch[];
   onEditClick?: () => void;
 }
 
 export const ColabCard = ({ onEditClick, ...collaborator }: collaborator) => {
-  const isActive = collaborator.isActive ?? true;
+  // const isActive = collaborator.isActive ?? true;
+  const isActive = collaborator.branches.every(b => b.isActive === true);
 
   return (
-    <div key={collaborator.id} className="p-4 flex flex-col relative gap-6">
+    <div key={collaborator.collaboratorId} className="p-4 flex flex-col relative gap-6">
       <div className="absolute top-2 right-2">
         <Badge
           className={cn(
@@ -41,7 +41,7 @@ export const ColabCard = ({ onEditClick, ...collaborator }: collaborator) => {
         <Avatar className="shadow-sm border-2 border-background w-20 h-20 ring-1 ring-border bg-gray-100 mt-2">
           <>
             <AvatarImage
-              src={collaborator.imageUrl}
+              src={collaborator.image}
               alt="Avatar"
               className="rounded-full object-cover"
             />
@@ -49,11 +49,12 @@ export const ColabCard = ({ onEditClick, ...collaborator }: collaborator) => {
           </>
         </Avatar>
         <div className="flex-1">
-          <h3 className="font-semibold text-lg">{collaborator.name}</h3>
+          <h3 className="font-semibold text-lg">{collaborator.firstName} {collaborator.lastName}</h3>
           <h4 className="text-sm text-muted-foreground">
-            Sucursal{" "}
             <span className="font-semibold">
-              {collaborator.branch.name.toLocaleUpperCase()}
+              {collaborator.branches.filter(b => b.isActive).length > 0
+                ? collaborator.branches.map(b => b.name).join(", ")
+                : "Sin sucursal"}
             </span>
           </h4>
         </div>

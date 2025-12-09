@@ -15,7 +15,7 @@ import { deleteCollaborator } from "@/app/actions/Collaborators";
 interface DeleteColabModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  collaboratorId: string;
+  collaboratorId: number;
   storeSlug: string;
   onSuccess?: () => void;
 }

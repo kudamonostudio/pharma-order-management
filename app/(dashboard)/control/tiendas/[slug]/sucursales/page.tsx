@@ -17,6 +17,12 @@ export default async function SucursalesPage({
 
   const allCollaborators = await getCollaboratorsByStore(store.id);
 
+  // const allCollaborators = [
+  // ...new Map(allAssignments.map(item => [item.collaboratorId, item])).values()
+  // ];
+
+  console.log({ store, allCollaborators })
+
   return (
     <SucursalesContent
       store={store}
@@ -24,4 +30,6 @@ export default async function SucursalesPage({
       allCollaborators={allCollaborators}
     />
   );
+  
+  // return <SucursalesContent store={store} branches={store.locations} />;
 }

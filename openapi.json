@@ -789,9 +789,9 @@
         "enum": [
           "ADMIN_SUPREMO",
           "TIENDA_ADMIN",
-          "COLABORADOR"
+          "SUCURSAL_ADMIN"
         ],
-        "example": "COLABORADOR",
+        "example": "SUCURSAL_ADMIN",
         "description": "Roles disponibles para los usuarios"
       },
       "OrderStatus": {
@@ -994,7 +994,7 @@
             "enum": [
               "ADMIN_SUPREMO",
               "TIENDA_ADMIN",
-              "COLABORADOR"
+              "SUCURSAL_ADMIN"
             ]
           },
           "storeId": {
@@ -1035,7 +1035,7 @@
             "enum": [
               "ADMIN_SUPREMO",
               "TIENDA_ADMIN",
-              "COLABORADOR"
+              "SUCURSAL_ADMIN"
             ]
           },
           "storeId": {

@@ -17,13 +17,15 @@ import { Location } from "@prisma/client";
 import { updateLocation } from "@/app/actions/Store/Locations";
 import { DeleteBranchModal } from "./DeleteBranchModal";
 import { AssignCollaboratorsModal } from "./AssignCollaboratorsModal";
+import { AssignmentWithCollaborator } from "@/shared/types/store";
+import { Branch } from "@/shared/types/collaborator";
 
 interface Collaborator {
-  id: string;
-  name: string | null;
-  imageUrl: string | null;
-  isActive: boolean;
-  branch: { id: number; name: string };
+  collaboratorId: number;
+  firstName: string;
+  lastName: string;
+  image: string | null;
+  branches: Branch[];
 }
 
 interface SimpleCollaborator {
@@ -33,7 +35,8 @@ interface SimpleCollaborator {
 }
 
 interface LocationWithCollaborators extends Location {
-  profiles: SimpleCollaborator[];
+  // profiles: SimpleCollaborator[];
+  collaboratorAssignments: AssignmentWithCollaborator[];
 }
 
 interface BranchConfigModalProps {
@@ -223,14 +226,13 @@ export function BranchConfigModal({
           router.refresh();
         }}
       />
-
       <AssignCollaboratorsModal
         open={isAssignCollaboratorsModalOpen}
         onOpenChange={setIsAssignCollaboratorsModalOpen}
         locationId={branch.id}
         locationName={branch.name}
         storeSlug={storeSlug}
-        assignedCollaborators={branch.profiles}
+        assignedCollaborators={branch.collaboratorAssignments}
         allCollaborators={allCollaborators}
       />
     </>
