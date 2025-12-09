@@ -1,7 +1,9 @@
 "use server";
 
+import { MIN_DIGITS_FOR_SEARCH } from "@/lib/constants";
 import { toNullable, toNumberOrNull } from "@/lib/helpers";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export async function createProduct(formData: FormData) {
@@ -109,7 +111,13 @@ export async function getProductsByStore(storeId: number, page = 1, limit = 12) 
 }
 
 // Obtener store con productos (optimizado - una sola operación)
-export async function getStoreWithProducts(slug: string, page = 1, limit = 12) {
+export async function getStoreWithProducts(
+  slug: string,
+  page = 1,
+  limit = 12,
+  search?: string
+) {
+
   const skip = (page - 1) * limit;
 
   const store = await prisma.store.findUnique({
@@ -124,22 +132,29 @@ export async function getStoreWithProducts(slug: string, page = 1, limit = 12) {
 
   if (!store) return null;
 
+  const productWhere: Prisma.ProductWhereInput = {
+    storeId: store.id,
+    deletedAt: null,
+  };
+
+
+  if (search && search.trim().length >= MIN_DIGITS_FOR_SEARCH) {
+    productWhere.name = {
+      contains: search.trim(),
+      mode: 'insensitive',
+    };
+  }
+
   const [products, total] = await Promise.all([
     prisma.product.findMany({
-      where: {
-        storeId: store.id,
-        deletedAt: null,
-      },
-      orderBy: { createdAt: "desc" },
+      where: productWhere,
+      orderBy: { createdAt: 'desc' },
       skip,
       take: limit,
     }),
 
     prisma.product.count({
-      where: {
-        storeId: store.id,
-        deletedAt: null,
-      },
+      where: productWhere,
     }),
   ]);
 

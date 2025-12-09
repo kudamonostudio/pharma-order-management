@@ -3,15 +3,20 @@
 import { useState } from "react";
 import { Store } from "@prisma/client";
 import { ColabCard } from "./ColabCard";
-import { ColabModal, Collaborator, Branch } from "./ColabModal";
+import { ColabModal, Collaborator } from "./ColabModal";
 import { EmptyState } from "@/components/ui/empty-state";
 import { CreateCollaboratorButton } from "./CreateCollaboratorButton";
 import { CreateCollaboratorModal } from "./CreateCollaboratorModal";
 
+interface SimpleLocation {
+  id: number;
+  name: string;
+}
+
 interface ColaboradoresContentProps {
   store: Store;
   collaborators: Collaborator[];
-  locations: Branch[];
+  locations: SimpleLocation[];
 }
 
 export default function ColaboradoresContent({
@@ -43,9 +48,9 @@ export default function ColaboradoresContent({
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
           {collaborators.map((collab) => (
-            <ColabCard
-              key={collab.id}
-              {...collab}
+            <ColabCard 
+              key={collab.collaboratorId} 
+              {...collab} 
               onEditClick={() => handleEditClick(collab)}
             />
           ))}

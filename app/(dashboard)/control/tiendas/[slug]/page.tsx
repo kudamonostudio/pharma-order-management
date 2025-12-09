@@ -93,7 +93,7 @@ export default async function StorePage({
 
         <section className="latest-orders">
           <h2 className="text-2xl font-medium mb-4">Últimas órdenes</h2>
-          <OrderList orders={mockLastOrders} />
+          {/* <OrderList orders={mockLastOrders} /> */}
         </section>
       </div>
     </div>

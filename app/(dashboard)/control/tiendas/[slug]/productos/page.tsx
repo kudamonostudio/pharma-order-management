@@ -8,14 +8,15 @@ export default async function ProductosPage({
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ page?: string }>;
+  searchParams?: Promise<{ page?: string; search?: string }>;
 }) {
   try {
     const { slug } = await params;
     const resolvedSearchParams = await searchParams;
     const page = Number(resolvedSearchParams?.page) || 1;
+    const search = resolvedSearchParams?.search || '';
 
-    const data = await getStoreWithProducts(slug, page, LIMIT_PER_PAGE);
+    const data = await getStoreWithProducts(slug, page, LIMIT_PER_PAGE, search);
 
     if (!data) {
       redirect("/supremo");
@@ -27,6 +28,7 @@ export default async function ProductosPage({
         initialProducts={data.products}
         initialPages={data.pages}
         initialPage={page}
+        initialSearch={search}
       />
     );
   } catch (error) {

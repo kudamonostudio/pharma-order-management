@@ -16,7 +16,7 @@ const createFunctions = async () => {
     create or replace function public.handle_new_user()
     returns trigger as $$
     begin
-      insert into public.profiles (id, role, email) values (new.id, 'COLABORADOR', new.email)
+      insert into public.profiles (id, role, email) values (new.id, 'SUCURSAL_ADMIN', new.email)
       on conflict (id) do nothing;
       return new;
     end;
@@ -192,25 +192,25 @@ async function insertData() {
   });
 
   // Crea Ordenes
-  await prisma.order.create({
-    data: {
-      orderCode: "ORD-0001",
-      date: new Date(),
-      status: "PENDING",
-      total: 150.75,
-      locationId: location.id,
-    },
-  });
+  // await prisma.order.create({
+  //   data: {
+  //     orderCode: "ORD-0001",
+  //     date: new Date(),
+  //     status: "PENDING",
+  //     total: 150.75,
+  //     locationId: location.id,
+  //   },
+  // });
 
-  await prisma.order.create({
-    data: {
-      orderCode: "ORD-0002",
-      date: new Date(),
-      status: "PENDING",
-      total: 300.00,
-      locationId: location.id,
-    },
-  });
+  // await prisma.order.create({
+  //   data: {
+  //     orderCode: "ORD-0002",
+  //     date: new Date(),
+  //     status: "PENDING",
+  //     total: 300.00,
+  //     locationId: location.id,
+  //   },
+  // });
 
   // Crear categoría Limpieza
   const otherCategory = await prisma.category.create({

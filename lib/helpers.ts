@@ -10,6 +10,9 @@ export const generateSlug = (name: string) => {
     .replace(/^-+|-+$/g, "");
 };
 
+export const normalize = (s: string) =>
+  s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
 
 export const serialize = (obj: any): any => {
   return JSON.parse(

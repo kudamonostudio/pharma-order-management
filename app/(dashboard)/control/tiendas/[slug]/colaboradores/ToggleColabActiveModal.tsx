@@ -16,7 +16,7 @@ import { toggleCollaboratorActive } from "@/app/actions/Collaborators";
 interface ToggleColabActiveModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  collaboratorId: string;
+  assignmentId: number;
   isActive: boolean;
   storeSlug: string;
   onSuccess?: () => void;
@@ -25,7 +25,7 @@ interface ToggleColabActiveModalProps {
 export function ToggleColabActiveModal({
   open,
   onOpenChange,
-  collaboratorId,
+  assignmentId,
   isActive,
   storeSlug,
   onSuccess,
@@ -36,7 +36,7 @@ export function ToggleColabActiveModal({
   const handleToggle = () => {
     startTransition(async () => {
       try {
-        await toggleCollaboratorActive(collaboratorId, !isActive, storeSlug);
+        await toggleCollaboratorActive(assignmentId, !isActive, storeSlug);
 
         router.refresh();
         onOpenChange(false);

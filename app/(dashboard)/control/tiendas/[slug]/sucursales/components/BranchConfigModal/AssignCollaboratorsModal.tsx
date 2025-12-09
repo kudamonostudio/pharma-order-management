@@ -14,13 +14,23 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { assignCollaboratorsToLocation } from "@/app/actions/Store/Locations";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { AssignmentWithCollaborator } from "@/shared/types/store";
+import { Branch } from "@/shared/types/collaborator";
+
+// interface Collaborator {
+//   id: string;
+//   name: string | null;
+//   imageUrl: string | null;
+//   isActive: boolean;
+//   branch: { id: number; name: string };
+// }
 
 interface Collaborator {
-  id: string;
-  name: string | null;
-  imageUrl: string | null;
-  isActive: boolean;
-  branch: { id: number; name: string };
+  collaboratorId: number;
+  firstName: string;
+  lastName: string;
+  image: string | null;
+  branches: Branch[];
 }
 
 interface SimpleCollaborator {
@@ -35,7 +45,7 @@ interface AssignCollaboratorsModalProps {
   locationId: number;
   locationName: string;
   storeSlug: string;
-  assignedCollaborators: SimpleCollaborator[];
+  assignedCollaborators: AssignmentWithCollaborator[];
   allCollaborators: Collaborator[];
 }
 
@@ -50,17 +60,17 @@ export function AssignCollaboratorsModal({
 }: AssignCollaboratorsModalProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
   // Inicializar con los colaboradores ya asignados
   useEffect(() => {
     if (open) {
-      const assignedIds = new Set(assignedCollaborators.map((c) => c.id));
+      const assignedIds = new Set(assignedCollaborators.map((c) => c.collaboratorId));
       setSelectedIds(assignedIds);
     }
   }, [open, assignedCollaborators]);
 
-  const handleToggle = (collaboratorId: string) => {
+  const handleToggle = (collaboratorId: number) => {
     setSelectedIds((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(collaboratorId)) {
@@ -80,6 +90,13 @@ export function AssignCollaboratorsModal({
         Array.from(selectedIds),
         storeSlug
       );
+
+      // console.log('@@@');
+      // console.log({
+      //   locationId,
+      //   selectedIds: Array.from(selectedIds),
+      //   storeSlug
+      // });
       onOpenChange(false);
       router.refresh();
     } catch (error) {
@@ -99,15 +116,13 @@ export function AssignCollaboratorsModal({
       .slice(0, 2);
   };
 
-  const getCollaboratorInfo = (collaborator: Collaborator) => {
-    // Agregar sucursal
-    if (collaborator.branch.id === locationId) {
-      return "Actualmente en esta sucursal";
-    } else if (collaborator.branch.id !== 0) {
-      return collaborator.branch.name;
-    } else {
-      return "Sin sucursal";
-    }
+  const CollaboratorInfo = ({ collaborator }: { collaborator: Collaborator }) => {
+    const branch = collaborator.branches.find(b => b.id === locationId);
+    const info = branch ? branch.name : null;
+    if (!info) return null;
+    return (
+      <span className="font-normal text-muted-foreground"> — {info}</span>
+    );
   };
 
   return (
@@ -128,11 +143,11 @@ export function AssignCollaboratorsModal({
           ) : (
             <div className="flex flex-col gap-1">
               {allCollaborators.map((collaborator) => {
-                const isSelected = selectedIds.has(collaborator.id);
-                const info = getCollaboratorInfo(collaborator);
+                const isSelected = selectedIds.has(collaborator.collaboratorId);
+                const currentLocation = collaborator.branches.find(b => b.id === locationId);
                 return (
                   <label
-                    key={collaborator.id}
+                    key={collaborator.collaboratorId}
                     className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
                       isSelected
                         ? "bg-muted"
@@ -141,24 +156,26 @@ export function AssignCollaboratorsModal({
                   >
                     <Checkbox
                       checked={isSelected}
-                      onCheckedChange={() => handleToggle(collaborator.id)}
+                      onCheckedChange={() => handleToggle(collaborator.collaboratorId)}
                     />
                     <Avatar className="h-8 w-8">
                       <AvatarImage
-                        src={collaborator.imageUrl || undefined}
-                        alt={collaborator.name || "Colaborador"}
+                        src={collaborator.image || undefined}
+                        alt={collaborator.firstName || "Colaborador"}
                         className="object-cover"
                       />
                       <AvatarFallback>
-                        {getInitials(collaborator.name)}
+                        {getInitials(collaborator.firstName)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-sm font-medium">
-                        {collaborator.name || "Sin nombre"}
-                        <span className="font-normal text-muted-foreground"> — {info}</span>
+                        {collaborator.firstName || "Sin nombre"}
+                        <CollaboratorInfo
+                          collaborator={collaborator}
+                        />
                       </span>
-                      {!collaborator.isActive && (
+                      {!currentLocation?.isActive && (
                         <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-sm">
                           Inactivo
                         </span>

@@ -21,17 +21,21 @@ import {
 import { useRouter } from "next/navigation";
 import { useCollaboratorStore } from "@/app/zustand/collaboratorStore";
 import { useDropzone } from "react-dropzone";
-import { Branch } from "./ColabModal";
 import {
   createCollaborator,
   updateCollaboratorImage,
 } from "@/app/actions/Collaborators";
-import { uploadCollaboratorImage } from "@/lib/supabase/client/uploadImage";
+import { uploadImage } from "@/lib/supabase/client/uploadImage";
+
+interface SimpleLocation {
+  id: number;
+  name: string;
+}
 
 interface CreateCollaboratorModalProps {
   storeId: number;
   storeSlug: string;
-  locations: Branch[];
+  locations: SimpleLocation[];
 }
 
 export function CreateCollaboratorModal({
@@ -84,11 +88,10 @@ export function CreateCollaboratorModal({
       if (!newCollaboratorId) throw new Error("No se creó el colaborador");
 
       if (collaboratorImage) {
-        const imageUrl = await uploadCollaboratorImage(
-          storeId,
-          newCollaboratorId,
-          collaboratorImage
-        );
+        const filePath = `stores/${storeId}/collaborators/${newCollaboratorId}/${crypto.randomUUID()}-${
+          collaboratorImage.name
+        }`;
+        const imageUrl = await uploadImage(filePath, collaboratorImage);
         await updateCollaboratorImage(newCollaboratorId, imageUrl);
         URL.revokeObjectURL(previewUrl as string);
       }
@@ -124,11 +127,21 @@ export function CreateCollaboratorModal({
           <input type="hidden" name="storeSlug" value={storeSlug} />
 
           <div className="space-y-2">
-            <Label htmlFor="name">Nombre *</Label>
+            <Label htmlFor="firstName">Nombres *</Label>
             <Input
-              id="name"
-              name="name"
-              placeholder="Ej: Juan Pérez"
+              id="firstName"
+              name="firstName"
+              placeholder="Ej: Juan"
+              required
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="lastName">Apellidos *</Label>
+            <Input
+              id="lastName"
+              name="lastName"
+              placeholder="Ej: Pérez"
               required
             />
           </div>

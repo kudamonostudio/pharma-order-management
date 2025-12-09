@@ -5,24 +5,25 @@ import { CreateBranchButton } from "./CreateBranchButton";
 import { Location, Store } from "@prisma/client";
 import { useState } from "react";
 import { BranchConfigModal } from "./components/BranchConfigModal";
-
-interface Collaborator {
-  id: string;
-  name: string | null;
-  imageUrl: string | null;
-}
+import { AssignmentWithCollaborator } from "@/shared/types/store";
+import { Branch } from "@/shared/types/collaborator";
 
 interface StoreCollaborator {
-  id: string;
-  name: string;
-  imageUrl: string;
-  isActive: boolean;
-  branch: { id: number; name: string };
+  assignmentId: number;
+  collaboratorId: number;
+  firstName: string;
+  lastName: string;
+  image: string | null;
+  branches: Branch[];
 }
 
 interface LocationWithCollaborators extends Location {
-  profiles: Collaborator[];
+  collaboratorAssignments: AssignmentWithCollaborator[];
 }
+
+// interface StoreExtended {
+//   collaboratorAssignments: AssignmentWithCollaborator[];
+// }
 
 interface SucursalesContentProps {
   store: Store;
@@ -46,11 +47,11 @@ export default function SucursalesContent({
 
   // Convertir allCollaborators al formato esperado por el modal (con todos los campos)
   const collaboratorsForModal = allCollaborators.map((c) => ({
-    id: c.id,
-    name: c.name,
-    imageUrl: c.imageUrl || null,
-    isActive: c.isActive,
-    branch: c.branch,
+    collaboratorId: c.collaboratorId,
+    firstName: c.firstName,
+    lastName: c.lastName,
+    image: c.image,
+    branches: c.branches,
   }));
 
   return (

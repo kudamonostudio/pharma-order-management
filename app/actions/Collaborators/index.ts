@@ -1,34 +1,48 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
-import { toNullable, toNumberOrNull } from "@/lib/helpers";
+import { toNumberOrNull } from "@/lib/helpers";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+// type BranchWithActive = {
+//   id: number;
+//   name: string;
+//   isActive: boolean;
+// };
+
+// type StoreCollaborator = {
+//   collaboratorId: number;
+//   firstName: string;
+//   lastName: string;
+//   code: string | null;
+//   image: string | null;
+//   branches: BranchWithActive[];
+// };
+
 export async function createCollaborator(formData: FormData) {
   const storeSlug = formData.get("storeSlug") as string;
+  const firstName = formData.get("firstName") as string;
+  const lastName = formData.get("lastName") as string;
+  const storeId = toNumberOrNull(formData.get("storeId"));
+  const locationId = toNumberOrNull(formData.get("locationId"));
 
-  const data = {
-    name: toNullable(formData.get("name")) ?? "",
-    storeId: toNumberOrNull(formData.get("storeId")),
-    locationId: toNumberOrNull(formData.get("locationId")),
-  };
-
-  if (!data.storeId || !data.name || !data.locationId) {
-    throw new Error("Campos requeridos faltantes: storeId, name o locationId");
+  if (!storeId || !firstName  || !lastName || !locationId) {
+    throw new Error("Campos requeridos faltantes: storeId, firstName, lastName o locationId");
   }
 
-  // Crear un ID para colaboradores sin cuenta de autenticación
-  const newUserId = crypto.randomUUID();
-
-  // Crear perfil de colaborador
-  const collaborator = await prisma.profile.create({
+  const collaborator = await prisma.collaborator.create({
     data: {
-      id: newUserId,
-      name: data.name,
-      storeId: data.storeId,
-      locationId: data.locationId,
-      role: "COLABORADOR",
-      isActive: true,
+      firstName,
+      lastName,
+    },
+  });
+
+  await prisma.collaboratorAssignment.create({
+    data: {
+      collaboratorId: collaborator.id,
+      storeId,
+      locationId,
     },
   });
 
@@ -36,30 +50,39 @@ export async function createCollaborator(formData: FormData) {
   return collaborator.id;
 }
 
-export async function updateCollaboratorImage(id: string, url: string) {
-  const updatedCollaborator = await prisma.profile.update({
+export async function updateCollaboratorImage(id: number, url: string) {
+  await prisma.collaborator.update({
     where: { id },
-    data: { imageUrl: url },
+    data: { image: url },
   });
-
-  return updatedCollaborator.id;
 }
 
 export async function updateCollaborator(
-  id: string,
+  collaboratorId: number,
+  assignmentId: number,
   data: {
-    name?: string;
+    firstName?: string;
+    lastName?: string;
     locationId?: number | null;
-    imageUrl?: string;
-    isActive?: boolean;
-    phone?: string;
+    image?: string;
+    code?: string | null;
   },
   storeSlug?: string
 ) {
-  await prisma.profile.update({
-    where: { id },
-    data,
+  const { locationId, ...collabAttibutes } = data;
+  await prisma.collaborator.update({
+    where: { id: collaboratorId },
+    data: collabAttibutes,
   });
+
+  if(locationId) {
+    await prisma.collaboratorAssignment.update({
+      where: { id: assignmentId },
+      data: {
+        locationId,
+      },
+    });
+  }
 
   if (storeSlug) {
     revalidatePath(`/control/tiendas/${storeSlug}/colaboradores`);
@@ -68,27 +91,27 @@ export async function updateCollaborator(
   }
 }
 
-export async function deleteCollaborator(id: string, storeSlug: string) {
+export async function deleteCollaborator(id: number, storeSlug: string) {
   if (!id) {
     console.warn("deleteCollaborator: missing id");
     return;
   }
 
-  await prisma.profile.update({
-    where: { id },
-    data: { deletedAt: new Date() },
-  });
+  // await prisma.profile.update({
+  //   where: { id },
+  //   data: { deletedAt: new Date() },
+  // });
 
   revalidatePath(`/control/tiendas/${storeSlug}/colaboradores`);
 }
 
 export async function toggleCollaboratorActive(
-  id: string,
+  assignmentId: number,
   isActive: boolean,
   storeSlug: string
 ) {
-  await prisma.profile.update({
-    where: { id },
+  await prisma.collaboratorAssignment.update({
+    where: { id: assignmentId },
     data: { isActive },
   });
 
@@ -97,13 +120,22 @@ export async function toggleCollaboratorActive(
 
 // Obtener colaboradores de una tienda
 export async function getCollaboratorsByStore(storeId: number) {
-  const collaborators = await prisma.profile.findMany({
+  const collaboratorAssignments = await prisma.collaboratorAssignment.findMany({
     where: {
       storeId,
-      deletedAt: null,
-      role: "COLABORADOR",
+      // deletedAt: null,
+      // role: "SUCURSAL_ADMIN",
     },
     include: {
+      collaborator: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          code: true,
+          image: true,
+        },
+      },
       location: {
         select: {
           id: true,
@@ -114,42 +146,60 @@ export async function getCollaboratorsByStore(storeId: number) {
     orderBy: { createdAt: "desc" },
   });
 
-  return collaborators.map((c) => ({
-    id: c.id,
-    name: c.name ?? "Sin nombre",
-    imageUrl: c.imageUrl ?? "",
-    isActive: c.isActive,
-    branch: c.location
-      ? { id: c.location.id, name: c.location.name }
-      : { id: 0, name: "Sin sucursal" },
-  }));
+  // Agrupar por collaboratorId
+  const map = new Map<number, any>();
+
+  for (const c of collaboratorAssignments) {
+    const key = c.collaborator.id;
+
+    if (!map.has(key)) {
+      map.set(key, {
+        collaboratorId: c.collaborator.id,
+        firstName: c.collaborator.firstName ?? "Sin nombre",
+        lastName: c.collaborator.lastName ?? "Sin apellidos",
+        code: c.collaborator.code,
+        image: c.collaborator.image,
+        branches: [],
+      });
+    }
+
+    const entry = map.get(key)!;
+
+    entry.branches.push({
+      id: c.location?.id ?? 0,
+      name: c.location?.name ?? "Sin sucursal",
+      isActive: c.isActive,
+    });
+  }
+
+  return Array.from(map.values());
 }
 
 // Obtener un colaborador por ID
 export async function getCollaboratorById(id: string) {
   const collaborator = await prisma.profile.findUnique({
     where: { id },
-    include: {
-      location: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-    },
+    // include: {
+    //   location: {
+    //     select: {
+    //       id: true,
+    //       name: true,
+    //     },
+    //   },
+    // },
   });
 
   if (!collaborator) return null;
 
   return {
     id: collaborator.id,
-    name: collaborator.name ?? "",
+    name: collaborator.firstName ?? "",
     imageUrl: collaborator.imageUrl ?? "",
     email: collaborator.email,
     phone: collaborator.phone,
     isActive: collaborator.isActive,
-    branch: collaborator.location
-      ? { id: collaborator.location.id, name: collaborator.location.name }
-      : null,
+    // branch: collaborator.location
+    //   ? { id: collaborator.location.id, name: collaborator.location.name }
+    //   : null,
   };
 }
