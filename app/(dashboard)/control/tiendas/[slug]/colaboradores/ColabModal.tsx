@@ -40,7 +40,7 @@ export interface Collaborator {
   firstName: string;
   lastName: string;
   code: string | null;
-  // isActive?: boolean;
+  isActive: boolean;
   branches: Branch[];
 }
 
@@ -160,7 +160,8 @@ export function ColabModal({
 
   if (!collaborator) return null;
 
-  const isActive = collaborator.branches.every(b => b.isActive === true);
+  // const isActive = collaborator.branches.every(b => b.isActive === true);
+  const isActive = collaborator.isActive;
 
   return (
     <>

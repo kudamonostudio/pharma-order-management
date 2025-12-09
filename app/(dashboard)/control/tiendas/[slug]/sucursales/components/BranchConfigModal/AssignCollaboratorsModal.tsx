@@ -17,19 +17,12 @@ import { Loader2 } from "lucide-react";
 import { AssignmentWithCollaborator } from "@/shared/types/store";
 import { Branch } from "@/shared/types/collaborator";
 
-// interface Collaborator {
-//   id: string;
-//   name: string | null;
-//   imageUrl: string | null;
-//   isActive: boolean;
-//   branch: { id: number; name: string };
-// }
-
 interface Collaborator {
   collaboratorId: number;
   firstName: string;
   lastName: string;
   image: string | null;
+  isActive: boolean;
   branches: Branch[];
 }
 
@@ -138,7 +131,6 @@ export function AssignCollaboratorsModal({
             <div className="flex flex-col gap-1">
               {allCollaborators.map((collaborator) => {
                 const isSelected = selectedIds.has(collaborator.collaboratorId);
-                const currentLocation = collaborator.branches.find(b => b.id === locationId);
                 return (
                   <label
                     key={collaborator.collaboratorId}
@@ -169,7 +161,7 @@ export function AssignCollaboratorsModal({
                           collaborator={collaborator}
                         />
                       </span>
-                      {currentLocation && !currentLocation?.isActive && (
+                      {!collaborator.isActive && (
                         <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-sm">
                           Inactivo
                         </span>

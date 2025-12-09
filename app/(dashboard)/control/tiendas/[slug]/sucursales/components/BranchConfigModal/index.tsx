@@ -25,6 +25,7 @@ interface Collaborator {
   firstName: string;
   lastName: string;
   image: string | null;
+  isActive: boolean;
   branches: Branch[];
 }
 

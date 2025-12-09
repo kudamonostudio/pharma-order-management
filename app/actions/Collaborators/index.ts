@@ -98,20 +98,9 @@ export async function toggleCollaboratorActive(
   isActive: boolean,
   storeSlug: string
 ) {
-  const store = await prisma.store.findFirst({
+  await prisma.collaborator.update({
     where: {
-      slug: storeSlug
-    },
-  });
-
-  if(!store) {
-    return;
-  }
-  
-  await prisma.collaboratorAssignment.updateMany({
-    where: {
-      collaboratorId,
-      storeId: store?.id,
+      id: collaboratorId
     },
     data: { isActive },
   });
@@ -136,6 +125,7 @@ export async function getCollaboratorsByStore(storeId: number) {
           lastName: true,
           code: true,
           image: true,
+          isActive: true,
         },
       },
       location: {
@@ -161,6 +151,7 @@ export async function getCollaboratorsByStore(storeId: number) {
         lastName: c.collaborator.lastName ?? "Sin apellidos",
         code: c.collaborator.code,
         image: c.collaborator.image,
+        isActive: c.collaborator.isActive,
         branches: [],
       });
     }

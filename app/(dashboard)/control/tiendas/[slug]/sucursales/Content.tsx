@@ -14,6 +14,7 @@ interface StoreCollaborator {
   firstName: string;
   lastName: string;
   image: string | null;
+  isActive: boolean;
   branches: Branch[];
 }
 
@@ -52,6 +53,7 @@ export default function SucursalesContent({
     lastName: c.lastName,
     image: c.image,
     branches: c.branches,
+    isActive: c.isActive,
   }));
 
   return (
