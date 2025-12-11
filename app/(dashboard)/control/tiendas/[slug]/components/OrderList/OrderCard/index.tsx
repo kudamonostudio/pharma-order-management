@@ -1,9 +1,10 @@
-import { Order } from "@prisma/client";
+// import { Order } from "@prisma/client";
 import { getCurrentProfile } from "@/lib/auth/session";
 import { OrderCardClient } from "./OrderCardClient";
+import { OrderInStore } from "@/shared/types/store";
 
 type OrderCardProps = {
-  order: Order;
+  order: OrderInStore;
 };
 
 export const OrderCard = async ({ order }: OrderCardProps) => {

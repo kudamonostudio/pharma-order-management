@@ -7,9 +7,10 @@ import { OrderCollab } from "./OrderCollab";
 import { mockCollaborators } from "@/app/mocks/collaborators";
 import { OrderDetailModal } from "./OrderDetailModal/OrderDetailModal";
 import { useOrderStore } from "@/app/zustand/orderStore";
+import { OrderInStore } from "@/shared/types/store";
 
 type OrderCardClientProps = {
-  order: any /* TODO: Usar el tipado de prisma. Por ahora usamos ANY */;
+  order: OrderInStore;
   isAdminSupremo: boolean;
 };
 
@@ -21,7 +22,7 @@ export function OrderCardClient({
   const { order: mockProducts } = useOrderStore();
 
   const mockCollab = mockCollaborators.find(
-    (collab) => collab.id === Number(order.profileId)
+    (collab) => collab.id === Number(order.collaborator?.id)
   );
 
   const handleClick = () => {
@@ -38,16 +39,16 @@ export function OrderCardClient({
       >
         <div className="flex gap-3 items-center">
           {mockCollab ? (
-            <OrderCollab collab={mockCollab} key={order.profileId} />
+            <OrderCollab collab={mockCollab} key={order.collaborator?.id} />
           ) : null}
           <div>
-            <h3 className="text-accent-foreground">{order.orderCode}</h3>
+            <h3 className="text-accent-foreground">{order.code}</h3>
             <p className="text-sm text-muted-foreground">
-              {formatDate(order.date)}
+              {formatDate(order.createdAt)}
             </p>
           </div>
         </div>
-        {isAdminSupremo && <p>{order.branch.name}</p>}
+        {isAdminSupremo && <p>{order.location?.name}</p>}
         <div className="text-right">
           <p className="text-sm font-medium">
             {getOrderStatusLabel(order.status)}
@@ -59,14 +60,14 @@ export function OrderCardClient({
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         order={{
-          id: order.orderCode,
+          id: order.code,
           status: order.status,
-          createdAt: order.date,
+          createdAt: order.createdAt,
           branch: {
-            id: String(order.locationId),
-            name: order.branch.name /* TODO: CARGAR NOMBRE DE LA UBICACIÓN */,
+            id: String(order.location?.id),
+            name: order.location?.name ?? '',
           },
-          profileId: order.profileId,
+          profileId: order.collaborator?.id,
         }}
         products={mockProducts}
       />

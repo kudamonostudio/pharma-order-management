@@ -26,18 +26,18 @@ model Profile {
 }
 
 model Store {
-  id                      Int                       @id @default(autoincrement())
-  name                    String                    @db.VarChar(100)
+  id                      Int                      @id @default(autoincrement())
+  name                    String                   @db.VarChar(100)
   address                 String?
   phone                   String?
-  createdAt               DateTime                  @default(now())
-  updatedAt               DateTime                  @updatedAt
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
   deletedAt               DateTime?
-  slug                    String                    @unique
+  slug                    String                   @unique
   banner                  String?
   logo                    String?
-  isActive                Boolean                   @default(true)
-  withPrices              Boolean                   @default(true)
+  isActive                Boolean                  @default(true)
+  withPrices              Boolean                  @default(true)
   collaboratorAssignments CollaboratorAssignment[]
   locations               Location[]
   orders                  Order[]
@@ -49,16 +49,16 @@ model Store {
 }
 
 model Location {
-  id                      Int                       @id @default(autoincrement())
-  name                    String                    @db.VarChar(50)
+  id                      Int                      @id @default(autoincrement())
+  name                    String                   @db.VarChar(50)
   address                 String
-  phone                   String?                   @db.VarChar(50)
+  phone                   String?                  @db.VarChar(50)
   storeId                 Int
-  createdAt               DateTime                  @default(now())
-  updatedAt               DateTime                  @updatedAt
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
   deletedAt               DateTime?
   collaboratorAssignments CollaboratorAssignment[]
-  store                   Store                     @relation(fields: [storeId], references: [id])
+  store                   Store                    @relation(fields: [storeId], references: [id])
   orders                  Order[]
   products                Product[]
 
@@ -67,21 +67,22 @@ model Location {
 
 model Order {
   id             Int            @id @default(autoincrement())
-  fullname       String
-  phoneContact   String
-  status         OrderStatus    @default(PENDING)
+  status         OrderStatus    @default(PENDIENTE)
+  code           String?        @unique @db.VarChar(25)
   locationId     Int?
-  storeId        Int?
-  collaboratorId Int?
-  items          Json
-  totalAmount    Decimal        @db.Decimal(10, 2)
-  currency       String         @db.VarChar(10)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
+  storeId        Int?
+  collaboratorId Int?
+  currency       String         @db.VarChar(10)
+  fullname       String
+  items          Json
+  phoneContact   String
+  totalAmount    Decimal        @db.Decimal(10, 2)
+  orderHistories OrderHistory[]
+  collaborator   Collaborator?  @relation(fields: [collaboratorId], references: [id])
   location       Location?      @relation(fields: [locationId], references: [id])
   store          Store?         @relation(fields: [storeId], references: [id])
-  collaborator   Collaborator?  @relation(fields: [collaboratorId], references: [id])
-  orderHistories OrderHistory[]
 
   @@map("orders")
 }
@@ -94,8 +95,8 @@ model OrderHistory {
   toStatus       String       @db.VarChar(20)
   note           String?
   createdAt      DateTime     @default(now())
-  order          Order        @relation(fields: [orderId], references: [id])
   collaborator   Collaborator @relation(fields: [collaboratorId], references: [id])
+  order          Order        @relation(fields: [orderId], references: [id])
 
   @@map("order_history")
 }
@@ -137,20 +138,20 @@ model Product {
 }
 
 model Collaborator {
-  id                      Int                       @id @default(autoincrement())
-  firstName               String                    @db.VarChar(100)
-  lastName                String                    @db.VarChar(100)
-  code                    String?                   @unique @db.VarChar(50)
+  id                      Int                      @id @default(autoincrement())
+  firstName               String                   @db.VarChar(100)
+  lastName                String                   @db.VarChar(100)
+  code                    String?                  @unique @db.VarChar(50)
   image                   String?
-  phone                   String?                   @db.VarChar(50)
-  email                   String?                   @unique
-  isActive                Boolean                   @default(true)
-  createdAt               DateTime                  @default(now())
-  updatedAt               DateTime                  @updatedAt
+  phone                   String?                  @db.VarChar(50)
+  email                   String?                  @unique
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
   deletedAt               DateTime?
+  isActive                Boolean                  @default(true)
   collaboratorAssignments CollaboratorAssignment[]
-  orders                  Order[]
   orderHistories          OrderHistory[]
+  orders                  Order[]
 
   @@map("collaborators")
 }
@@ -160,8 +161,8 @@ model CollaboratorAssignment {
   collaboratorId Int
   storeId        Int
   locationId     Int
-  isActive       Boolean      @default(true)
   createdAt      DateTime     @default(now())
+  isActive       Boolean      @default(true)
   collaborator   Collaborator @relation(fields: [collaboratorId], references: [id])
   location       Location     @relation(fields: [locationId], references: [id])
   store          Store        @relation(fields: [storeId], references: [id])
@@ -177,8 +178,9 @@ enum Role {
 }
 
 enum OrderStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETE
-  CANCELLED
+  ENTREGADA
+  PENDIENTE
+  CANCELADA
+  EN_PROCESO
+  LISTO_PARA_RETIRO
 }
