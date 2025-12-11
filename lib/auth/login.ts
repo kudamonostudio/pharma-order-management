@@ -15,17 +15,17 @@ export async function loginUnique(email: string, password: string) {
   if (!user) throw new Error("No se encontró el usuario.");
 
   const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select("role, storeId")
+    .from("profiles")
+    .select("role, storeId, firstName, lastName, imageUrl")
     .eq("id", user.id)
     .single();
 
   if (profileError) {
-    console.log({ profileError })
+    console.log({ profileError });
     throw new Error(profileError.message);
   }
 
-    let storeSlug: string | null = null;
+  let storeSlug: string | null = null;
 
   if (profile.storeId) {
     const { data: store, error: storeError } = await supabase
@@ -39,5 +39,20 @@ export async function loginUnique(email: string, password: string) {
     storeSlug = store?.slug ?? null;
   }
 
-  return { user, profile, storeSlug };
+  // Construir nombre completo a partir de firstName y lastName
+  const fullName =
+    [profile.firstName, profile.lastName].filter(Boolean).join(" ") ||
+    undefined;
+
+  // Retornar datos completos del usuario para guardar en el store
+  return {
+    user,
+    profile,
+    storeSlug,
+    userProfile: {
+      email: user.email!,
+      name: fullName,
+      avatar: profile.imageUrl || undefined,
+    },
+  };
 }

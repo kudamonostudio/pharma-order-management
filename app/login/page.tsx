@@ -1,10 +1,28 @@
-import { LoginForm } from "@/components/auth/login-form";
+import LoginForm from "@/components/auth/login-form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function AdminLoginPage() {
   return (
-    <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
-      <div className="w-full max-w-sm">
-        <LoginForm />
+    <div className="flex min-h-screen bg-neutral-950 p-12 justify-end">
+      {/* Right side - Form */}
+      <div className="flex w-full max-w-2xl items-center justify-center p-8 rounded-md bg-white">
+        <Card className="border-none shadow-none w-4/5 h-full flex flex-col gap-12 justify-center text-center">
+          <CardHeader className="p-0!">
+            <CardTitle className="text-4xl">Bienvenido de nuevo!</CardTitle>
+            <CardDescription className="text-lg">
+              Ingresa tus credenciales para acceder a tu cuenta
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-0!">
+            <LoginForm />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

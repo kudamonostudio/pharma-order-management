@@ -15,114 +15,90 @@ model Profile {
   deletedAt DateTime?
   email     String?   @unique
   phone     String?
-  storeId    Int?
-  // locationId Int?
   firstName String?   @db.VarChar(100)
   imageUrl  String?
   isActive  Boolean   @default(true)
-  store      Store?    @relation(fields: [storeId], references: [id])
-  // location   Location? @relation(fields: [locationId], references: [id])
   lastName  String?   @db.VarChar(100)
+  storeId   Int?
+  store     Store?    @relation(fields: [storeId], references: [id])
 
   @@map("profiles")
 }
 
 model Store {
-  id                     Int                      @id @default(autoincrement())
-  name                   String                   @db.VarChar(100)
-  address                String?
-  phone                  String?
-  createdAt              DateTime                 @default(now())
-  updatedAt              DateTime                 @updatedAt
-  deletedAt              DateTime?
-  slug                   String                   @unique
-  banner                 String?
-  logo                   String?
-  isActive               Boolean                  @default(true)
-  withPrices             Boolean                  @default(true)
+  id                      Int                       @id @default(autoincrement())
+  name                    String                    @db.VarChar(100)
+  address                 String?
+  phone                   String?
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  deletedAt               DateTime?
+  slug                    String                    @unique
+  banner                  String?
+  logo                    String?
+  isActive                Boolean                   @default(true)
+  withPrices              Boolean                   @default(true)
   collaboratorAssignments CollaboratorAssignment[]
-  locations              Location[]
-  products               Product[]
-  profile                Profile[]
-  orders                 Order[]
+  locations               Location[]
+  orders                  Order[]
+  products                Product[]
+  profile                 Profile[]
 
   @@index([slug])
   @@map("stores")
 }
 
 model Location {
-  id                     Int                      @id @default(autoincrement())
-  name                   String                   @db.VarChar(50)
-  address                String
-  phone                  String?                  @db.VarChar(50)
-  storeId                Int
-  createdAt              DateTime                 @default(now())
-  updatedAt              DateTime                 @updatedAt
-  deletedAt              DateTime?
+  id                      Int                       @id @default(autoincrement())
+  name                    String                    @db.VarChar(50)
+  address                 String
+  phone                   String?                   @db.VarChar(50)
+  storeId                 Int
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  deletedAt               DateTime?
   collaboratorAssignments CollaboratorAssignment[]
-  store                  Store                    @relation(fields: [storeId], references: [id])
-  orders                 Order[]
-  products               Product[]
-  // profiles  Profile[]
+  store                   Store                     @relation(fields: [storeId], references: [id])
+  orders                  Order[]
+  products                Product[]
 
   @@map("locations")
 }
 
-// model Order {
-//   id                       Int                     @id @default(autoincrement())
-//   orderCode                String
-//   date                     DateTime
-//   status                   OrderStatus
-//   total                    Decimal
-//   locationId               Int?
-//   createdAt                DateTime                @default(now())
-//   updatedAt                DateTime                @updatedAt
-//   deletedAt                DateTime?
-//   collaboratorAssignmentId Int?
-//   storeId                  Int?
-//   collaboratorAssignment   CollaboratorAssignment? @relation(fields: [collaboratorAssignmentId], references: [id])
-//   location                 Location?               @relation(fields: [locationId], references: [id])
-//   store                    Store?                  @relation(fields: [storeId], references: [id])
-
-//   @@map("orders")
-// }
-
 model Order {
-  id             Int          @id @default(autoincrement())
+  id             Int            @id @default(autoincrement())
   fullname       String
   phoneContact   String
-  status         OrderStatus  @default(PENDING)
+  status         OrderStatus    @default(PENDING)
   locationId     Int?
   storeId        Int?
   collaboratorId Int?
-  items          Json         
-  totalAmount    Decimal      @db.Decimal(10, 2)
-  currency       String       @db.VarChar(10)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  items          Json
+  totalAmount    Decimal        @db.Decimal(10, 2)
+  currency       String         @db.VarChar(10)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  location       Location?      @relation(fields: [locationId], references: [id])
+  store          Store?         @relation(fields: [storeId], references: [id])
+  collaborator   Collaborator?  @relation(fields: [collaboratorId], references: [id])
+  orderHistories OrderHistory[]
 
-  location       Location?     @relation(fields: [locationId], references: [id])
-  store          Store?     @relation(fields: [storeId], references: [id])
-  collaborator   Collaborator? @relation(fields: [collaboratorId], references: [id])
-  orderHistories   OrderHistory[]
   @@map("orders")
 }
 
 model OrderHistory {
-  id              Int       @id @default(autoincrement())
-  orderId         Int
-  collaboratorId  Int
-  fromStatus      String?   @db.VarChar(20)
-  toStatus        String    @db.VarChar(20)
-  note            String?
-  createdAt       DateTime  @default(now())
-
-  order           Order     @relation(fields: [orderId], references: [id])
-  collaborator    Collaborator     @relation(fields: [collaboratorId], references: [id])
+  id             Int          @id @default(autoincrement())
+  orderId        Int
+  collaboratorId Int
+  fromStatus     String?      @db.VarChar(20)
+  toStatus       String       @db.VarChar(20)
+  note           String?
+  createdAt      DateTime     @default(now())
+  order          Order        @relation(fields: [orderId], references: [id])
+  collaborator   Collaborator @relation(fields: [collaboratorId], references: [id])
 
   @@map("order_history")
 }
-
 
 model Category {
   id          Int       @id @default(autoincrement())
@@ -161,17 +137,17 @@ model Product {
 }
 
 model Collaborator {
-  id                     Int                      @id @default(autoincrement())
-  firstName              String                   @db.VarChar(100)
-  lastName               String                   @db.VarChar(100)
-  code                   String?                  @unique @db.VarChar(50)
-  image                  String?
-  phone                  String?                  @db.VarChar(50)
-  email                  String?                  @unique
-  isActive               Boolean                  @default(true)
-  createdAt              DateTime                 @default(now())
-  updatedAt              DateTime                 @updatedAt
-  deletedAt              DateTime?
+  id                      Int                       @id @default(autoincrement())
+  firstName               String                    @db.VarChar(100)
+  lastName                String                    @db.VarChar(100)
+  code                    String?                   @unique @db.VarChar(50)
+  image                   String?
+  phone                   String?                   @db.VarChar(50)
+  email                   String?                   @unique
+  isActive                Boolean                   @default(true)
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  deletedAt               DateTime?
   collaboratorAssignments CollaboratorAssignment[]
   orders                  Order[]
   orderHistories          OrderHistory[]

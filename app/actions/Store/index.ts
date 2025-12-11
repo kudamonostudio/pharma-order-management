@@ -111,17 +111,15 @@ export async function getStoreBySlug(slug: string) {
               isActive: true,
             },
             include: {
-              collaborator: true,
-              // collaborator: {
-              //   select: {
-              //     id: true,
-              //     firstName: true,
-              //     lastName: true,
-              //     // image: true,
-              //     // phone: true,
-              //     // email: true,
-              //   },
-              // },
+              collaborator: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  image: true,
+                  email: true,
+                },
+              },
             },
           },
         },

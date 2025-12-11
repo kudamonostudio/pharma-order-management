@@ -20,7 +20,6 @@ export function AdminNavbar() {
     <header className="sticky top-0 z-50 w-full border-b bg-background">
       <div className="flex h-14 items-center gap-4 px-4">
         <SidebarTrigger />
-
         <div className="flex-1 max-w-md">
           <div className="relative">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -31,9 +30,8 @@ export function AdminNavbar() {
             />
           </div>
         </div>
-
-        <div className="flex items-center gap-2 ml-auto">
-          {/* Notifications */}
+        {/*  <div className="flex items-center gap-2 ml-auto">
+         // Notifications
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="relative">
@@ -64,7 +62,7 @@ export function AdminNavbar() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* User menu */}
+         // User menu
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
@@ -83,7 +81,8 @@ export function AdminNavbar() {
               <DropdownMenuItem>Cerrar sesión</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+        </div> */}
+        {/* DONE: Se deja pronto por si el sistema se mejora a futuro con notificaciones */}
       </div>
     </header>
   );

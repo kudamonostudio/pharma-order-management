@@ -13,8 +13,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-import { ChevronsUpDown, LogOut } from "lucide-react";
+import { ChevronsUpDown, LogOut, Settings } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   ADMIN_SUPREMO_DASHBOARD_ITEMS,
   getStoreMenuItems,
@@ -28,18 +29,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/auth/dropdown-menu";
 import { usePathname } from "next/navigation";
-import { Store } from "@prisma/client";
+import { Profile, Store } from "@prisma/client";
 import Link from "next/link";
 import { LogoPlaceholder } from "./LogoPlaceholder";
+import { useLogout } from "@/hooks/use-logout";
+import { useUserStore } from "@/app/zustand/userStore";
+import { useEffect, useState } from "react";
 
 interface AppSidebarProps {
   userRole: string;
-  user: any;
+  user: Profile;
   store?: Store | null;
 }
 
 export function AppSidebar({ userRole, user, store }: AppSidebarProps) {
   const pathname = usePathname();
+  const { logout } = useLogout();
+
+  const getInitials = useUserStore((state) => state.getInitials);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   // Determinar qué items mostrar
   const showAdminItems = userRole === "ADMIN_SUPREMO";
@@ -56,11 +68,23 @@ export function AppSidebar({ userRole, user, store }: AppSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="#">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <span className="text-lg font-bold">A</span>
-                </div>
+                <Avatar className="h-8 w-8 rounded-lg">
+                  <AvatarImage
+                    src={user?.imageUrl || "/avatars/shadcn.jpg"}
+                    alt={user?.firstName || "Usuario"}
+                  />
+                  <AvatarFallback className="rounded-lg">
+                    {isHydrated
+                      ? getInitials()
+                      : user?.email?.charAt(0).toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="font-semibold">Gian </span>
+                  {user && (
+                    <span className="font-semibold">
+                      {user.firstName} {user.lastName}
+                    </span>
+                  )}
                   <span className="text-xs">Admin Supremo</span>
                 </div>
               </a>
@@ -144,20 +168,22 @@ export function AppSidebar({ userRole, user, store }: AppSidebarProps) {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                >
-                  <Avatar className="h-8 w-8 rounded-lg">
-                    <AvatarImage src="/avatars/shadcn.jpg" alt="shadcn" />
-                    <AvatarFallback className="rounded-lg">MG</AvatarFallback>
+                <Button className="w-full justify-start gap-2 bg-sidebar-accent text-sidebar-accent-foreground hover:bg-sidebar-accent/80 focus-visible:ring-0 focus-visible:ring-offset-0">
+                  <Settings className="h-5 w-5" />
+                  <span className="font-medium">Configuración</span>
+                  {/* <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarImage src={user?.imageUrl || "/avatars/shadcn.jpg"} alt={user?.firstName || "Usuario"} />
+                    <AvatarFallback className="rounded-lg">
+                      {isHydrated ? getInitials() : user?.email?.charAt(0).toUpperCase() || "U"}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-medium">{user?.name}</span>
+                    <span className="truncate font-medium">{user?.firstName} {user?.lastName}</span>
                     <span className="truncate text-xs">{user?.email}</span>
-                  </div>
+                  </div> */}
+
                   <ChevronsUpDown className="ml-auto size-4" />
-                </SidebarMenuButton>
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent
                 className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
@@ -168,20 +194,29 @@ export function AppSidebar({ userRole, user, store }: AppSidebarProps) {
                 <DropdownMenuLabel className="p-0 font-normal">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                     <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage src="/avatars/shadcn.jpg" alt="shadcn" />
-                      <AvatarFallback className="rounded-lg">MG</AvatarFallback>
+                      <AvatarImage
+                        src={user?.imageUrl || "/avatars/shadcn.jpg"}
+                        alt={user?.firstName || "Usuario"}
+                      />
+                      <AvatarFallback className="rounded-lg">
+                        {isHydrated
+                          ? getInitials()
+                          : user?.email?.charAt(0).toUpperCase() || "U"}
+                      </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-medium">{user?.name}</span>
+                      <span className="truncate font-medium">
+                        {user?.firstName} {user?.lastName}
+                      </span>
                       <span className="truncate text-xs">{user?.email}</span>
                     </div>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={logout}>
                   <LogOut className="mr-2 h-4 w-4" />
-                  Log out
+                  Cerrar sesión
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

@@ -18,8 +18,10 @@ export default async function StoreLayout({
   // Authentication check
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
-  const { data: { user } } = await supabase.auth.getUser();
-  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   if (error || !data?.claims) {
     redirect("/auth/login");
   }
@@ -46,14 +48,10 @@ export default async function StoreLayout({
   if (!store) {
     redirect("/supremo");
   }
-  
+
   return (
     <SidebarProvider>
-      <AppSidebar 
-        userRole={profile.role} 
-        user={user} 
-        store={store} 
-      />
+      <AppSidebar userRole={profile.role} user={profile} store={store} />
       <main className="w-full">
         <AdminNavbar />
         <div className="px-8 pt-4">
@@ -61,7 +59,11 @@ export default async function StoreLayout({
         </div>
         {children}
         <CreateBranchModal storeId={store.id} storeSlug={store.slug} />
-        <CreateProductModal storeId={store.id} storeSlug={store.slug} withPrices={store.withPrices} />
+        <CreateProductModal
+          storeId={store.id}
+          storeSlug={store.slug}
+          withPrices={store.withPrices}
+        />
       </main>
     </SidebarProvider>
   );
