@@ -87,6 +87,7 @@ const Page = async ({ params }: PageProps) => {
         storeName={store.name} 
         storeLogo={store.logo || ""} 
         locations={store.locations}
+        storeSlug={slug}
       />
     </StoreContainer>
   );

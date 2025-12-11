@@ -5,6 +5,7 @@ interface ConfirmOrderModalFooterProps {
   isValid: boolean;
   onNext: () => void;
   onBack: () => void;
+  isSubmitting?: boolean;
 }
 
 export default function ConfirmOrderModalFooter({
@@ -12,6 +13,7 @@ export default function ConfirmOrderModalFooter({
   isValid,
   onNext,
   onBack,
+  isSubmitting = false,
 }: ConfirmOrderModalFooterProps) {
   return (
     <div className="border-t bg-background px-6 py-4 mt-auto">
@@ -23,7 +25,7 @@ export default function ConfirmOrderModalFooter({
             <Button
               type="button"
               className="bg-zinc-900 hover:bg-zinc-950 text-white cursor-pointer"
-              disabled={false}
+              disabled={isSubmitting}
               onClick={onBack}
             >
               Atrás
@@ -42,9 +44,9 @@ export default function ConfirmOrderModalFooter({
             type="submit"
             form="order-form"
             className="bg-emerald-600 hover:bg-emerald-700 text-white"
-            disabled={!isValid}
+            disabled={!isValid || isSubmitting}
           >
-            Confirmar Orden
+            {isSubmitting ? "Creando..." : "Confirmar Orden"}
           </Button>
         )}
       </div>

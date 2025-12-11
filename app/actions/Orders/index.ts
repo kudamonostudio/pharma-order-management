@@ -1,27 +1,40 @@
+"use server";
+
 import { toNullable } from "@/lib/helpers";
 import { GetOrdersByStoreResponse } from "@/shared/types/order";
 import { Order, OrderStatus, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+import { prisma } from "@/lib/prisma";
 
 export async function createOrder(formData: FormData) {
-  const storeSlug = formData.get("storeSlug");
+  const storeSlug = formData.get("storeSlug") as string;
+  
+  // Obtener la tienda por slug
+  const store = await prisma.store.findUnique({
+    where: { slug: storeSlug },
+  });
+
+  if (!store) {
+    throw new Error("Tienda no encontrada");
+  }
 
   const data = {
-    fullname: toNullable(formData.get("fullname")),
-    phoneContact: toNullable(formData.get("phoneContact")),
+    fullname: toNullable(formData.get("fullname")) || "",
+    phoneContact: toNullable(formData.get("phoneContact")) || "",
     locationId: Number(formData.get("locationId")),
-    collaboratorId: Number(formData.get("collaboratorId")),
-    items: formData.get("items"),
+    storeId: store.id,
+    items: JSON.parse(formData.get("items") as string),
     totalAmount: Number(formData.get("totalAmount")),
     currency: 'UYU',
+    status: 'PENDING' as OrderStatus,
   };
 
-  const product = await prisma.product.create({
+  const order = await prisma.order.create({
     data
   });
 
-  revalidatePath(`/control/tiendas/${storeSlug}/orders`);
-  return product.id;
+  revalidatePath(`/control/${storeSlug}/orders`);
+  return order.id;
 }
 
 export async function getOrdersByStore(
@@ -77,6 +90,10 @@ export async function updateOrderStatus(
   const order = await prisma.order.findUnique({
     where: { id },
   });
+
+  if (!order) {
+    throw new Error("Orden no encontrada");
+  }
 
   const updatedOrder = await prisma.order.update({
     where: { id },

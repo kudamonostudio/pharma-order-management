@@ -17,6 +17,8 @@ import ConfirmOrderModalFooter from "./ConfirmOrderModalFooter";
 import ConfirmOrderModalForm from "./ConfirmOrderModalForm";
 import SelectedProductsTotal from "../SelectedProductsTotal";
 import { StoreLocation } from "@/app/types/store";
+import { createOrder } from "@/app/actions/Orders";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   fullName: z.string().min(3, "Mínimo 3 caracteres"),
@@ -33,6 +35,7 @@ interface Props {
   storeName: string;
   storeLogo: string;
   locations: StoreLocation[];
+  storeSlug: string;
 }
 
 export default function ConfirmOrderModalContent({
@@ -42,9 +45,12 @@ export default function ConfirmOrderModalContent({
   storeName,
   storeLogo,
   locations,
+  storeSlug,
 }: Props) {
   const [step, setStep] = useState<"products" | "form">("products");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { order, getOrderQuantity, clearOrder } = useOrderStore();
+  const router = useRouter();
 
   // Obtener datos guardados del localStorage
   const savedFullName =
@@ -103,26 +109,50 @@ export default function ConfirmOrderModalContent({
     setStep("products");
   };
 
-  const onSubmit = (data: FormData) => {
-    const payload = {
-      customerName: data.fullName,
-      customerPhone: data.phone,
-      branchId: data.branchId,
-      items: order.map((item) => ({
-        productId: item.id,
+  const onSubmit = async (data: FormData) => {
+    try {
+      setIsSubmitting(true);
+      
+      // Calcular el total
+      const totalAmount = 0; // Por ahora en 0 ya que los productos no tienen precio
+      
+      // Preparar los items
+      const items = order.map((item) => ({
+        productId: parseInt(item.id),
         quantity: item.quantity,
-      })),
-      totalQuantity: getOrderQuantity(),
-    };
+        name: item.name,
+      }));
 
-    console.log("📦 PAYLOAD DE LA ORDEN:", payload);
+      // Crear FormData para enviar al server action
+      const formData = new FormData();
+      formData.append("storeSlug", storeSlug);
+      formData.append("fullname", data.fullName);
+      formData.append("phoneContact", data.phone);
+      formData.append("locationId", data.branchId);
+      formData.append("items", JSON.stringify(items));
+      formData.append("totalAmount", totalAmount.toString());
 
-    localStorage.setItem("customerFullName", data.fullName);
-    localStorage.setItem("customerPhone", data.phone);
+      // Llamar a la server action
+      await createOrder(formData);
 
-    clearOrder();
+      // Guardar datos del cliente en localStorage
+      localStorage.setItem("customerFullName", data.fullName);
+      localStorage.setItem("customerPhone", data.phone);
 
-    handleOpenChange(false);
+      // Limpiar la orden
+      clearOrder();
+
+      // Cerrar el modal
+      handleOpenChange(false);
+      
+      // Opcional: Mostrar mensaje de éxito o redirigir
+      router.refresh();
+    } catch (error) {
+      console.error("Error al crear la orden:", error);
+      // Aquí podrías mostrar un toast o mensaje de error
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -174,6 +204,7 @@ export default function ConfirmOrderModalContent({
           isValid={isValid}
           onNext={handleNext}
           onBack={handleBack}
+          isSubmitting={isSubmitting}
         />
       </DialogContent>
     </Dialog>

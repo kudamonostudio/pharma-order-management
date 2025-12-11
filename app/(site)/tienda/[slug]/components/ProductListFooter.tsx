@@ -12,9 +12,10 @@ interface ProductListFooterProps {
   storeName: string;
   storeLogo: string;
   locations: StoreLocation[];
+  storeSlug: string;
 }
 
-const ProductListFooter = ({ storeId, storeName, storeLogo, locations }: ProductListFooterProps) => {
+const ProductListFooter = ({ storeId, storeName, storeLogo, locations, storeSlug }: ProductListFooterProps) => {
   const { order, getOrderQuantity, setStoreId } = useOrderStore();
   const [confirmOrderOpen, setConfirmOrderOpen] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -92,6 +93,7 @@ const ProductListFooter = ({ storeId, storeName, storeLogo, locations }: Product
         storeName={storeName}
         storeLogo={storeLogo}
         locations={locations}
+        storeSlug={storeSlug}
       />
     </>
   );
