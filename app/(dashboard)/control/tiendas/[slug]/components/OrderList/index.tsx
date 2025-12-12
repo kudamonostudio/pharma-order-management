@@ -1,8 +1,9 @@
-import { Order } from "@prisma/client";
+// import { Order } from "@prisma/client";
+import { OrderInStore } from "@/shared/types/store";
 import { OrderCard } from "./OrderCard";
 
 interface OrderListProps {
-  orders: Order[];
+  orders: OrderInStore[];
 }
 
 export function OrderList({ orders }: OrderListProps) {

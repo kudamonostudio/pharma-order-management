@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server";
 
 import crypto from "crypto";
@@ -5,6 +6,7 @@ import { generateSlug } from "@/lib/helpers";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { Store } from "@prisma/client";
+import { StoreExtended, StoreExtendedParams } from "@/shared/types/store";
 
 export async function createStore(formData: FormData) {
   const name = formData.get("name") as string;
@@ -129,3 +131,41 @@ export async function getStoreBySlug(slug: string) {
 
   return store;
 }
+
+export async function getStoreExtended(
+  slug: string,
+  params: StoreExtendedParams = {}
+): Promise<StoreExtended | null> {
+  if (!slug) return null;
+
+
+  const includeInformation: any = {}
+
+  const { includeOrders = false } = params;
+
+  if(includeOrders) {
+    includeInformation.orders = {
+      select: {
+        id: true,
+        code: true,
+        status: true,
+        createdAt: true,
+        collaborator: {
+          select: { id: true, firstName: true, lastName: true },
+        },
+        location: {
+          select: { id: true, name: true },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    };
+  }
+
+  const store = await prisma.store.findUnique({
+    where: { slug },
+    include: includeInformation,
+  });
+
+  return store as StoreExtended;
+}
+

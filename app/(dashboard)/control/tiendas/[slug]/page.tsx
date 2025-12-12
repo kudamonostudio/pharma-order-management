@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { OrderList } from "./components/OrderList";
-import { getStoreBySlug } from "@/app/actions/Store";
+import { getStoreExtended } from "@/app/actions/Store";
 
 export default async function StorePage({
   params,
@@ -8,11 +8,13 @@ export default async function StorePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const store = await getStoreBySlug(slug);
+  const store = await getStoreExtended(slug, { includeOrders: true});
 
   if (!store) {
     redirect("/supremo");
   }
+
+  console.log({ store }) // VER AQUI EL CONTENIDO
 
   const mockLastOrders = [
     {
@@ -93,7 +95,7 @@ export default async function StorePage({
 
         <section className="latest-orders">
           <h2 className="text-2xl font-medium mb-4">Últimas órdenes</h2>
-          <OrderList orders={mockLastOrders} /> {/* TODO: CARGAR ÓRDENES REALES */}
+          <OrderList orders={store.orders ?? []} /> {/* TODO: CARGAR ÓRDENES REALES */}
         </section>
       </div>
     </div>
