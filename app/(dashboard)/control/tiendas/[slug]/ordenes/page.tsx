@@ -23,7 +23,7 @@ export default async function OrdenesPage({
     return;
   }
 
-  const {orders, total, pages} = ordersResponse;
+  const { orders } = ordersResponse;
   
   // const mockOrders = [
   //   { id: "ORD-001", customer: "Cliente A", total: 150.00, status: "Pendiente" },

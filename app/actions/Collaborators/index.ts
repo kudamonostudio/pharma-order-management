@@ -5,21 +5,6 @@ import { toNumberOrNull } from "@/lib/helpers";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-// type BranchWithActive = {
-//   id: number;
-//   name: string;
-//   isActive: boolean;
-// };
-
-// type StoreCollaborator = {
-//   collaboratorId: number;
-//   firstName: string;
-//   lastName: string;
-//   code: string | null;
-//   image: string | null;
-//   branches: BranchWithActive[];
-// };
-
 export async function createCollaborator(formData: FormData) {
   const storeSlug = formData.get("storeSlug") as string;
   const firstName = formData.get("firstName") as string;
