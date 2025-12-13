@@ -80,6 +80,7 @@ model Order {
   phoneContact   String
   totalAmount    Decimal        @db.Decimal(10, 2)
   orderHistories OrderHistory[]
+  messages       Message[]
   collaborator   Collaborator?  @relation(fields: [collaboratorId], references: [id])
   location       Location?      @relation(fields: [locationId], references: [id])
   store          Store?         @relation(fields: [storeId], references: [id])
@@ -99,6 +100,20 @@ model OrderHistory {
   order          Order        @relation(fields: [orderId], references: [id])
 
   @@map("order_history")
+}
+
+model Message {
+  id             Int          @id @default(autoincrement())
+  type           MessageType
+  orderId        Int
+  collaboratorId Int
+  message        String      
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime  @updatedAt
+  collaborator   Collaborator @relation(fields: [collaboratorId], references: [id])
+  order          Order        @relation(fields: [orderId], references: [id])
+
+  @@map("messages")
 }
 
 model Category {
@@ -152,6 +167,7 @@ model Collaborator {
   collaboratorAssignments CollaboratorAssignment[]
   orderHistories          OrderHistory[]
   orders                  Order[]
+  messages                Message[]
 
   @@map("collaborators")
 }
@@ -184,3 +200,9 @@ enum OrderStatus {
   EN_PROCESO
   LISTO_PARA_RETIRO
 }
+
+enum MessageType {
+  INTERN
+  TO_CLIENT
+}
+

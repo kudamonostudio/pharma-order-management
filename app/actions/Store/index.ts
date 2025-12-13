@@ -6,7 +6,8 @@ import { generateSlug } from "@/lib/helpers";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { Store } from "@prisma/client";
-import { StoreExtended, StoreExtendedParams } from "@/shared/types/store";
+import { StoreWithOrdersParams, StoreWithOrdersResponse } from "@/shared/types/store";
+import { LIMIT_PER_PAGE } from "@/lib/constants";
 
 export async function createStore(formData: FormData) {
   const name = formData.get("name") as string;
@@ -132,40 +133,81 @@ export async function getStoreBySlug(slug: string) {
   return store;
 }
 
-export async function getStoreExtended(
+export async function getStoreWithOrders(
   slug: string,
-  params: StoreExtendedParams = {}
-): Promise<StoreExtended | null> {
+  params: StoreWithOrdersParams = {}
+): Promise<StoreWithOrdersResponse | null> {
   if (!slug) return null;
 
+  const {
+    ordersPage = 1,
+    ordersLimit = LIMIT_PER_PAGE,
+    status,
+  } = params;
 
-  const includeInformation: any = {}
+  const skip = (ordersPage - 1) * ordersLimit;
 
-  const { includeOrders = false } = params;
-
-  if(includeOrders) {
-    includeInformation.orders = {
-      select: {
-        id: true,
-        code: true,
-        status: true,
-        createdAt: true,
-        collaborator: {
-          select: { id: true, firstName: true, lastName: true },
-        },
-        location: {
-          select: { id: true, name: true },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    };
-  }
+  const orderWhere = status ? { status } : undefined;
 
   const store = await prisma.store.findUnique({
     where: { slug },
-    include: includeInformation,
+    include: {
+      orders: {
+        where: orderWhere,
+        skip,
+        take: ordersLimit,
+        select: {
+          id: true,
+          code: true,
+          status: true,
+          items: true,
+          totalAmount: true,
+          currency: true,
+          createdAt: true,
+          collaborator: {
+            select: { id: true, firstName: true, lastName: true },
+          },
+          location: {
+            select: { id: true, name: true },
+          },
+          messages: {
+            select: {
+              id: true,
+              type: true,
+              message: true,
+              collaboratorId: true,
+              createdAt: true,
+            }
+          }
+        },
+        orderBy: { createdAt: "desc" },
+      }
+    },
   });
 
-  return store as StoreExtended;
+  if (!store) return null;
+
+  const totalOrders = await prisma.order.count({
+    where: {
+      storeId: store.id,
+      ...(status && { status }),
+    },
+  });
+
+  const orders = store.orders.map((order) => ({
+    ...order,
+    totalAmount: Number(order.totalAmount),
+  }));
+
+  return {
+    store: {
+      ...store,
+      orders,
+    },
+    ordersPagination: {
+      total: totalOrders,
+      page: Math.ceil(totalOrders / ordersLimit),
+    },
+  };
 }
 

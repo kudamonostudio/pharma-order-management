@@ -203,33 +203,6 @@ export async function assignCollaboratorsToLocation(
     });
   }
 
-
-
-
-
-
-
-
-
-  // const currentIds = new Set(currentAssignments.map((c) => c.collaboratorId));
-
-  // const uniqueIncomingIds = Array.from(new Set(activeCollaboratorIds));
-
-  // const idsToInsert = uniqueIncomingIds.filter((id) => !currentIds.has(id));
-
-
-  // if (idsToInsert.length === 0) {
-  //   return;
-  // }
-
-  // await prisma.collaboratorAssignment.createMany({
-  //   data: idsToInsert.map((id) => ({
-  //     locationId,
-  //     collaboratorId: id,
-  //     storeId: location.storeId,
-  //   })),
-  // });
-
   revalidatePath(`/control/tiendas/${storeSlug}/sucursales`);
   revalidatePath(`/control/tiendas/${storeSlug}/colaboradores`);
 }

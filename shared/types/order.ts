@@ -19,5 +19,11 @@ export interface StoreOrder {
 export interface GetOrdersByStoreResponse {
   orders: StoreOrder[];
   total: number;
-  pages: number;
+  page: number;
+}
+
+export interface UpdateOrderStatusData {
+  id: number,
+  status: OrderStatus,
+  collaboratorId: number,
 }

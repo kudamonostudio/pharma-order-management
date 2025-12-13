@@ -54,13 +54,26 @@ export function OrderCardClient({
             {getOrderStatusLabel(order.status)}
           </p>
         </div>
+        
+      </div>
+
+      {/* MENSAJES: (QUITAR LUEGO) */}
+      <div>
+        Mensajes (QUITAR LUEGO):
+        <div>
+          <pre>
+            <code>
+            { JSON.stringify(order.messages, null, 4)}
+          </code>
+          </pre>
+        </div>
       </div>
 
       <OrderDetailModal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
         order={{
-          id: order.code,
+          id: order.code ?? order.id.toString(),
           status: order.status,
           createdAt: order.createdAt,
           branch: {

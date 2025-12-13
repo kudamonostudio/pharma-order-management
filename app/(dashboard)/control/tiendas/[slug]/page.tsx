@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { OrderList } from "./components/OrderList";
-import { getStoreExtended } from "@/app/actions/Store";
+import { getStoreWithOrders } from "@/app/actions/Store";
 
 export default async function StorePage({
   params,
@@ -8,76 +8,88 @@ export default async function StorePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const store = await getStoreExtended(slug, { includeOrders: true});
+  const response = await getStoreWithOrders(slug);
 
-  if (!store) {
+  // Acciones para las ordenes:
+  // getStoreWithOrders() --> entrega la tienda con sus ordenes paginadas opcionalmente
+  // getOrdersByStore() --> entrega directamente las ordenes paginadas
+  // createOrder --> crea orden
+  // updateOrderStatus --> actualiza el estado de la orden
+  // getOrderMessages --> entrega los mensajes de la orden
+  // createMessage --> crea un mensaje
+  // updateOrderMessage --> actualiza un mensaje
+
+
+  if (!response) {
     redirect("/supremo");
   }
 
-  console.log({ store }) // VER AQUI EL CONTENIDO
+  const { store, ordersPagination } = response;
 
-  const mockLastOrders = [
-    {
-      id: 1,
-      orderCode: "ORD-751",
-      date: new Date().toDateString(),
-      status: "PENDIENTE",
-      branch: {
-        id: 1,
-        name: "Sucursal Centro",
-      },
-      profileId: 0,
-    },
-    {
-      id: 2,
-      orderCode: "ORD-752",
-      date: new Date().toDateString(),
-      status: "LISTO_PARA_RETIRO",
-      branch: {
-        id: 1,
-        name: "Sucursal Centro",
-      },
-      profileId: 1,
-    },
-    {
-      id: 3,
-      orderCode: "ORD-753",
-      date: new Date().toDateString(),
-      status: "ENTREGADA",
-      branch: {
-        id: 2,
-        name: "Sucursal Paso Molino",
-      },
-      profileId: 2,
-    },
-    {
-      id: 4,
-      orderCode: "ORD-722",
-      date: new Date().toDateString(),
-      status: "CANCELADA",
-      branch: {
-        id: 2,
-        name: "Sucursal Paso Molino",
-      },
-      profileId: null,
-    },
-    {
-      id: 5,
-      orderCode: "ORD-754",
-      date: new Date().toDateString(),
-      status: "CANCELADA",
-      branch: { id: 1, name: "Sucursal Centro" },
-      profileId: 4,
-    },
-    {
-      id: 6,
-      orderCode: "ORD-755",
-      date: new Date().toDateString(),
-      status: "EN_PROCESO",
-      branch: { id: 3, name: "Sucursal Atlántida" },
-      profileId: 3,
-    },
-  ];
+  console.log({ store, ordersPagination }) // VER AQUI EL CONTENIDO
+
+  // const mockLastOrders = [
+  //   {
+  //     id: 1,
+  //     orderCode: "ORD-751",
+  //     date: new Date().toDateString(),
+  //     status: "PENDIENTE",
+  //     branch: {
+  //       id: 1,
+  //       name: "Sucursal Centro",
+  //     },
+  //     profileId: 0,
+  //   },
+  //   {
+  //     id: 2,
+  //     orderCode: "ORD-752",
+  //     date: new Date().toDateString(),
+  //     status: "LISTO_PARA_RETIRO",
+  //     branch: {
+  //       id: 1,
+  //       name: "Sucursal Centro",
+  //     },
+  //     profileId: 1,
+  //   },
+  //   {
+  //     id: 3,
+  //     orderCode: "ORD-753",
+  //     date: new Date().toDateString(),
+  //     status: "ENTREGADA",
+  //     branch: {
+  //       id: 2,
+  //       name: "Sucursal Paso Molino",
+  //     },
+  //     profileId: 2,
+  //   },
+  //   {
+  //     id: 4,
+  //     orderCode: "ORD-722",
+  //     date: new Date().toDateString(),
+  //     status: "CANCELADA",
+  //     branch: {
+  //       id: 2,
+  //       name: "Sucursal Paso Molino",
+  //     },
+  //     profileId: null,
+  //   },
+  //   {
+  //     id: 5,
+  //     orderCode: "ORD-754",
+  //     date: new Date().toDateString(),
+  //     status: "CANCELADA",
+  //     branch: { id: 1, name: "Sucursal Centro" },
+  //     profileId: 4,
+  //   },
+  //   {
+  //     id: 6,
+  //     orderCode: "ORD-755",
+  //     date: new Date().toDateString(),
+  //     status: "EN_PROCESO",
+  //     branch: { id: 3, name: "Sucursal Atlántida" },
+  //     profileId: 3,
+  //   },
+  // ];
 
   return (
     <div className="px-8 py-8 w-full max-w-5xl">

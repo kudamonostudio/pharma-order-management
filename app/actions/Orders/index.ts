@@ -1,7 +1,7 @@
 "use server";
 
 import { toNullable } from "@/lib/helpers";
-import { GetOrdersByStoreResponse } from "@/shared/types/order";
+import { GetOrdersByStoreResponse, UpdateOrderStatusData } from "@/shared/types/order";
 import { Order, OrderStatus, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
@@ -78,15 +78,14 @@ export async function getOrdersByStore(
       totalAmount: Number(order.totalAmount),
     })),
     total,
-    pages: Math.ceil(total / limit),
+    page: Math.ceil(total / limit),
   };
 }
 
 export async function updateOrderStatus(
-  id: number,
-  status: OrderStatus,
-  collaboratorId: number,
+  data: UpdateOrderStatusData
 ) {
+  const { id, status, collaboratorId } = data;
   const order = await prisma.order.findUnique({
     where: { id },
   });

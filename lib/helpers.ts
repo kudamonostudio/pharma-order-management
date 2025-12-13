@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Decimal } from "@prisma/client/runtime/library";
+import { MESSAGE_LIMITS } from "./constants";
 
 export const generateSlug = (name: string) => {
   return name
@@ -33,3 +34,19 @@ export const toNumberOrNull = (value: FormDataEntryValue | null): number | null 
   const num = Number(value);
   return isNaN(num) ? null : num;
 };
+
+export const validateMessageContent = (message: string): string => {
+  const trimmed = message.trim();
+
+  if (trimmed.length < MESSAGE_LIMITS.MIN_LENGTH) {
+    throw new Error("Message cannot be empty");
+  }
+
+  if (trimmed.length > MESSAGE_LIMITS.MAX_LENGTH) {
+    throw new Error(
+      `Message exceeds maximum length of ${MESSAGE_LIMITS.MAX_LENGTH} characters`
+    );
+  }
+
+  return trimmed;
+}
