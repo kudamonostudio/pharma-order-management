@@ -4,8 +4,7 @@ import { useState } from "react";
 import { getOrderStatusColor, getOrderStatusLabel } from "../../../constants";
 import { formatDate } from "@/app/(dashboard)/utils/dates";
 import { OrderCollab } from "./OrderCollab";
-import { mockCollaborators } from "@/app/mocks/collaborators";
-import { OrderDetailModal } from "./OrderDetailModal/OrderDetailModal";
+import { OrderDetailModal } from "./OrderDetailModal/ModalContent";
 import { useOrderStore } from "@/app/zustand/orderStore";
 import { OrderInStore } from "@/shared/types/store";
 
@@ -21,10 +20,6 @@ export function OrderCardClient({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { order: mockProducts } = useOrderStore();
 
-  const mockCollab = mockCollaborators.find(
-    (collab) => collab.id === Number(order.collaborator?.id)
-  );
-
   const handleClick = () => {
     setIsModalOpen(true);
   };
@@ -38,8 +33,11 @@ export function OrderCardClient({
         )}`}
       >
         <div className="flex gap-3 items-center">
-          {mockCollab ? (
-            <OrderCollab collab={mockCollab} key={order.collaborator?.id} />
+          {order.collaborator ? (
+            <OrderCollab
+              collab={order.collaborator}
+              key={order.collaborator?.id}
+            />
           ) : null}
           <div>
             <h3 className="text-accent-foreground">{order.code}</h3>
@@ -54,34 +52,12 @@ export function OrderCardClient({
             {getOrderStatusLabel(order.status)}
           </p>
         </div>
-        
-      </div>
-
-      {/* MENSAJES: (QUITAR LUEGO) */}
-      <div>
-        Mensajes (QUITAR LUEGO):
-        <div>
-          <pre>
-            <code>
-            { JSON.stringify(order.messages, null, 4)}
-          </code>
-          </pre>
-        </div>
       </div>
 
       <OrderDetailModal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
-        order={{
-          id: order.code ?? order.id.toString(),
-          status: order.status,
-          createdAt: order.createdAt,
-          branch: {
-            id: String(order.location?.id),
-            name: order.location?.name ?? '',
-          },
-          profileId: order.collaborator?.id,
-        }}
+        order={order}
         products={mockProducts}
       />
     </>

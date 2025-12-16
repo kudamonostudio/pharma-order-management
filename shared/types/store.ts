@@ -58,6 +58,7 @@ export interface CollaboratorBasic {
   id: number;
   firstName: string;
   lastName: string;
+  image?: string | null;
 }
 
 export interface LocationBasic {
@@ -66,9 +67,9 @@ export interface LocationBasic {
 }
 
 export interface MessageBasic {
-  id: number,
-  type: MessageType,
-  message: string,
-  collaboratorId: number,
-  createdAt: Date,
+  id: number;
+  type: MessageType;
+  message: string;
+  collaborator: CollaboratorBasic | null;
+  createdAt: Date;
 }

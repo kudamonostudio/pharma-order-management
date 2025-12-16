@@ -2,18 +2,12 @@
 
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { OrderDetailModalContent } from "./OrderDetailModalContent";
-import { type OrderStatus as OrderStatusType } from "@/app/(dashboard)/control/tiendas/[slug]/constants";
+import { OrderInStore } from "@/shared/types/store";
 
 interface OrderDetailModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  order: {
-    id: string;
-    status: OrderStatusType | string;
-    createdAt: Date;
-    branch: { id: string; name: string };
-    profileId?: string | number | null;
-  };
+  order: OrderInStore;
   products: Array<{
     id: string;
     name: string;

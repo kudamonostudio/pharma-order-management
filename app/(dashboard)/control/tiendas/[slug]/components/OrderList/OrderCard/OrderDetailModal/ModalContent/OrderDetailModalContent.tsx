@@ -6,22 +6,17 @@ import {
   type OrderStatus as OrderStatusType,
   getOrderStatusColor,
 } from "@/app/(dashboard)/control/tiendas/[slug]/constants";
-import { OrderDetailModalProducts } from "./OrderDetailModalProducts";
+import { OrderDetailModalProducts } from "../OrderDetailModalProducts";
 import OrderStatusModal from "./OrderStatusModal";
 import { formatDate } from "@/app/(dashboard)/utils/dates";
-import { OrderCollab } from "../OrderCollab";
-import { mockCollaborators } from "@/app/mocks/collaborators";
+import { OrderCollab } from "../../OrderCollab";
 import { Separator } from "@/components/ui/separator";
 import { ModalControl, type ModalControlValue } from "./ModalControl";
+import { OrderInStore } from "@/shared/types/store";
+import { MessageList } from "./Messages/MessageList";
 
 interface OrderDetailModalContentProps {
-  order: {
-    id: string;
-    status: OrderStatusType | string;
-    createdAt: Date;
-    branch: { id: string; name: string };
-    profileId?: string | number | null;
-  };
+  order: OrderInStore;
   products: Array<{
     id: string;
     name: string;
@@ -37,9 +32,7 @@ export function OrderDetailModalContent({
   const [controlValue, setControlValue] =
     useState<ModalControlValue>("products");
   const statusColor = getOrderStatusColor(order.status as OrderStatusType);
-  const mockCollab = mockCollaborators.find(
-    (collab) => collab.id === Number(order.profileId)
-  );
+  const collaborator = order.collaborator;
 
   return (
     <div className="flex flex-col ">
@@ -48,7 +41,7 @@ export function OrderDetailModalContent({
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-accent-foreground/85">
-              #{order.id}
+              #{order.code ?? order.id}
             </h1>
             <span className="text-sm">
               Creada el {formatDate(order.createdAt)}
@@ -56,7 +49,7 @@ export function OrderDetailModalContent({
             <h3 className="text-base font-normal">
               Retira en la sucursal:{" "}
               <span className="text-accent-foreground font-medium">
-                {order.branch.name}
+                {order.location?.name ?? "Sin asignar"}
               </span>
             </h3>
             <div className="flex items-center gap-2 mt-2">
@@ -75,13 +68,17 @@ export function OrderDetailModalContent({
           <div className="flex flex-col items-end gap-6">
             <OrderStatusModal status={order.status} />
             <div className="flex items-center gap-2">
-              {mockCollab && (
-                <OrderCollab collab={mockCollab} key={order.profileId} />
+              {collaborator && (
+                <OrderCollab collab={collaborator} key={collaborator.id} />
               )}
               <div>
-                {mockCollab?.name && <p className="text-sm">Gestiona:</p>}
+                {collaborator?.firstName && (
+                  <p className="text-sm">Gestiona:</p>
+                )}
                 <span className="text-accent-foreground font-medium text-center">
-                  {mockCollab?.name || "Sin asignar"}{" "}
+                  {collaborator
+                    ? `${collaborator.firstName} ${collaborator.lastName}`
+                    : "Sin asignar"}{" "}
                   {/* TODO: CREAR BOTON DE GESTIONAR ORDEN - CAMBIAR ESTADO */}
                 </span>
               </div>
@@ -96,14 +93,10 @@ export function OrderDetailModalContent({
           <OrderDetailModalProducts order={products} />
         )}
         {controlValue === "internal-messages" && (
-          <div className="py-8 text-center text-muted-foreground">
-            Mensajes internos
-          </div>
+          <MessageList messages={order.messages} type="INTERN" />
         )}
         {controlValue === "client-messages" && (
-          <div className="py-8 text-center text-muted-foreground">
-            Mensajes al cliente
-          </div>
+          <MessageList messages={order.messages} type="TO_CLIENT" />
         )}
       </div>
     </div>

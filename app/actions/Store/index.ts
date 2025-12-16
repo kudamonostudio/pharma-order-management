@@ -6,7 +6,10 @@ import { generateSlug } from "@/lib/helpers";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { Store } from "@prisma/client";
-import { StoreWithOrdersParams, StoreWithOrdersResponse } from "@/shared/types/store";
+import {
+  StoreWithOrdersParams,
+  StoreWithOrdersResponse,
+} from "@/shared/types/store";
 import { LIMIT_PER_PAGE } from "@/lib/constants";
 
 export async function createStore(formData: FormData) {
@@ -139,11 +142,7 @@ export async function getStoreWithOrders(
 ): Promise<StoreWithOrdersResponse | null> {
   if (!slug) return null;
 
-  const {
-    ordersPage = 1,
-    ordersLimit = LIMIT_PER_PAGE,
-    status,
-  } = params;
+  const { ordersPage = 1, ordersLimit = LIMIT_PER_PAGE, status } = params;
 
   const skip = (ordersPage - 1) * ordersLimit;
 
@@ -165,7 +164,7 @@ export async function getStoreWithOrders(
           currency: true,
           createdAt: true,
           collaborator: {
-            select: { id: true, firstName: true, lastName: true },
+            select: { id: true, firstName: true, lastName: true, image: true },
           },
           location: {
             select: { id: true, name: true },
@@ -175,13 +174,20 @@ export async function getStoreWithOrders(
               id: true,
               type: true,
               message: true,
-              collaboratorId: true,
               createdAt: true,
-            }
-          }
+              collaborator: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  image: true,
+                },
+              },
+            },
+          },
         },
         orderBy: { createdAt: "desc" },
-      }
+      },
     },
   });
 
@@ -210,4 +216,3 @@ export async function getStoreWithOrders(
     },
   };
 }
-
