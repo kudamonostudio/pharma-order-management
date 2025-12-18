@@ -21,7 +21,6 @@ export async function loginUnique(email: string, password: string) {
     .single();
 
   if (profileError) {
-    console.log({ profileError });
     throw new Error(profileError.message);
   }
 

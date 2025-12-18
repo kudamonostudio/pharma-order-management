@@ -8,14 +8,26 @@ import { OrderDetailModal } from "./OrderDetailModal/ModalContent";
 import { useOrderStore } from "@/app/zustand/orderStore";
 import { OrderInStore } from "@/shared/types/store";
 
+interface Collaborator {
+  id: number;
+  firstName: string;
+  lastName: string;
+  image: string | null;
+  isActive: boolean;
+}
+
 type OrderCardClientProps = {
   order: OrderInStore;
   isAdminSupremo: boolean;
+  storeSlug: string;
+  availableCollaborators: Collaborator[];
 };
 
 export function OrderCardClient({
   order,
   isAdminSupremo,
+  storeSlug,
+  availableCollaborators,
 }: OrderCardClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { order: mockProducts } = useOrderStore();
@@ -59,6 +71,8 @@ export function OrderCardClient({
         onOpenChange={setIsModalOpen}
         order={order}
         products={mockProducts}
+        storeSlug={storeSlug}
+        availableCollaborators={availableCollaborators}
       />
     </>
   );
