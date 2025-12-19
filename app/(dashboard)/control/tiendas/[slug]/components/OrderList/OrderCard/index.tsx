@@ -5,6 +5,7 @@ import { OrderInStore } from "@/shared/types/store";
 
 interface Collaborator {
   id: number;
+  code: string | null;
   firstName: string;
   lastName: string;
   image: string | null;

@@ -32,6 +32,7 @@ export default async function StorePage({
     id: c.collaboratorId,
     firstName: c.firstName,
     lastName: c.lastName,
+    code: c.code,
     image: c.image,
     isActive: c.isActive,
   }));

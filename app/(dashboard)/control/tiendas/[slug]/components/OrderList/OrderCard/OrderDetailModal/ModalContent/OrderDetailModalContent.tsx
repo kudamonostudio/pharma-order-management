@@ -16,10 +16,10 @@ import { OrderInStore } from "@/shared/types/store";
 import { MessageList } from "./Messages/MessageList";
 import { Button } from "@/components/ui/button";
 import { AssignCollaboratorToOrderModal } from "./AssignCollaboratorToOrderModal";
-import Link from "next/link";
 
-interface Collaborator {
+interface AvailableCollaborator {
   id: number;
+  code: string | null;
   firstName: string;
   lastName: string;
   image: string | null;
@@ -35,7 +35,7 @@ interface OrderDetailModalContentProps {
     quantity: number;
   }>;
   storeSlug: string;
-  availableCollaborators: Collaborator[];
+  availableCollaborators: AvailableCollaborator[];
 }
 
 export function OrderDetailModalContent({
@@ -120,7 +120,6 @@ export function OrderDetailModalContent({
                   <>
                     <span className="text-accent-foreground font-medium text-center">
                       {collaborator.firstName} {collaborator.lastName}
-                      {/* TODO: CREAR BOTON DE GESTIONAR ORDEN - CAMBIAR ESTADO */}
                     </span>
                     <small
                       className="underline block cursor-pointer"
@@ -130,12 +129,6 @@ export function OrderDetailModalContent({
                     </small>
                   </>
                 )}
-                {/* 
-                 onClick={() => {
-                if (!order.collaborator) {
-                  setIsAssignModalOpen(true);
-                }
-              }} */}
               </div>
             </div>
           </div>

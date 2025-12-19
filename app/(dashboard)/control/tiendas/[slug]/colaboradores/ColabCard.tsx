@@ -4,24 +4,22 @@ import { Badge } from "@/components/ui/badge";
 import { Pencil } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Branch } from "@/shared/types/collaborator";
+import { Collaborator } from "@prisma/client";
 
-interface collaborator {
-  collaboratorId: number;
-  image: string;
-  firstName: string;
-  lastName: string;
-  isActive: boolean;
+interface ColabCardProps extends Collaborator {
   branches: Branch[];
   onEditClick?: () => void;
 }
 
-export const ColabCard = ({ onEditClick, ...collaborator }: collaborator) => {
+export const ColabCard = ({ onEditClick, ...collaborator }: ColabCardProps) => {
   const isActive = collaborator.isActive ?? true;
 
-  const collaboratorActiveLocations = collaborator.branches.filter(b => b.isActive);
+  const collaboratorActiveLocations = collaborator.branches.filter(
+    (b) => b.isActive
+  );
   return (
-    <div key={collaborator.collaboratorId} className="p-4 flex flex-col relative gap-6">
-      <div className="absolute top-2 right-2">
+    <div key={collaborator.id} className="p-4 flex flex-col gap-2">
+      <div className="flex justify-end">
         <Badge
           className={cn(
             "gap-1.5 text-xs font-medium px-3 rounded-full",
@@ -37,34 +35,41 @@ export const ColabCard = ({ onEditClick, ...collaborator }: collaborator) => {
           {isActive ? "Activo" : "Inactivo"}
         </Badge>
       </div>
-      <div className="flex gap-3 items-center flex-1">
-        <Avatar className="shadow-sm border-2 border-background w-20 h-20 ring-1 ring-border bg-gray-100 mt-2">
-          <>
-            <AvatarImage
-              src={collaborator.image}
-              alt="Avatar"
-              className="rounded-full object-cover"
-            />
-            <AvatarFallback />
-          </>
-        </Avatar>
-        <div className="flex-1">
-          <h3 className="font-semibold text-lg">{collaborator.firstName} {collaborator.lastName}</h3>
-          <h4 className="text-sm text-muted-foreground">
-            <span className="font-semibold">
-              {collaboratorActiveLocations.length > 0
-                ? collaboratorActiveLocations.map(b => b.name).join(", ")
-                : "Sin sucursal"}
+      <div className="flex flex-col gap-6">
+        <div className="flex gap-3 items-center flex-1">
+          <Avatar className="shadow-sm border-2 border-background w-20 h-20 ring-1 ring-border bg-gray-100 mt-2">
+            <>
+              <AvatarImage
+                src={collaborator.image ?? undefined}
+                alt="Avatar"
+                className="rounded-full object-cover"
+              />
+              <AvatarFallback />
+            </>
+          </Avatar>
+          <div className="flex-1">
+            <h3 className="font-semibold text-lg">
+              {collaborator.firstName} {collaborator.lastName}
+            </h3>
+            <h4 className="text-sm text-muted-foreground">
+              <span className="font-semibold">
+                {collaboratorActiveLocations.length > 0
+                  ? collaboratorActiveLocations.map((b) => b.name).join(", ")
+                  : "Sin sucursal"}
+              </span>
+            </h4>
+            <span className="text-neutral-600 font-medium text-sm leading-5">
+              # {collaborator.code}
             </span>
-          </h4>
+          </div>
         </div>
+        {onEditClick && (
+          <Button onClick={onEditClick} className="w-full mt-3">
+            <Pencil className="h-4 w-4" />
+            Editar
+          </Button>
+        )}
       </div>
-      {onEditClick && (
-        <Button onClick={onEditClick} className="w-full mt-3">
-          <Pencil className="h-4 w-4" />
-          Editar
-        </Button>
-      )}
     </div>
   );
 };
