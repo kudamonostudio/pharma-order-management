@@ -1,52 +1,100 @@
-"use client";
-import { useOrderStore } from "@/app/zustand/orderStore";
 import StoreContainer from "../../components/StoreContainer";
 import StoreLogo from "../../components/StoreLogo";
 import { OrderDetailContent } from "./OrderDetailContent";
-import { type OrderStatus as OrderStatusType } from "@/app/(dashboard)/control/tiendas/[slug]/constants";
+import { prisma } from "@/lib/prisma";
+import { notFound } from "next/navigation";
 
 // Esta página muestra la orden creada, el listado de productos, la sucursal y el estado de la orden
-const Page = () => {
-  const { order } =
-    useOrderStore(); /* TODO: Esto debe quitarse, es la orden para la creacion */
-  const mockOrder: {
+interface PageProps {
+  params: Promise<{
+    slug: string;
     id: string;
-    status: OrderStatusType;
-    totalQuantity: number;
-    items: Array<{ quantity: number }>;
-    branch: { id: string; name: string };
-    createdAt: Date;
-  } = {
-    id: "order_12345",
-    status: "EN_PROCESO",
-    createdAt: new Date(),
-    branch: {
-      id: "3",
-      name: "Sucursal 1",
+  }>;
+}
+
+type OrderItemPayload = {
+  productId: number;
+  name: string;
+  quantity: number;
+  imageUrl?: string | null;
+};
+
+const Page = async ({ params }: PageProps) => {
+  const { slug, id } = await params;
+
+  const orderId = Number(id);
+  if (Number.isNaN(orderId)) {
+    notFound();
+  }
+
+  const dbOrder = await prisma.order.findFirst({
+    where: {
+      id: orderId,
+      store: {
+        slug,
+        isActive: true,
+        deletedAt: null,
+      },
     },
-    /* branchId: "3", */ // TODO: Obtener la sucursal desde supabase una vez implementadas las sucursales
-    items: [
-      {
-        /* productId: "4", */ // TODO: Obtener el producto desde supabase una vez implementados los productos
-        quantity: 3,
+    select: {
+      id: true,
+      status: true,
+      createdAt: true,
+      items: true,
+      location: {
+        select: {
+          id: true,
+          name: true,
+        },
       },
-      {
-        /* productId: "5", */ // TODO: Obtener el producto desde supabase una vez implementados los productos
-        quantity: 1,
+      store: {
+        select: {
+          name: true,
+          logo: true,
+        },
       },
-    ],
-    totalQuantity: 4,
+    },
+  });
+
+  if (!dbOrder) {
+    notFound();
+  }
+
+  const storeName = dbOrder.store?.name ?? "Tienda";
+  const storeLogo = dbOrder.store?.logo ?? "";
+
+  const products = (dbOrder.items as OrderItemPayload[]).map((item) => ({
+    id: item.productId.toString(),
+    name: item.name,
+    image: item.imageUrl || undefined,
+    quantity: item.quantity,
+  }));
+
+  const orderForView = {
+    id: dbOrder.id.toString(),
+    status: dbOrder.status,
+    createdAt: dbOrder.createdAt,
+    branch: {
+      id: dbOrder.location?.id.toString() ?? "",
+      name: dbOrder.location?.name ?? "Sucursal sin asignar",
+    },
   };
+
   return (
     <StoreContainer>
       <div className="pt-12 pb-8 flex gap-4 items-center justify-center border-b">
-        <StoreLogo logoUrl="https://i.pinimg.com/736x/c9/9d/0e/c99d0ec4d6f81c2e2592f41216d8fcd7.jpg" />
+        <StoreLogo logoUrl={storeLogo} />
         <h1 className="text-3xl font-semibold text-foreground tracking-tight">
-          Nombre de la tienda
+          {storeName}
         </h1>
       </div>
-      <OrderDetailContent order={mockOrder} products={order} showBranchInfo={true} />
+      <OrderDetailContent
+        order={orderForView}
+        products={products}
+        showBranchInfo={true}
+      />
     </StoreContainer>
   );
 };
+
 export default Page;

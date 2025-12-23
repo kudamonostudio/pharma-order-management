@@ -24,12 +24,6 @@ export default async function OrdenesPage({
   }
 
   const { orders } = ordersResponse;
-  
-  // const mockOrders = [
-  //   { id: "ORD-001", customer: "Cliente A", total: 150.00, status: "Pendiente" },
-  //   { id: "ORD-002", customer: "Cliente B", total: 85.50, status: "Completada" },
-  //   { id: "ORD-003", customer: "Cliente C", total: 200.00, status: "En proceso" },
-  // ];
 
   return (
     <div className="px-8 py-4 w-full">

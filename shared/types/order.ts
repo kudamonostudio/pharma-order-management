@@ -28,3 +28,18 @@ export interface UpdateOrderStatusData {
   collaboratorId: number,
   prevCollaboratorId?: number,
 }
+
+export interface OrderHistoryItem {
+  id: number;
+  orderId: number;
+  collaborator: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    image: string | null;
+  } | null;
+  fromStatus: string | null;
+  toStatus: string;
+  note: string | null;
+  createdAt: Date;
+}

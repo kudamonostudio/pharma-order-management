@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Collaborator, CollaboratorAssignment, MessageType, OrderStatus } from "@prisma/client";
+import { OrderHistoryItem } from "./order";
 
 export interface AssignmentWithCollaborator extends CollaboratorAssignment {
   collaborator: Collaborator;
@@ -52,6 +53,7 @@ export interface OrderInStore {
   collaborator: CollaboratorBasic | null;
   location: LocationBasic | null;
   messages: MessageBasic[];
+  history?: OrderHistoryItem[];
 }
 
 export interface CollaboratorBasic {

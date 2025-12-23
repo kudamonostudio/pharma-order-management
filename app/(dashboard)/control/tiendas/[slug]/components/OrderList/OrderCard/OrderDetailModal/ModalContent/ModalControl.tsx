@@ -1,12 +1,13 @@
 "use client";
 
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Package, MessageCircle, User } from "lucide-react";
+import { Package, MessageCircle, User, Calendar } from "lucide-react";
 
 export type ModalControlValue =
   | "products"
   | "internal-messages"
-  | "client-messages";
+  | "client-messages"
+  | "history";
 
 interface ModalControlProps {
   value: ModalControlValue;
@@ -58,6 +59,18 @@ export function ModalControl({ value, onChange }: ModalControlProps) {
       >
         <User className="h-4 w-4 mr-2" />
         Mensajes al cliente
+      </ToggleGroupItem>
+      <ToggleGroupItem
+        value="history"
+        aria-label="Historial"
+        className={`transition-none cursor-pointer ${
+          value === "history"
+            ? "bg-white! text-black! hover:bg-white!"
+            : "bg-transparent! text-zinc-400! hover:bg-transparent! hover:text-zinc-400!"
+        }`}
+      >
+        <Calendar className="h-4 w-4 mr-2" />
+        Historial
       </ToggleGroupItem>
     </ToggleGroup>
   );

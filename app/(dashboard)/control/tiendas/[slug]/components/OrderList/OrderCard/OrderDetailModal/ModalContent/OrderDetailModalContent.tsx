@@ -16,6 +16,9 @@ import { OrderInStore } from "@/shared/types/store";
 import { MessageList } from "./Messages/MessageList";
 import { Button } from "@/components/ui/button";
 import { AssignCollaboratorToOrderModal } from "./AssignCollaboratorToOrderModal";
+import { UpdateOrderStatusModal } from "./UpdateOrderStatusModal";
+import { HistoryEventCard } from "./history/HistoryEventCard";
+import { OrderHistoryList } from "./history/OrderHistoryList";
 
 interface AvailableCollaborator {
   id: number;
@@ -47,6 +50,7 @@ export function OrderDetailModalContent({
   const [controlValue, setControlValue] =
     useState<ModalControlValue>("products");
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [isUpdateStatusModalOpen, setIsUpdateStatusModalOpen] = useState(false);
   const statusColor = getOrderStatusColor(order.status as OrderStatusType);
   const collaborator = order.collaborator;
 
@@ -91,7 +95,9 @@ export function OrderDetailModalContent({
             <Button
               variant={"outline"}
               onClick={() => {
-                if (!order.collaborator) {
+                if (order.collaborator) {
+                  setIsUpdateStatusModalOpen(true);
+                } else {
                   setIsAssignModalOpen(true);
                 }
               }}
@@ -150,6 +156,12 @@ export function OrderDetailModalContent({
         >
           <MessageList messages={order.messages} type="TO_CLIENT" />
         </div>
+        <div className={controlValue === "history" ? "block" : "hidden"}>
+          <div className="flex flex-col gap-2">
+            <HistoryEventCard label="Orden creada" date={order.createdAt} />
+            <OrderHistoryList history={order.history ?? []} />
+          </div>
+        </div>
       </div>
 
       <AssignCollaboratorToOrderModal
@@ -162,6 +174,17 @@ export function OrderDetailModalContent({
         currentCollaboratorId={order.collaborator?.id}
         availableCollaborators={availableCollaborators}
       />
+      {order.collaborator && (
+        <UpdateOrderStatusModal
+          open={isUpdateStatusModalOpen}
+          onOpenChange={setIsUpdateStatusModalOpen}
+          orderId={order.id}
+          orderCode={order.code}
+          currentStatus={order.status as OrderStatusType}
+          currentCollaboratorId={order.collaborator?.id}
+          availableCollaborators={availableCollaborators}
+        />
+      )}
     </div>
   );
 }

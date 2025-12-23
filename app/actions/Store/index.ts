@@ -185,6 +185,24 @@ export async function getStoreWithOrders(
               },
             },
           },
+          orderHistories: {
+            select: {
+              id: true,
+              orderId: true,
+              fromStatus: true,
+              toStatus: true,
+              note: true,
+              createdAt: true,
+              collaborator: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true,
+                  image: true,
+                },
+              },
+            },
+          },
         },
         orderBy: { createdAt: "desc" },
       },
@@ -202,6 +220,7 @@ export async function getStoreWithOrders(
 
   const orders = store.orders.map((order) => ({
     ...order,
+    history: order.orderHistories,
     totalAmount: Number(order.totalAmount),
   }));
 

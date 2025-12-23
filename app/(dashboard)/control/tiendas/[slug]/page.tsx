@@ -37,8 +37,6 @@ export default async function StorePage({
     isActive: c.isActive,
   }));
 
-  //console.log({ store, ordersPagination }); // VER AQUI EL CONTENIDO
-
   return (
     <div className="px-8 py-8 w-full max-w-5xl">
       <div className="flex flex-col gap-6">

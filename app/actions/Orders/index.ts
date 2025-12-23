@@ -4,6 +4,7 @@ import { toNullable } from "@/lib/helpers";
 import {
   GetOrdersByStoreResponse,
   UpdateOrderStatusData,
+  OrderHistoryItem,
 } from "@/shared/types/order";
 import { Order, OrderStatus, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
@@ -50,7 +51,7 @@ export async function createOrder(formData: FormData) {
     items: itemsWithImages,
     totalAmount: Number(formData.get("totalAmount")),
     currency: "UYU",
-    status: "PENDING" as OrderStatus,
+    status: "PENDIENTE" as OrderStatus,
   };
 
   const order = await prisma.order.create({
@@ -126,11 +127,41 @@ export async function updateOrderStatus(data: UpdateOrderStatusData) {
       collaboratorId,
       fromStatus: order.status,
       toStatus: status,
-      prevCollaboratorId
+      prevCollaboratorId,
+      note: "Actualizacion de Estado",
     },
   });
 
   return updatedOrder.id;
+}
+
+export async function getOrderHistory(
+  orderId: number
+): Promise<OrderHistoryItem[]> {
+  if (!orderId) return [];
+
+  const history = await prisma.orderHistory.findMany({
+    where: { orderId },
+    orderBy: { createdAt: "asc" },
+    select: {
+      id: true,
+      orderId: true,
+      fromStatus: true,
+      toStatus: true,
+      note: true,
+      createdAt: true,
+      collaborator: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          image: true,
+        },
+      },
+    },
+  });
+
+  return history as OrderHistoryItem[];
 }
 
 export async function assignCollaboratorToOrder(

@@ -53,7 +53,7 @@ export function OrderCardClient({
             />
           ) : null}
           <div>
-            <h3 className="text-accent-foreground">{order.code}</h3>
+            <h3 className="text-accent-foreground">#ORD-{order.code ?? order.id}</h3>
             <p className="text-sm text-muted-foreground">
               {formatDate(order.createdAt)}
             </p>
