@@ -26,4 +26,5 @@ export interface UpdateOrderStatusData {
   id: number,
   status: OrderStatus,
   collaboratorId: number,
+  prevCollaboratorId?: number,
 }

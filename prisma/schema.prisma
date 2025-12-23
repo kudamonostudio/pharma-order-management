@@ -92,6 +92,7 @@ model OrderHistory {
   id             Int          @id @default(autoincrement())
   orderId        Int
   collaboratorId Int
+  prevCollaboratorId Int?
   fromStatus     String?      @db.VarChar(20)
   toStatus       String       @db.VarChar(20)
   note           String?
