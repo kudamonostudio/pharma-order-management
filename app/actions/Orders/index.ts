@@ -106,7 +106,7 @@ export async function getOrdersByStore(
 }
 
 export async function updateOrderStatus(data: UpdateOrderStatusData) {
-  const { id, status, collaboratorId } = data;
+  const { id, status, collaboratorId, prevCollaboratorId } = data;
   const order = await prisma.order.findUnique({
     where: { id },
   });
@@ -126,6 +126,7 @@ export async function updateOrderStatus(data: UpdateOrderStatusData) {
       collaboratorId,
       fromStatus: order.status,
       toStatus: status,
+      prevCollaboratorId
     },
   });
 
