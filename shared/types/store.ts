@@ -16,6 +16,7 @@ export interface StoreWithOrdersParams {
   ordersPage?: number;
   ordersLimit?: number;
   status?: OrderStatus;
+  collaboratorId?: number;
 }
 
 export interface StoreWithOrders {
@@ -34,12 +35,18 @@ export interface StoreWithOrders {
   orders?: OrderInStore[];
 }
 
+export interface StoreOrdersStats {
+  pending: number;
+  completedThisMonth: number;
+}
+
 export interface StoreWithOrdersResponse {
   store: StoreWithOrders;
   ordersPagination: {
     total: number;
     page: number;
-  }
+  };
+  ordersStats: StoreOrdersStats;
 }
 
 export interface OrderInStore {

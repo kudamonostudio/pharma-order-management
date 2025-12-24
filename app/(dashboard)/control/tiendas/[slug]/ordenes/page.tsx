@@ -1,47 +1,74 @@
-import { getOrdersByStore } from "@/app/actions/Orders";
-import { getStoreBySlug } from "@/app/actions/Store";
+import { getStoreWithOrders } from "@/app/actions/Store";
+import { getCollaboratorsByStore } from "@/app/actions/Collaborators";
 import { redirect } from "next/navigation";
+import { OrderList } from "../components/OrderList";
+import { OrdersFilters } from "./components/OrdersFilters";
+
+interface OrdenesPageProps {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{
+    status?: string;
+    collaboratorId?: string;
+  }>;
+}
 
 export default async function OrdenesPage({
   params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+  searchParams,
+}: OrdenesPageProps) {
   const { slug } = await params;
+  const { status, collaboratorId } = await searchParams;
 
-  const store = await getStoreBySlug(slug);
+  // Convert status to uppercase to match Prisma OrderStatus enum
+  const normalizedStatus = status ? status.toUpperCase() : undefined;
 
-  if (!store) {
+  const response = await getStoreWithOrders(slug, {
+    status: normalizedStatus as any,
+    collaboratorId: collaboratorId ? Number(collaboratorId) : undefined,
+    ordersLimit: 50,
+    ordersPage: 1,
+  });
+
+  if (!response) {
     redirect("/supremo");
   }
-  
-  // TODO: TRAER ORDERS DEL ACTION "getOrdersByStore"
 
-  const ordersResponse = await getOrdersByStore(store.id);
+  const { store } = response;
 
-  if (!ordersResponse) {
-    return;
-  }
-
-  const { orders } = ordersResponse;
+  const collaboratorsData = await getCollaboratorsByStore(store.id);
+  const availableCollaborators = collaboratorsData.map((c) => ({
+    id: c.collaboratorId,
+    firstName: c.firstName,
+    lastName: c.lastName,
+    code: c.code,
+    image: c.image,
+    isActive: c.isActive,
+  }));
 
   return (
-    <div className="px-8 py-4 w-full">
-      <h1 className="font-bold text-2xl mb-6">Órdenes de {store.name}</h1>
-      <div className="space-y-4">
-        {orders.map((order) => (
-          <div key={order.id} className="p-4 border rounded-lg flex justify-between items-center">
-            <div>
-              <h3 className="font-semibold">{order.id}</h3>
-              <p className="text-sm text-muted-foreground">{order.fullname}</p>
-            </div>
-            <div className="text-right">
-                <p className="font-bold">${order.totalAmount}</p>
-                <p className="text-sm text-muted-foreground">{order.status}</p>
-            </div>
-          </div>
-        ))}
+    <div className="px-8 py-4 w-full max-w-5xl">
+      <h1 className="font-medium text-2xl mb-6">Órdenes</h1>
+
+      <div className="mb-6">
+        <OrdersFilters
+          storeSlug={slug}
+          availableCollaborators={availableCollaborators}
+          currentStatus={status}
+          currentCollaboratorId={collaboratorId}
+        />
       </div>
+
+      <section className="latest-orders">
+        {store.orders?.length ? (
+          <OrderList
+            orders={store.orders ?? []}
+            storeSlug={slug}
+            availableCollaborators={availableCollaborators}
+          />
+        ) : (
+          <p className="italic mx-2">No hay resultados para estos filtros</p>
+        )}
+      </section>
     </div>
   );
 }

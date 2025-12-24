@@ -5,7 +5,7 @@ import crypto from "crypto";
 import { generateSlug } from "@/lib/helpers";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { Store } from "@prisma/client";
+import { Store, OrderStatus } from "@prisma/client";
 import {
   StoreWithOrdersParams,
   StoreWithOrdersResponse,
@@ -146,7 +146,10 @@ export async function getStoreWithOrders(
 
   const skip = (ordersPage - 1) * ordersLimit;
 
-  const orderWhere = status ? { status } : undefined;
+  const orderWhere = {
+    ...(status && { status }),
+    ...(params.collaboratorId && { collaboratorId: params.collaboratorId }),
+  };
 
   const store = await prisma.store.findUnique({
     where: { slug },
@@ -215,6 +218,37 @@ export async function getStoreWithOrders(
     where: {
       storeId: store.id,
       ...(status && { status }),
+      ...(params.collaboratorId && { collaboratorId: params.collaboratorId }),
+    },
+  });
+
+  const pendingOrdersCount = await prisma.order.count({
+    where: {
+      storeId: store.id,
+      status: OrderStatus.PENDIENTE,
+    },
+  });
+
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const endOfMonth = new Date(
+    now.getFullYear(),
+    now.getMonth() + 1,
+    0,
+    23,
+    59,
+    59,
+    999
+  );
+
+  const completedThisMonthCount = await prisma.order.count({
+    where: {
+      storeId: store.id,
+      status: OrderStatus.ENTREGADA,
+      createdAt: {
+        gte: startOfMonth,
+        lte: endOfMonth,
+      },
     },
   });
 
@@ -232,6 +266,10 @@ export async function getStoreWithOrders(
     ordersPagination: {
       total: totalOrders,
       page: Math.ceil(totalOrders / ordersLimit),
+    },
+    ordersStats: {
+      pending: pendingOrdersCount,
+      completedThisMonth: completedThisMonthCount,
     },
   };
 }

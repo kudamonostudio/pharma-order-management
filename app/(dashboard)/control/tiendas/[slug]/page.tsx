@@ -24,7 +24,10 @@ export default async function StorePage({
     redirect("/supremo");
   }
 
-  const { store, ordersPagination } = response;
+  const { store, ordersPagination, ordersStats } = response;
+
+  const pendingOrdersCount = ordersStats?.pending ?? 0;
+  const completedThisMonthCount = ordersStats?.completedThisMonth ?? 0;
 
   // Obtener colaboradores de la tienda
   const collaboratorsData = await getCollaboratorsByStore(store.id);
@@ -43,11 +46,11 @@ export default async function StorePage({
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="p-6 border rounded-lg">
             <h3 className="font-semibold mb-2">Órdenes pendientes</h3>
-            <p className="text-3xl font-bold">12</p>
+            <p className="text-3xl font-bold">{pendingOrdersCount}</p>
           </div>
           <div className="p-6 border rounded-lg">
             <h3 className="font-semibold mb-2">Órdenes concretadas este mes</h3>
-            <p className="text-3xl font-bold">234</p>
+            <p className="text-3xl font-bold">{completedThisMonthCount}</p>
           </div>
         </div>
 
