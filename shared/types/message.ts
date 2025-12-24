@@ -4,6 +4,7 @@ export interface SimpleCollaborator {
   id: number;
   firstName: string;
   lastName: string;
+  image?: string | null;
 }
 
 export interface OrderMessageResponse {

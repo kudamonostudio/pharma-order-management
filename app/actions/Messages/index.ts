@@ -60,11 +60,13 @@ const { orderId, collaboratorId, message, type } = data;
       collaboratorId: true,
       message: true,
       createdAt: true,
+      updatedAt: true,
       collaborator: {
         select: {
           id: true,
           firstName: true,
           lastName: true,
+          image: true,
         },
       },
     },
