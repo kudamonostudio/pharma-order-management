@@ -34,6 +34,7 @@ export function CreateStoreModal({
     address: "",
     phone: "",
     image: "",
+    email: "",
   });
 
   const onDrop = (acceptedFiles: File[]) => {
@@ -64,6 +65,9 @@ export function CreateStoreModal({
       formDataToSend.append("name", formData.name);
       formDataToSend.append("address", formData.address);
       formDataToSend.append("phone", formData.phone);
+      if(formData.email !== "") {
+        formDataToSend.append("email", formData.email);
+      }
 
       const newStore = await createStore(formDataToSend);
 
@@ -81,6 +85,7 @@ export function CreateStoreModal({
         address: "",
         phone: "",
         image: "",
+        email: "",
       });
       setLogoFile(null);
       setPreviewUrl(null);
@@ -144,6 +149,17 @@ export function CreateStoreModal({
               value={formData.phone}
               onChange={(e) =>
                 setFormData({ ...formData, phone: e.target.value })
+              }
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Correo electrónico administrador</Label>
+            <Input
+              id="email"
+              placeholder="Ej: admin@tienda.com"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
               }
             />
           </div>

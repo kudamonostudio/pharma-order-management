@@ -29,7 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/auth/dropdown-menu";
 import { usePathname } from "next/navigation";
-import { Profile, Store } from "@prisma/client";
+import { Profile, Role, Store } from "@prisma/client";
 import Link from "next/link";
 import { LogoPlaceholder } from "./LogoPlaceholder";
 import { useLogout } from "@/hooks/use-logout";
@@ -54,12 +54,25 @@ export function AppSidebar({ userRole, user, store }: AppSidebarProps) {
   }, []);
 
   // Determinar qué items mostrar
-  const showAdminItems = userRole === "ADMIN_SUPREMO";
+  const showAdminItems = userRole === Role.ADMIN_SUPREMO;
   const showStoreItems =
-    userRole === "ADMIN_DE_TIENDA" || (userRole === "ADMIN_SUPREMO" && store);
+    userRole === Role.TIENDA_ADMIN || (userRole === Role.ADMIN_SUPREMO && store);
 
   // Generar items de tienda con URLs dinámicas si hay store
   const storeMenuItems = store ? getStoreMenuItems(store.slug) : [];
+
+  const mapperRole = (role: string) => {
+    switch (role) {
+      case Role.ADMIN_SUPREMO:
+        return 'Admin Supremo';
+      case Role.TIENDA_ADMIN:
+        return 'Administrador de Tienda';
+      case Role.SUCURSAL_ADMIN:
+        return 'Administrador de Sucursal';
+      default:
+        return '';
+    }
+  }
 
   return (
     <Sidebar>
@@ -85,7 +98,7 @@ export function AppSidebar({ userRole, user, store }: AppSidebarProps) {
                       {user.firstName} {user.lastName}
                     </span>
                   )}
-                  <span className="text-xs">Admin Supremo</span>
+                  <span className="text-xs">{mapperRole(userRole)}</span>
                 </div>
               </a>
             </SidebarMenuButton>

@@ -61,6 +61,10 @@ const executeAuthRLS = async () => {
   await prisma.$executeRawUnsafe(`
     GRANT USAGE ON SCHEMA public TO authenticated;
   `);
+
+  await prisma.$executeRawUnsafe(`
+    GRANT SELECT ON public.stores TO authenticated;
+  `);
 }
 
 async function createBucket() {

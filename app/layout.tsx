@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { InviteListener } from "@/components/auth/invite-listener";
+
 import "./globals.css";
-import Link from "next/link";
-import { DeployButton } from "@/components/auth/deploy-button";
-import { AuthButton } from "@/components/auth/auth-button";
 import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
@@ -48,7 +47,9 @@ export default function RootLayout({
               <AuthButton />
             </div>
           </nav> */}
-        {children}
+          <InviteListener>
+            {children}
+          </InviteListener>
         {/*   </ThemeProvider> */}
       </body>
     </html>
