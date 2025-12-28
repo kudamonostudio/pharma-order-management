@@ -16,7 +16,7 @@ export async function loginUnique(email: string, password: string) {
 
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
-    .select("role, storeId, firstName, lastName, imageUrl")
+    .select("role, storeId, locationId, firstName, lastName, imageUrl")
     .eq("id", user.id)
     .single();
 
@@ -38,12 +38,10 @@ export async function loginUnique(email: string, password: string) {
     storeSlug = store?.slug ?? null;
   }
 
-  // Construir nombre completo a partir de firstName y lastName
   const fullName =
     [profile.firstName, profile.lastName].filter(Boolean).join(" ") ||
     undefined;
 
-  // Retornar datos completos del usuario para guardar en el store
   return {
     user,
     profile,

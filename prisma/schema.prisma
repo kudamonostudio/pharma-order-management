@@ -20,7 +20,9 @@ model Profile {
   isActive  Boolean   @default(true)
   lastName  String?   @db.VarChar(100)
   storeId   Int?
+  locationId   Int?
   store     Store?    @relation(fields: [storeId], references: [id])
+  location  Location?    @relation(fields: [locationId], references: [id])
 
   @@map("profiles")
 }
@@ -61,6 +63,7 @@ model Location {
   store                   Store                    @relation(fields: [storeId], references: [id])
   orders                  Order[]
   products                Product[]
+  profile                 Profile[]
 
   @@map("locations")
 }

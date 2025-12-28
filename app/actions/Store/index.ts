@@ -5,17 +5,19 @@ import crypto from "crypto";
 import { generateSlug } from "@/lib/helpers";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { Store, OrderStatus } from "@prisma/client";
+import { Role, Store, OrderStatus } from "@prisma/client";
 import {
   StoreWithOrdersParams,
   StoreWithOrdersResponse,
 } from "@/shared/types/store";
 import { LIMIT_PER_PAGE } from "@/lib/constants";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export async function createStore(formData: FormData) {
   const name = formData.get("name") as string;
   const address = formData.get("address") as string;
   const phone = formData.get("phone") as string | null;
+  const email = formData.get("email") as string | null;
   let slug = generateSlug(name);
 
   const exists = await prisma.store.findUnique({
@@ -36,8 +38,31 @@ export async function createStore(formData: FormData) {
     },
   });
 
+  if(email) {
+    await createAdminStore(email, store.id);
+  }
+
   revalidatePath("/supremo");
   return store;
+}
+
+async function createAdminStore(email: string, storeId: number){
+  const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email);
+
+  if (error || !data?.user) {
+    console.error("Supabase Auth Error:", error);
+    throw new Error("Error creating store admin user");
+  }
+
+  const userId = data.user.id;
+
+  await prisma.profile.update({
+    where: { id: userId },
+    data: {
+      role: Role.TIENDA_ADMIN,
+      storeId,
+    },
+  });
 }
 
 export async function updateStore(id: number, formData: FormData) {

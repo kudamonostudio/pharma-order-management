@@ -1,8 +1,8 @@
-// Vamos a usar server actions para el CUD (Create, Update, Delete), es decir, para mutaciones. Para el GET usaremos API routes.
 "use server";
-import { Location } from "@prisma/client";
+import { Location, Role } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { supabaseAdmin } from "@/lib/supabase/admin";
 
 export async function createLocation(formData: FormData) {
   const storeId = Number(formData.get("storeId"));
@@ -10,12 +10,13 @@ export async function createLocation(formData: FormData) {
   const name = (formData.get("name") as string) || "";
   const address = (formData.get("address") as string) || "";
   const phone = (formData.get("phone") as string) || null;
+  const email = formData.get("email") as string | null;
 
   if (!storeId || !name || !address) {
     throw new Error(`createLocation: missing fields ${JSON.stringify({ storeId, name, address })}`);
   }
 
-  await prisma.location.create({
+  const location = await prisma.location.create({
     data: {
       name,
       address,
@@ -24,7 +25,31 @@ export async function createLocation(formData: FormData) {
     },
   });
 
+  if(email) {
+    await createAdminLocation(email, storeId, location.id);
+  }
+
   revalidatePath(`/control/tiendas/${slug}`);
+}
+
+async function createAdminLocation(email: string, storeId: number, locationId: number){
+  const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email);
+
+  if (error || !data?.user) {
+    console.error("Supabase Auth Error:", error);
+    throw new Error("Error creating location admin user");
+  }
+
+  const userId = data.user.id;
+
+  await prisma.profile.update({
+    where: { id: userId },
+    data: {
+      role: Role.SUCURSAL_ADMIN,
+      storeId,
+      locationId,
+    },
+  });
 }
 
 export async function updateLocation(id: number, storeSlug: string, formData: FormData) {
@@ -55,64 +80,6 @@ export async function deleteLocation(id: number, storeSlug: string) {
 
   revalidatePath(`/control/tiendas/${storeSlug}`);
 }
-
-// export async function assignCollaboratorsToLocation(
-//   locationId: number,
-//   collaboratorIds: number[],
-//   storeSlug: string
-// ) {
-//   if (!locationId) {
-//     throw new Error("assignCollaboratorsToLocation: missing locationId");
-//   }
-
-//   // Obtener los colaboradores actualmente asignados a esta sucursal
-//   const currentCollaborators = await prisma.profile.findMany({
-//     where: {
-//       locationId,
-//       deletedAt: null,
-//     },
-//     select: { id: true },
-//   });
-
-//   const currentIds = new Set(currentCollaborators.map((c) => c.id));
-//   const newIds = new Set(collaboratorIds);
-
-//   // Colaboradores a quitar (están en current pero no en new)
-//   const toRemove = currentCollaborators
-//     .filter((c) => !newIds.has(c.id))
-//     .map((c) => c.id);
-
-//   // Colaboradores a agregar (están en new pero no en current)
-//   const toAdd = collaboratorIds.filter((id) => !currentIds.has(id));
-
-//   // Solo ejecutar si hay cambios
-//   if (toRemove.length > 0) {
-//     await prisma.profile.updateMany({
-//       where: {
-//         id: { in: toRemove },
-//         deletedAt: null,
-//       },
-//       data: {
-//         locationId: null,
-//       },
-//     });
-//   }
-
-//   if (toAdd.length > 0) {
-//     await prisma.profile.updateMany({
-//       where: {
-//         id: { in: toAdd },
-//         deletedAt: null,
-//       },
-//       data: {
-//         locationId,
-//       },
-//     });
-//   }
-
-//   revalidatePath(`/control/tiendas/${storeSlug}/sucursales`);
-//   revalidatePath(`/control/tiendas/${storeSlug}/colaboradores`);
-// }
 
 export async function assignCollaboratorsToLocation(
   locationId: number,
