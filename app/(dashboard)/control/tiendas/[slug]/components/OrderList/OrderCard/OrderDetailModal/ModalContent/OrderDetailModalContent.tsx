@@ -167,12 +167,14 @@ export function OrderDetailModalContent({
                     <span className="text-accent-foreground font-medium text-center">
                       {collaborator.firstName} {collaborator.lastName}
                     </span>
+                    {order.status !== "ENTREGADA" && (
                     <small
                       className="underline block cursor-pointer"
                       onClick={() => setIsAssignModalOpen(true)}
                     >
                       Cambiar
                     </small>
+                    )}
                   </>
                 )}
               </div>

@@ -167,7 +167,8 @@ export async function getOrderHistory(
 export async function assignCollaboratorToOrder(
   orderId: number,
   collaboratorId: number,
-  storeSlug: string
+  storeSlug: string,
+  whoChangedCollaboratorId: number
 ) {
   if (!orderId || !collaboratorId) {
     throw new Error(
@@ -177,15 +178,58 @@ export async function assignCollaboratorToOrder(
 
   const order = await prisma.order.findUnique({
     where: { id: orderId },
+    include: {
+      collaborator: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+        },
+      },
+    },
   });
 
   if (!order) {
     throw new Error("assignCollaboratorToOrder: order not found");
   }
 
+  // Get the new collaborator info for the note
+  const newCollaborator = await prisma.collaborator.findUnique({
+    where: { id: collaboratorId },
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+    },
+  });
+
+  if (!newCollaborator) {
+    throw new Error("assignCollaboratorToOrder: new collaborator not found");
+  }
+
+  // Update the order
   await prisma.order.update({
     where: { id: orderId },
     data: { collaboratorId },
+  });
+
+  // Create history entry for assignment change
+  let note = "";
+  if (order.collaborator) {
+    note = `Asignación cambiada de ${order.collaborator.firstName} ${order.collaborator.lastName} a ${newCollaborator.firstName} ${newCollaborator.lastName}`;
+  } else {
+    note = `Orden asignada a ${newCollaborator.firstName} ${newCollaborator.lastName}`;
+  }
+
+  await prisma.orderHistory.create({
+    data: {
+      orderId: orderId,
+      collaboratorId: whoChangedCollaboratorId,
+      prevCollaboratorId: order.collaboratorId,
+      fromStatus: null, // No status change
+      toStatus: order.status, // Keep current status
+      note: note,
+    },
   });
 
   revalidatePath(`/control/${storeSlug}`);

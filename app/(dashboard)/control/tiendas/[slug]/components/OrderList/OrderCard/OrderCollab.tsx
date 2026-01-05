@@ -6,6 +6,7 @@ interface OrderCollabProps {
     firstName?: string;
     lastName?: string;
     image?: string | null;
+    variant?: "default" | "small";
   };
 }
 
@@ -15,9 +16,10 @@ export const OrderCollab = ({ collab }: OrderCollabProps) => {
     collab.lastName?.charAt(0) ?? ""
   }`;
 
+  const styles = collab.variant === "small" ? "w-10 h-10" : "w-12 h-12";
   return (
     <Avatar
-      className="shadow-sm border-2 border-background w-12 h-12 sm:w-14 sm:h-14 ring-1 ring-border"
+      className={`shadow-sm border-2 border-background ring-1 ring-border ${styles}`}
       key={collab.id}
     >
       {imageUrl && (

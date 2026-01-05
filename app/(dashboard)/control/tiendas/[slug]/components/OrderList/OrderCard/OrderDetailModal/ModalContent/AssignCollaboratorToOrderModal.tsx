@@ -70,7 +70,7 @@ export function AssignCollaboratorToOrderModal({
 
     setIsLoading(true);
     try {
-      await assignCollaboratorToOrder(orderId, selectedId, storeSlug);
+      await assignCollaboratorToOrder(orderId, selectedId, storeSlug, confirmedByCollaboratorId);
       setShowCodeModal(false);
       onOpenChange(false);
       router.refresh();

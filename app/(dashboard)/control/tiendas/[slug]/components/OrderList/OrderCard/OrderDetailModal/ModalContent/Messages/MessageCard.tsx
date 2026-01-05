@@ -14,7 +14,7 @@ export const MessageCard = ({ message }: { message: MessageBasic }) => {
     : "Usuario desconocido";
 
   return (
-    <div className="flex gap-3 py-3">
+    <div className="flex gap-3 p-3 border-emerald-500/30 w-fit bg-emerald-100 border rounded-sm">
       <Avatar className="w-10 h-10 shrink-0">
         {collaborator?.image && (
           <AvatarImage
