@@ -14,6 +14,7 @@ import { LogoPlaceholder } from "../(dashboard)/components/LogoPlaceholder";
 import { StoreFilter } from "./components/StoreFilter";
 
 import { StoreConfigButton } from "../(dashboard)/components/StoreConfigButton";
+import HasPricesButton from "../(dashboard)/components/HasPricesButton";
 
 interface TiendasContentProps {
   stores: Store[];
@@ -63,6 +64,10 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
             <div className="absolute top-3 left-3 z-10">
               <IsActiveButton isActive={store.isActive} variant="small" />
             </div>
+
+            {store.withPrices && (<div className="absolute top-3 right-3 z-10">
+              <HasPricesButton isActive={store.isActive} variant="small" />
+            </div>)}
 
             <div className="flex flex-col items-center gap-4 pt-8 pb-4 relative z-10">
               {/* Logo */}

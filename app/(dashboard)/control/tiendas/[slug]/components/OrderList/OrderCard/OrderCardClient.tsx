@@ -22,6 +22,7 @@ type OrderCardClientProps = {
   isAdminSupremo: boolean;
   storeSlug: string;
   availableCollaborators: Collaborator[];
+  withPrices: boolean;
 };
 
 export function OrderCardClient({
@@ -29,6 +30,7 @@ export function OrderCardClient({
   isAdminSupremo,
   storeSlug,
   availableCollaborators,
+  withPrices,
 }: OrderCardClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { order: mockProducts } = useOrderStore();
@@ -74,6 +76,7 @@ export function OrderCardClient({
         products={mockProducts}
         storeSlug={storeSlug}
         availableCollaborators={availableCollaborators}
+        withPrices={withPrices}
       />
     </>
   );

@@ -13,10 +13,11 @@ interface ProductListFooterProps {
   storeLogo: string;
   locations: StoreLocation[];
   storeSlug: string;
+  withPrices: boolean;
 }
 
-const ProductListFooter = ({ storeId, storeName, storeLogo, locations, storeSlug }: ProductListFooterProps) => {
-  const { order, getOrderQuantity, setStoreId } = useOrderStore();
+const ProductListFooter = ({ storeId, storeName, storeLogo, locations, storeSlug, withPrices }: ProductListFooterProps) => {
+  const { order, getOrderQuantity, getOrderTotal, setStoreId } = useOrderStore();
   const [confirmOrderOpen, setConfirmOrderOpen] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false);
 
@@ -73,6 +74,13 @@ const ProductListFooter = ({ storeId, storeName, storeLogo, locations, storeSlug
                     {order.length === 1 ? "producto" : "productos"}
                   </span>
                 </div>
+                {withPrices && (
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-2xl font-semibold text-emerald-600">
+                      ${getOrderTotal().toFixed(2)}
+                    </span>
+                  </div>
+                )}
               </div>
               <div className="lg:absolute md:right-0">
                 <Button
@@ -94,6 +102,7 @@ const ProductListFooter = ({ storeId, storeName, storeLogo, locations, storeSlug
         storeLogo={storeLogo}
         locations={locations}
         storeSlug={storeSlug}
+        withPrices={withPrices}
       />
     </>
   );

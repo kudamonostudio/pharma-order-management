@@ -8,9 +8,10 @@ import Image from "next/image";
 
 interface ProductListProps {
   products: StoreProductItem[];
+  withPrices: boolean;
 }
 
-const ProductList = ({ products }: ProductListProps) => {
+const ProductList = ({ products, withPrices }: ProductListProps) => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
 
   return (
@@ -69,6 +70,11 @@ const ProductList = ({ products }: ProductListProps) => {
                     <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">
                       {product.description}
                     </p>
+                    {withPrices && product.price !== undefined && (
+                      <p className="text-lg font-bold text-emerald-600 mt-2">
+                        ${product.price.toFixed(2)}
+                      </p>
+                    )}
                   </div>
                   <AddButton product={product} />
                 </div>
@@ -108,6 +114,11 @@ const ProductList = ({ products }: ProductListProps) => {
                       <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-2">
                         {product.description}
                       </p>
+                      {withPrices && product.price !== undefined && (
+                        <p className="text-lg font-bold text-emerald-600">
+                          ${product.price.toFixed(2)}
+                        </p>
+                      )}
                     </div>
                     <AddButton product={product} />
                   </div>

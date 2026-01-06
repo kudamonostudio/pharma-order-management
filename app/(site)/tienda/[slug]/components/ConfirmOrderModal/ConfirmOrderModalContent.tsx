@@ -36,6 +36,7 @@ interface Props {
   storeLogo: string;
   locations: StoreLocation[];
   storeSlug: string;
+  withPrices: boolean;
 }
 
 export default function ConfirmOrderModalContent({
@@ -46,10 +47,11 @@ export default function ConfirmOrderModalContent({
   storeLogo,
   locations,
   storeSlug,
+  withPrices,
 }: Props) {
   const [step, setStep] = useState<"products" | "form">("products");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { order, getOrderQuantity, clearOrder } = useOrderStore();
+  const { order, getOrderQuantity, getOrderTotal, clearOrder } = useOrderStore();
   const router = useRouter();
 
   // Obtener datos guardados del localStorage
@@ -114,9 +116,9 @@ export default function ConfirmOrderModalContent({
       setIsSubmitting(true);
       
       // Calcular el total
-      const totalAmount = 0; // Por ahora en 0 ya que los productos no tienen precio
+      const totalAmount = getOrderTotal();
       
-      // Preparar los items
+      // Preparar los items (sin precio, solo productId, quantity y name)
       const items = order.map((item) => ({
         productId: parseInt(item.id),
         quantity: item.quantity,
@@ -177,10 +179,14 @@ export default function ConfirmOrderModalContent({
         {step === "products" ? (
           <div className="flex-1 flex flex-col px-6 overflow-hidden">
             <div className="flex-1 overflow-y-auto">
-              <SelectedProducts order={order}/>
+              <SelectedProducts order={order} withPrices={withPrices} />
             </div>
             <div className="shrink-0 pt-4">
-              <SelectedProductsTotal totalQuantity={getOrderQuantity()} />
+              <SelectedProductsTotal 
+                totalQuantity={getOrderQuantity()} 
+                totalAmount={getOrderTotal()}
+                withPrices={withPrices}
+              />
             </div>
           </div>
         ) : (

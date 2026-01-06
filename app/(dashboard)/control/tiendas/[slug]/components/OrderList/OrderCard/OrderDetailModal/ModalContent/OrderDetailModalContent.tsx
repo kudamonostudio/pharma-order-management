@@ -43,6 +43,7 @@ interface OrderDetailModalContentProps {
   }>;
   storeSlug: string;
   availableCollaborators: AvailableCollaborator[];
+  withPrices: boolean;
 }
 
 export function OrderDetailModalContent({
@@ -50,6 +51,7 @@ export function OrderDetailModalContent({
   products,
   storeSlug,
   availableCollaborators,
+  withPrices,
 }: OrderDetailModalContentProps) {
   const [controlValue, setControlValue] =
     useState<ModalControlValue>("products");
@@ -186,7 +188,7 @@ export function OrderDetailModalContent({
           <ModalControl value={controlValue} onChange={setControlValue} />
         </div>
         {controlValue === "products" && (
-          <OrderDetailModalProducts order={order.items} />
+          <OrderDetailModalProducts order={order.items} withPrices={withPrices} />
         )}
         <div
           className={controlValue === "internal-messages" ? "block" : "hidden"}
@@ -206,6 +208,44 @@ export function OrderDetailModalContent({
         </div>
       </div>
       
+      {/* Fixed Footer for Products - only show when viewing products with prices */}
+      {controlValue === "products" && withPrices && (() => {
+        const totalQuantity = order.items.reduce(
+          (sum: number, product: any) => sum + (product.quantity || 0),
+          0
+        );
+        const totalAmount = order.items.reduce((sum: number, product: any) => {
+          const price = product.price || 0;
+          return sum + price * (product.quantity || 0);
+        }, 0);
+
+        return (
+          <div className="fixed w-full bottom-0 bg-background p-4">
+            <div className="max-w-4xl mx-auto">
+              <Separator className="mb-4" />
+              <div className="grid grid-cols-5 gap-4">
+                <div className="col-span-3 flex items-center justify-between px-4 py-3 bg-muted/30 rounded-lg">
+                  <span className="text-lg font-medium text-foreground">
+                    Total de productos
+                  </span>
+                  <span className="text-2xl font-bold text-primary">
+                    {totalQuantity}
+                  </span>
+                </div>
+                <div className="col-span-2 flex items-center justify-between px-4 py-4 bg-emerald-50 dark:bg-emerald-950 rounded-lg border border-emerald-600">
+                  <span className="text-xl text-foreground">
+                    Total de la orden
+                  </span>
+                  <span className="text-xl font-medium text-emerald-600">
+                    ${totalAmount.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Fixed Message Input Footer - only show when viewing messages */}
       {(controlValue === "internal-messages" || controlValue === "client-messages") && (
         <div className="fixed w-full bottom-0 bg-background border-t p-4">

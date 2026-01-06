@@ -283,10 +283,41 @@ export async function getStoreWithOrders(
     totalAmount: Number(order.totalAmount),
   }));
 
+  // Enriquecer los items de las órdenes con los precios actuales de los productos
+  const allProductIds = new Set<number>();
+  orders.forEach(order => {
+    if (Array.isArray(order.items)) {
+      order.items.forEach((item: any) => {
+        if (item.productId) {
+          allProductIds.add(item.productId);
+        }
+      });
+    }
+  });
+
+  // Obtener los precios actuales de todos los productos
+  const currentPrices = await prisma.product.findMany({
+    where: { id: { in: Array.from(allProductIds) } },
+    select: { id: true, price: true },
+  });
+
+  const priceMap = new Map(currentPrices.map(p => [p.id, p.price ? Number(p.price) : null]));
+
+  // Agregar los precios actuales a cada item
+  const enrichedOrders = orders.map(order => ({
+    ...order,
+    items: Array.isArray(order.items)
+      ? order.items.map((item: any) => ({
+          ...item,
+          price: priceMap.get(item.productId) || null,
+        }))
+      : order.items,
+  }));
+
   return {
     store: {
       ...store,
-      orders,
+      orders: enrichedOrders,
     },
     ordersPagination: {
       total: totalOrders,

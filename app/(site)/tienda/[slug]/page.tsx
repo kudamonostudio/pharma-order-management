@@ -27,6 +27,7 @@ const Page = async ({ params }: PageProps) => {
       id: true,
       name: true,
       logo: true,
+      withPrices: true,
       locations: {
         where: {
           deletedAt: null,
@@ -59,6 +60,7 @@ const Page = async ({ params }: PageProps) => {
       name: true,
       imageUrl: true,
       description: true,
+      price: true,
     },
     orderBy: {
       name: "asc",
@@ -71,6 +73,7 @@ const Page = async ({ params }: PageProps) => {
     name: product.name,
     image: product.imageUrl || "",
     description: product.description || "",
+    price: product.price ? Number(product.price) : undefined,
   }));
 
   return (
@@ -81,13 +84,14 @@ const Page = async ({ params }: PageProps) => {
           {store.name}
         </h1>
       </div>
-      <ProductList products={products} />
+      <ProductList products={products} withPrices={store.withPrices} />
       <ProductListFooter 
         storeId={store.id} 
         storeName={store.name} 
         storeLogo={store.logo || ""} 
         locations={store.locations}
         storeSlug={slug}
+        withPrices={store.withPrices}
       />
     </StoreContainer>
   );

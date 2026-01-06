@@ -25,6 +25,7 @@ interface OrderDetailModalProps {
   }>;
   storeSlug: string;
   availableCollaborators: Collaborator[];
+  withPrices: boolean;
 }
 
 export function OrderDetailModal({
@@ -34,6 +35,7 @@ export function OrderDetailModal({
   products,
   storeSlug,
   availableCollaborators,
+  withPrices,
 }: OrderDetailModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -45,6 +47,7 @@ export function OrderDetailModal({
               products={products}
               storeSlug={storeSlug}
               availableCollaborators={availableCollaborators}
+              withPrices={withPrices}
             />
           </div>
         </div>

@@ -1,9 +1,11 @@
 "use client";
 import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import Image from "next/image";
 
 export function OrderDetailModalProducts({
   order,
+  withPrices,
 }: {
   order: Array<{
     id: string;
@@ -11,7 +13,9 @@ export function OrderDetailModalProducts({
     image?: string;
     imageUrl?: string;
     quantity: number;
+    price?: number;
   }>;
+  withPrices: boolean;
 }) {
   /*   const { order } = useOrderStore(); */
 
@@ -24,6 +28,8 @@ export function OrderDetailModalProducts({
         {/* Lista de productos */}
         {order.map((product, index) => {
           const productImage = product.image || product.imageUrl;
+          const subtotal =
+            product.price && withPrices ? product.price * product.quantity : 0;
 
           return (
             <Card
@@ -51,11 +57,21 @@ export function OrderDetailModalProducts({
                   )}
                 </div>
 
-                {/* Nombre del producto */}
+                {/* Nombre del producto y precio */}
                 <div className="flex-1 min-w-0 text-center">
                   <h3 className="text-base text-foreground leading-tight">
                     {product.name}
                   </h3>
+                  {withPrices && product.price !== undefined && (
+                    <div className="mt-1">
+                      <p className="text-xs text-muted-foreground">
+                        ${product.price.toFixed(2)} c/u
+                      </p>
+                      <p className="text-sm font-bold text-emerald-600">
+                        ${subtotal.toFixed(2)}
+                      </p>
+                    </div>
+                  )}
                 </div>
                 {/* Cantidad */}
                 <div className="shrink-0 text-center justify-center rounded-full flex flex-col">
@@ -64,7 +80,6 @@ export function OrderDetailModalProducts({
                     {product.quantity}
                   </span>
                 </div>
-                {/* TODO: AGREGAR PRECIO EN CASO DE QUE SEAN PRODUCTOS CON PRECIO */}
               </div>
             </Card>
           );

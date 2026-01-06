@@ -3,6 +3,7 @@ import { Store } from "@prisma/client";
 import { LogoPlaceholder } from "../../../../components/LogoPlaceholder";
 import { StoreHeaderActions } from "./StoreHeaderActions";
 import { getCurrentProfile } from "@/lib/auth/session";
+import HasPricesButton from "@/app/(dashboard)/components/HasPricesButton";
 
 interface StoreHeaderProps {
   store: Store;
@@ -30,8 +31,12 @@ export async function StoreHeader({ store }: StoreHeaderProps) {
           <div className="flex justify-center items-center gap-4">
             <h1 className="font-bold text-3xl">{store.name}</h1>
             {isAdminSupremo && (
-              <IsActiveButton isActive={store.isActive} variant="small" />
+              <div className="flex gap-2">
+                <IsActiveButton isActive={store.isActive} variant="small" />
+                {store.withPrices && <HasPricesButton isActive={store.isActive} variant="small" />}
+              </div>
             )}
+
           </div>
           <p className="text-muted-foreground">{store.address}</p>
           <p className="text-muted-foreground">{store.phone}</p>

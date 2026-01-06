@@ -14,12 +14,14 @@ interface OrderListProps {
   orders: OrderInStore[];
   storeSlug: string;
   availableCollaborators: Collaborator[];
+  withPrices: boolean;
 }
 
 export function OrderList({
   orders,
   storeSlug,
   availableCollaborators,
+  withPrices,
 }: OrderListProps) {
   return (
     <div className="space-y-4">
@@ -29,6 +31,7 @@ export function OrderList({
           order={order}
           storeSlug={storeSlug}
           availableCollaborators={availableCollaborators}
+          withPrices={withPrices}
         />
       ))}
     </div>

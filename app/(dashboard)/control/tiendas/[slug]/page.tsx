@@ -60,6 +60,7 @@ export default async function StorePage({
             orders={store.orders ?? []}
             storeSlug={slug}
             availableCollaborators={availableCollaborators}
+            withPrices={store.withPrices}
           />
         </section>
       </div>

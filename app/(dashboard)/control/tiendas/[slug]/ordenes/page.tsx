@@ -64,6 +64,7 @@ export default async function OrdenesPage({
             orders={store.orders ?? []}
             storeSlug={slug}
             availableCollaborators={availableCollaborators}
+            withPrices={store.withPrices}
           />
         ) : (
           <p className="italic mx-2">No hay resultados para estos filtros</p>

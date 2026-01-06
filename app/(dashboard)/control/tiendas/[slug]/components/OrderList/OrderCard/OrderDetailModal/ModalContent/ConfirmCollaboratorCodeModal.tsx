@@ -6,6 +6,7 @@ import {
   DialogContent,
   DialogDescription,
   DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,6 +83,7 @@ export function ConfirmCollaboratorCodeModal({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
+          <DialogTitle>Confirmar asignación</DialogTitle>
           <DialogDescription className="text-base text-foreground font-medium pt-2">
             Ingresa tu código de colaborador
           </DialogDescription>

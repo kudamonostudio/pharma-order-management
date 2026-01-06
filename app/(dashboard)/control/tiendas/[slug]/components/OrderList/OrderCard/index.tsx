@@ -16,12 +16,14 @@ type OrderCardProps = {
   order: OrderInStore;
   storeSlug: string;
   availableCollaborators: Collaborator[];
+  withPrices: boolean;
 };
 
 export const OrderCard = async ({
   order,
   storeSlug,
   availableCollaborators,
+  withPrices,
 }: OrderCardProps) => {
   const profile = await getCurrentProfile();
   const isAdminSupremo = profile?.role === "ADMIN_SUPREMO";
@@ -32,6 +34,7 @@ export const OrderCard = async ({
       isAdminSupremo={isAdminSupremo}
       storeSlug={storeSlug}
       availableCollaborators={availableCollaborators}
+      withPrices={withPrices}
     />
   );
 };

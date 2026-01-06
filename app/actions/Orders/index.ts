@@ -28,7 +28,7 @@ export async function createOrder(formData: FormData) {
     quantity: number;
   }>;
 
-  // Obtener las imágenes de los productos
+  // Obtener las imágenes de los productos (NO guardar precios)
   const productIds = rawItems.map((item) => item.productId);
   const products = await prisma.product.findMany({
     where: { id: { in: productIds } },
@@ -37,7 +37,7 @@ export async function createOrder(formData: FormData) {
 
   const productImageMap = new Map(products.map((p) => [p.id, p.imageUrl]));
 
-  // Añadir imageUrl a cada item
+  // Añadir solo imageUrl a cada item
   const itemsWithImages = rawItems.map((item) => ({
     ...item,
     imageUrl: productImageMap.get(item.productId) || null,

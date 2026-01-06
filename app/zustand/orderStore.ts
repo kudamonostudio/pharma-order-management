@@ -6,6 +6,7 @@ interface StoreProductItem {
   name: string;
   image: string;
   description: string;
+  price?: number;
 }
 
 interface OrderProduct extends StoreProductItem {
@@ -21,6 +22,7 @@ interface OrderState {
   increment: (id: string) => void;
   decrement: (id: string) => void;
   getOrderQuantity: () => number;
+  getOrderTotal: () => number;
   clearOrder: () => void;
 }
 
@@ -101,6 +103,14 @@ export const useOrderStore = create<OrderState>((set, get) => ({
   getOrderQuantity: () => {
     const currentOrder = get().order;
     return currentOrder.reduce((total, item) => total + item.quantity, 0);
+  },
+
+  getOrderTotal: () => {
+    const currentOrder = get().order;
+    return currentOrder.reduce((total, item) => {
+      const price = item.price || 0;
+      return total + (price * item.quantity);
+    }, 0);
   },
 
   clearOrder: () =>
