@@ -174,11 +174,16 @@ export async function getStoreWithOrders(
   const orderWhere = {
     ...(status && { status }),
     ...(params.collaboratorId && { collaboratorId: params.collaboratorId }),
+    ...(params.locationId && { locationId: params.locationId }),
   };
 
   const store = await prisma.store.findUnique({
     where: { slug },
     include: {
+      locations: {
+        where: { deletedAt: null },
+        select: { id: true, name: true },
+      },
       orders: {
         where: orderWhere,
         skip,
@@ -244,6 +249,7 @@ export async function getStoreWithOrders(
       storeId: store.id,
       ...(status && { status }),
       ...(params.collaboratorId && { collaboratorId: params.collaboratorId }),
+      ...(params.locationId && { locationId: params.locationId }),
     },
   });
 

@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/auth/checkbox";
 import {
   Select,
   SelectContent,
@@ -24,7 +25,7 @@ import { Pencil, Trash2, Power } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DeleteColabModal } from "./DeleteColabModal";
 import { ToggleColabActiveModal } from "./ToggleColabActiveModal";
-import { updateCollaborator } from "@/app/actions/Collaborators";
+import { updateCollaborator, updateCollaboratorLocations } from "@/app/actions/Collaborators";
 import { uploadCollaboratorImage } from "@/lib/supabase/client/uploadImage";
 import { Branch } from "@/shared/types/collaborator";
 import { useGenerateCode } from "@/app/(dashboard)/hooks/use-generate-code";
@@ -78,6 +79,8 @@ export function ColabModal({
     lastName: "",
     code: "",
   });
+  
+  const [selectedLocationIds, setSelectedLocationIds] = useState<number[]>([]);
 
   // Move hook call to component body
   const generateCode = useGenerateCode(5).generateCode;
@@ -127,6 +130,12 @@ export function ColabModal({
         lastName: collaborator.lastName,
         code: collaborator.code ?? '',
       });
+      
+      // Get currently active location IDs
+      const activeLocationIds = collaborator.branches
+        .filter(branch => branch.isActive)
+        .map(branch => branch.id);
+      setSelectedLocationIds(activeLocationIds);
     }
   }, [collaborator]);
 
@@ -154,11 +163,27 @@ export function ColabModal({
           firstName: formData.firstName,
           lastName: formData.lastName,
           code: formData.code !== '' ? formData.code : null,
-          // locationId: Number(formData.branchId),
           image: imageUrl,
         },
         storeSlug
       );
+
+      // Update location assignments if storeId is available
+      if (storeId) {
+        console.log("About to call updateCollaboratorLocations with:", {
+          collaboratorId: collaborator.collaboratorId,
+          selectedLocationIds,
+          storeId,
+          storeSlug
+        });
+        
+        await updateCollaboratorLocations(
+          collaborator.collaboratorId,
+          selectedLocationIds,
+          storeId,
+          storeSlug
+        );
+      }
 
       onOpenChange(false);
       router.refresh();
@@ -166,6 +191,14 @@ export function ColabModal({
       console.error("Error updating collaborator:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleLocationChange = (locationId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedLocationIds(prev => [...prev, locationId]);
+    } else {
+      setSelectedLocationIds(prev => prev.filter(id => id !== locationId));
     }
   };
 
@@ -264,30 +297,31 @@ export function ColabModal({
                 <Button title="test" size={"sm"} onClick={(e)=> createCode(e)}>Generar código</Button>
               </div>
 
-              {/* <div className="space-y-2">
-                <Label htmlFor="edit-branch">Sucursal *</Label>
-                <Select
-                  // value={formData.branchId}
-                  value=""
-                  onValueChange={(value) =>
-                    setFormData({ ...formData, branchId: value })
-                  }
-                >
-                  <SelectTrigger id="edit-branch">
-                    <SelectValue placeholder="Selecciona una sucursal" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {locations.map((location) => (
-                      <SelectItem
-                        key={location.id}
-                        value={location.id.toString()}
+              <div className="space-y-2">
+                <Label>Sucursales</Label>
+                <div className="space-y-2 max-h-32 overflow-y-auto border rounded-md p-2">
+                  {locations.map((location) => (
+                    <div key={location.id} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`location-${location.id}`}
+                        checked={selectedLocationIds.includes(location.id)}
+                        onCheckedChange={(checked) =>
+                          handleLocationChange(location.id, checked as boolean)
+                        }
+                      />
+                      <Label
+                        htmlFor={`location-${location.id}`}
+                        className="text-sm font-normal cursor-pointer"
                       >
                         {location.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div> */}
+                      </Label>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-neutral-500">
+                  Selecciona las sucursales donde trabaja el colaborador
+                </p>
+              </div>
 
               <div className="space-y-2">
                 <Label>Imagen</Label>

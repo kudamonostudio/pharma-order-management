@@ -7,6 +7,7 @@ import { ColabModal, Collaborator } from "./ColabModal";
 import { EmptyState } from "@/components/ui/empty-state";
 import { CreateCollaboratorButton } from "./CreateCollaboratorButton";
 import { CreateCollaboratorModal } from "./CreateCollaboratorModal";
+import { CollaboratorsFilters } from "./CollaboratorsFilters";
 
 interface SimpleLocation {
   id: number;
@@ -17,12 +18,16 @@ interface ColaboradoresContentProps {
   store: Store;
   collaborators: Collaborator[];
   locations: SimpleLocation[];
+  canAccessBranchFilter: boolean;
+  currentLocationId?: string;
 }
 
 export default function ColaboradoresContent({
   store,
   collaborators,
   locations,
+  canAccessBranchFilter,
+  currentLocationId,
 }: ColaboradoresContentProps) {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedCollaborator, setSelectedCollaborator] =
@@ -41,6 +46,13 @@ export default function ColaboradoresContent({
         </h1>
         <CreateCollaboratorButton />
       </div>
+
+      <CollaboratorsFilters
+        storeSlug={store.slug}
+        availableLocations={locations}
+        currentLocationId={currentLocationId}
+        canAccessBranchFilter={canAccessBranchFilter}
+      />
 
       <div className="space-y-4">
         {collaborators.length === 0 && (

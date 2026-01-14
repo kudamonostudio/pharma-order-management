@@ -96,10 +96,11 @@ export async function toggleCollaboratorActive(
 }
 
 // Obtener colaboradores de una tienda
-export async function getCollaboratorsByStore(storeId: number) {
+export async function getCollaboratorsByStore(storeId: number, locationId?: number) {
   const collaboratorAssignments = await prisma.collaboratorAssignment.findMany({
     where: {
       storeId,
+      ...(locationId && { locationId }),
       collaborator: {
         deletedAt: null,
       },
@@ -182,4 +183,102 @@ export async function getCollaboratorById(id: string) {
     //   ? { id: collaborator.location.id, name: collaborator.location.name }
     //   : null,
   };
+}
+
+export async function updateCollaboratorLocations(
+  collaboratorId: number,
+  activeLocationIds: number[],
+  storeId: number,
+  storeSlug: string
+) {
+  console.log("updateCollaboratorLocations called with:", {
+    collaboratorId,
+    activeLocationIds,
+    storeId,
+    storeSlug
+  });
+
+  if (!collaboratorId || !storeId) {
+    throw new Error("updateCollaboratorLocations: missing required parameters");
+  }
+
+  // Get existing assignments for this collaborator in this store
+  const existingAssignments = await prisma.collaboratorAssignment.findMany({
+    where: {
+      collaboratorId,
+      storeId,
+    },
+    select: { id: true, locationId: true, isActive: true },
+  });
+
+  console.log("existingAssignments:", existingAssignments);
+
+  const activeSet = new Set(activeLocationIds);
+  console.log("activeSet:", activeSet);
+
+  const updatesToActivate: number[] = [];
+  const updatesToDeactivate: number[] = [];
+  const idsToInsert: number[] = [];
+
+  // Analizar todos los registros existentes
+  for (const assignment of existingAssignments) {
+    const { locationId, isActive } = assignment;
+
+    if (activeSet.has(locationId)) {
+      // Debe estar activo
+      if (!isActive) {
+        // Existe pero estaba inactivo → activar
+        updatesToActivate.push(locationId);
+      }
+
+      // Como ya está considerado, lo sacamos del Set para saber qué IDs son nuevos
+      activeSet.delete(locationId);
+    } else {
+      // No está en los que vienen del cliente → debe desactivarse si está activo
+      if (isActive) {
+        updatesToDeactivate.push(locationId);
+      }
+    }
+  }
+
+  // Lo que queda en activeSet → son IDs que NO existen en assignments → insertar
+  idsToInsert.push(...Array.from(activeSet));
+
+  // Insertar nuevos registros
+  if (idsToInsert.length > 0) {
+    await prisma.collaboratorAssignment.createMany({
+      data: idsToInsert.map((locationId) => ({
+        locationId,
+        collaboratorId,
+        storeId,
+        isActive: true,
+      })),
+    });
+  }
+
+  // Activar registros existentes que estaban inactivos
+  if (updatesToActivate.length > 0) {
+    await prisma.collaboratorAssignment.updateMany({
+      where: {
+        collaboratorId,
+        storeId,
+        locationId: { in: updatesToActivate },
+      },
+      data: { isActive: true },
+    });
+  }
+
+  // Desactivar registros que ya no están seleccionados
+  if (updatesToDeactivate.length > 0) {
+    await prisma.collaboratorAssignment.updateMany({
+      where: {
+        collaboratorId,
+        storeId,
+        locationId: { in: updatesToDeactivate },
+      },
+      data: { isActive: false },
+    });
+  }
+
+  revalidatePath(`/control/tiendas/${storeSlug}/colaboradores`);
 }

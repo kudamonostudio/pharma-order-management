@@ -17,6 +17,7 @@ export interface StoreWithOrdersParams {
   ordersLimit?: number;
   status?: OrderStatus;
   collaboratorId?: number;
+  locationId?: number;
 }
 
 export interface StoreWithOrders {
@@ -33,6 +34,7 @@ export interface StoreWithOrders {
   isActive: boolean;
   withPrices: boolean;
   orders?: OrderInStore[];
+  locations?: LocationBasic[];
 }
 
 export interface StoreOrdersStats {

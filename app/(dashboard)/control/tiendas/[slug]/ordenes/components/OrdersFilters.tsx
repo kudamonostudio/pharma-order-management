@@ -41,18 +41,29 @@ interface CollaboratorOption {
   code: string | null;
 }
 
+interface LocationOption {
+  id: number;
+  name: string;
+}
+
 interface OrdersFiltersProps {
   storeSlug: string;
   availableCollaborators: CollaboratorOption[];
+  availableLocations: LocationOption[];
   currentStatus?: string;
   currentCollaboratorId?: string;
+  currentLocationId?: string;
+  canAccessBranchFilter: boolean;
 }
 
 export function OrdersFilters({
   storeSlug,
   availableCollaborators,
+  availableLocations,
   currentStatus,
   currentCollaboratorId,
+  currentLocationId,
+  canAccessBranchFilter,
 }: OrdersFiltersProps) {
   const ALL_OPTION_VALUE = "ALL";
   const router = useRouter();
@@ -65,8 +76,13 @@ export function OrdersFilters({
   const [localCollaboratorId, setLocalCollaboratorId] = useState<string>(
     currentCollaboratorId || ALL_OPTION_VALUE
   );
+  const [localLocationId, setLocalLocationId] = useState<string>(
+    currentLocationId || ALL_OPTION_VALUE
+  );
   const [collaboratorSearchValue, setCollaboratorSearchValue] = useState("");
   const [collaboratorOpen, setCollaboratorOpen] = useState(false);
+  const [locationSearchValue, setLocationSearchValue] = useState("");
+  const [locationOpen, setLocationOpen] = useState(false);
 
   // Set initial defaults if no current values
   useEffect(() => {
@@ -97,13 +113,20 @@ export function OrdersFilters({
       params.delete("collaboratorId");
     }
 
+    // Handle location filter (only if user has permission)
+    if (canAccessBranchFilter && localLocationId && localLocationId !== ALL_OPTION_VALUE) {
+      params.set("locationId", localLocationId);
+    } else {
+      params.delete("locationId");
+    }
+
     const query = params.toString();
     const url = query
       ? `/control/tiendas/${storeSlug}/ordenes?${query}`
       : `/control/tiendas/${storeSlug}/ordenes`;
 
     router.push(url);
-  }, [localStatus, localCollaboratorId, searchParams, storeSlug, router]);
+  }, [localStatus, localCollaboratorId, localLocationId, canAccessBranchFilter, searchParams, storeSlug, router]);
 
   const handleStatusChange = (value: string) => {
     setLocalStatus(value);
@@ -115,6 +138,12 @@ export function OrdersFilters({
     setCollaboratorSearchValue("");
   };
 
+  const handleLocationSelect = (locationId: string) => {
+    setLocalLocationId(locationId);
+    setLocationOpen(false);
+    setLocationSearchValue("");
+  };
+
   // Filter collaborators based on search
   const filteredCollaborators = availableCollaborators.filter((collab) =>
     `${collab.firstName} ${collab.lastName}`
@@ -122,9 +151,19 @@ export function OrdersFilters({
       .includes(collaboratorSearchValue.toLowerCase())
   );
 
+  // Filter locations based on search
+  const filteredLocations = availableLocations.filter((location) =>
+    location.name.toLowerCase().includes(locationSearchValue.toLowerCase())
+  );
+
   // Get selected collaborator for display
   const selectedCollaborator = availableCollaborators.find(
     (collab) => String(collab.id) === localCollaboratorId
+  );
+
+  // Get selected location for display
+  const selectedLocation = availableLocations.find(
+    (location) => String(location.id) === localLocationId
   );
 
   const statusOptions = Object.keys(
@@ -243,6 +282,80 @@ export function OrdersFilters({
           </PopoverContent>
         </Popover>
       </div>
+
+      {canAccessBranchFilter && (
+        <div className="flex-1 space-y-1">
+          <Label>Filtrar por sucursal</Label>
+          <Popover open={locationOpen} onOpenChange={setLocationOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                aria-expanded={locationOpen}
+                className="w-full justify-between"
+              >
+                {selectedLocation ? (
+                  selectedLocation.name
+                ) : localLocationId === ALL_OPTION_VALUE ? (
+                  "Todas las sucursales"
+                ) : (
+                  "Seleccionar sucursal..."
+                )}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-full p-0">
+              <Command>
+                <CommandInput
+                  placeholder="Buscar sucursal..."
+                  value={locationSearchValue}
+                  onValueChange={setLocationSearchValue}
+                />
+                <CommandList>
+                  <CommandEmpty>No se encontraron sucursales.</CommandEmpty>
+                  <CommandGroup>
+                    <CommandItem
+                      onSelect={() => handleLocationSelect(ALL_OPTION_VALUE)}
+                      className="cursor-pointer"
+                    >
+                      <Check
+                        className={cn(
+                          "mr-2 h-4 w-4",
+                          localLocationId === ALL_OPTION_VALUE
+                            ? "opacity-100"
+                            : "opacity-0"
+                        )}
+                      />
+                      Todas las sucursales
+                    </CommandItem>
+                    {filteredLocations.map((location) => (
+                      <CommandItem
+                        key={location.id}
+                        onSelect={() =>
+                          handleLocationSelect(String(location.id))
+                        }
+                        className={cn("cursor-pointer",
+                          localLocationId === String(location.id) ? "bg-green-100": ""
+                        )}
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4 items-center",
+                            localLocationId === String(location.id)
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                        {location.name}
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        </div>
+      )}
 
       <div className="shrink-0">
         <Button onClick={applyFilters} className="w-full lg:w-auto">
