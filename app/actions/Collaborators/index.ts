@@ -11,6 +11,7 @@ export async function createCollaborator(formData: FormData) {
   const lastName = formData.get("lastName") as string;
   const storeId = toNumberOrNull(formData.get("storeId"));
   const locationId = toNumberOrNull(formData.get("locationId"));
+  const code = formData.get("code") as string | null;
 
   if (!storeId || !firstName  || !lastName || !locationId) {
     throw new Error("Campos requeridos faltantes: storeId, firstName, lastName o locationId");
@@ -20,6 +21,7 @@ export async function createCollaborator(formData: FormData) {
     data: {
       firstName,
       lastName,
+      code,
     },
   });
 

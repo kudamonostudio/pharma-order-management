@@ -43,7 +43,7 @@ export const getStoreMenuItems = (storeSlug: string) => [
   },
   {
     title: "Órdenes",
-    url: `/control/tiendas/${storeSlug}/ordenes`,
+    url: `/control/tiendas/${storeSlug}/ordenes?status=PENDIENTE`,
     icon: NotepadText,
   },
 ];

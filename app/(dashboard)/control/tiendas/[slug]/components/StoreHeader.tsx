@@ -16,7 +16,7 @@ export async function StoreHeader({ store }: StoreHeaderProps) {
   const isAdminSupremo = profile?.role === "ADMIN_SUPREMO";
 
   return (
-    <div className="flex justify-between py-4">
+    <div className="flex justify-between py-4 gap-2">
       <div className="flex items-center gap-4">
         {store.logo ? (
           <img
@@ -28,8 +28,8 @@ export async function StoreHeader({ store }: StoreHeaderProps) {
           <LogoPlaceholder variant="store" isActive={store.isActive} />
         )}
         <div>
-          <div className="flex justify-center items-center gap-4">
-            <h1 className="font-bold text-3xl">{store.name}</h1>
+          <div className="flex flex-col lg:flex-row lg:justify-center lg:items-center gap-4">
+            <h1 className="font-bold text-xl lg:text-3xl">{store.name}</h1>
             {isAdminSupremo && (
               <div className="flex gap-2">
                 <IsActiveButton isActive={store.isActive} variant="small" />
@@ -38,7 +38,7 @@ export async function StoreHeader({ store }: StoreHeaderProps) {
             )}
 
           </div>
-          <p className="text-muted-foreground">{store.address}</p>
+          <p className="text-muted-foreground mt-4 lg:mt-0">{store.address}</p>
           <p className="text-muted-foreground">{store.phone}</p>
         </div>
       </div>

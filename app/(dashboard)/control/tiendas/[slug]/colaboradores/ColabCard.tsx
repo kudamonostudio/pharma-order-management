@@ -1,10 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Pencil } from "lucide-react";
+import { Pencil, NotepadText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Branch } from "@/shared/types/collaborator";
 import { Collaborator } from "@prisma/client";
+import Link from "next/link";
 
 interface ColabCardProps extends Collaborator {
   branches: Branch[];
@@ -63,12 +64,22 @@ export const ColabCard = ({ onEditClick, ...collaborator }: ColabCardProps) => {
             </span>
           </div>
         </div>
-        {onEditClick && (
-          <Button onClick={onEditClick} className="w-full mt-3">
-            <Pencil className="h-4 w-4" />
-            Editar
-          </Button>
-        )}
+        <div className="">
+          {onEditClick && (
+            <Button onClick={onEditClick} className="w-full mt-3">
+              <Pencil className="h-4 w-4" />
+              Editar
+            </Button>
+          )}
+          <Link
+            href={`./ordenes?status=PENDIENTE&collaboratorId=${collaborator.collaboratorId}`}
+          >
+            <Button className="w-full mt-3">
+              <NotepadText className="h-4 w-4" />
+              Ver Órdenes
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -15,7 +15,7 @@ interface OrderHistoryListProps {
 
 // Status styling function based on order status colors
 const getStatusClasses = (status: DashboardOrderStatus): string => {
-  const baseClasses = "inline-block px-2 py-1 border text-xs font-semibold";
+  const baseClasses = "inline-block px-2 py-1 border text-xs font-semibold rounded-full";
   const statusColors = getOrderStatusColor(status);
   return `${baseClasses} ${statusColors}`;
 };

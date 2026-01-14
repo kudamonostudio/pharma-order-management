@@ -27,6 +27,8 @@ import { ToggleColabActiveModal } from "./ToggleColabActiveModal";
 import { updateCollaborator } from "@/app/actions/Collaborators";
 import { uploadCollaboratorImage } from "@/lib/supabase/client/uploadImage";
 import { Branch } from "@/shared/types/collaborator";
+import { useGenerateCode } from "@/app/(dashboard)/hooks/use-generate-code";
+import { set } from "zod";
 
 interface SimpleLocation {
   id: number;
@@ -76,6 +78,15 @@ export function ColabModal({
     lastName: "",
     code: "",
   });
+
+  // Move hook call to component body
+  const generateCode = useGenerateCode(5).generateCode;
+  const createCode = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    const newCode = generateCode();
+    setFormData({ ...formData, code: newCode });
+    console.log(newCode);
+  };
 
   const onDrop = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -250,6 +261,7 @@ export function ColabModal({
                     setFormData({ ...formData, code: e.target.value })
                   }
                 />
+                <Button title="test" size={"sm"} onClick={(e)=> createCode(e)}>Generar código</Button>
               </div>
 
               {/* <div className="space-y-2">

@@ -23,6 +23,7 @@ import MessageInput from "./Messages/MessageInput";
 import { createOrderMessage } from "./Messages/actions";
 import { MessageType } from "@prisma/client";
 import { MessageBasic } from "@/shared/types/store";
+import { LinkToOrder } from "../../../../../colaboradores/LinkToOrder";
 
 interface AvailableCollaborator {
   id: number;
@@ -109,6 +110,7 @@ export function OrderDetailModalContent({
                 #{order.code ?? order.id}
               </h1>
               <OrderStatusModal status={order.status} variant="small" />
+              <LinkToOrder store={storeSlug} orderId={order.id} />
             </div>
             <span className="text-sm">
               Creada el {formatDate(order.createdAt)}

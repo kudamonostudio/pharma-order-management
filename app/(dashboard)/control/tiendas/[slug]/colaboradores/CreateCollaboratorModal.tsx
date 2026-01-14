@@ -26,6 +26,7 @@ import {
   updateCollaboratorImage,
 } from "@/app/actions/Collaborators";
 import { uploadImage } from "@/lib/supabase/client/uploadImage";
+import { useGenerateCode } from "@/app/(dashboard)/hooks/use-generate-code";
 
 interface SimpleLocation {
   id: number;
@@ -78,11 +79,15 @@ export function CreateCollaboratorModal({
     if (!open) close();
   };
 
+  // Move hook call to component body
+  const generateCode = useGenerateCode(5).generateCode;
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
     const formData = new FormData(e.currentTarget);
-
+    const newCode = generateCode();
+    formData.append("code", newCode);
+    console.log(Array.from(formData.entries()));
     try {
       const newCollaboratorId = await createCollaborator(formData);
       if (!newCollaboratorId) throw new Error("No se creó el colaborador");

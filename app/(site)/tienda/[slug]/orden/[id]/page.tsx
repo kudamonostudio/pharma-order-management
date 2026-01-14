@@ -19,6 +19,14 @@ type OrderItemPayload = {
   imageUrl?: string | null;
 };
 
+async function getProductPrices(productIds: number[]): Promise<Map<number, number>> {
+  const products = await prisma.product.findMany({
+    where: { id: { in: productIds } },
+    select: { id: true, price: true },
+  });
+  return new Map(products.map((p) => [p.id, p.price?.toNumber() ?? 0]));
+}
+
 const Page = async ({ params }: PageProps) => {
   const { slug, id } = await params;
 
@@ -51,6 +59,28 @@ const Page = async ({ params }: PageProps) => {
         select: {
           name: true,
           logo: true,
+          withPrices: true,
+        },
+      },
+      messages: {
+        where: {
+          type: "TO_CLIENT",
+        },
+        select: {
+          id: true,
+          message: true,
+          createdAt: true,
+          collaborator: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              image: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
         },
       },
     },
@@ -62,12 +92,23 @@ const Page = async ({ params }: PageProps) => {
 
   const storeName = dbOrder.store?.name ?? "Tienda";
   const storeLogo = dbOrder.store?.logo ?? "";
+  const withPrices = dbOrder.store?.withPrices ?? false;
 
-  const products = (dbOrder.items as OrderItemPayload[]).map((item) => ({
+  const orderItems = dbOrder.items as OrderItemPayload[];
+  
+  // Obtener precios actuales si la tienda tiene withPrices
+  let priceMap = new Map<number, number>();
+  if (withPrices) {
+    const productIds = orderItems.map((item) => item.productId);
+    priceMap = await getProductPrices(productIds);
+  }
+
+  const products = orderItems.map((item) => ({
     id: item.productId.toString(),
     name: item.name,
     image: item.imageUrl || undefined,
     quantity: item.quantity,
+    price: withPrices ? priceMap.get(item.productId) : undefined,
   }));
 
   const orderForView = {
@@ -80,6 +121,12 @@ const Page = async ({ params }: PageProps) => {
     },
   };
 
+  const messages = dbOrder.messages.map((msg) => ({
+    id: msg.id,
+    message: msg.message,
+    createdAt: msg.createdAt,
+  }));
+
   return (
     <StoreContainer>
       <div className="pt-12 pb-8 flex gap-4 items-center justify-center border-b">
@@ -91,6 +138,9 @@ const Page = async ({ params }: PageProps) => {
       <OrderDetailContent
         order={orderForView}
         products={products}
+        messages={messages}
+        storeName={storeName}
+        withPrices={withPrices}
         showBranchInfo={true}
       />
     </StoreContainer>

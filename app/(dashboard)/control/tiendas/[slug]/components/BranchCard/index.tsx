@@ -31,14 +31,14 @@ function index({ branch, store, onEdit }: BranchCardProps) {
   return (
     <Card
       key={branch.id}
-      className="border border-neutral-200 shadow-none rounded-sm p-2 flex flex-row justify-between"
+      className="border border-neutral-200 shadow-none rounded-sm p-2 py-8"
     >
-      <div className="flex flex-row gap-4">
+      <div className="flex flex-row gap-4 justify-center">
         {store.logo ? (
           <img
             src={store.logo}
             alt={store.name}
-            className="w-20 h-20 rounded-full object-cover m-auto"
+            className="w-12 h-12 xl:w-16 xl:h-16 rounded-full object-cover"
           />
         ) : (
           <LogoPlaceholder
@@ -48,7 +48,7 @@ function index({ branch, store, onEdit }: BranchCardProps) {
           />
         )}
         <div className="flex flex-col justify-center">
-          <h1 className="font-bold text-xl">Sucursal {branch.name}</h1>
+          <h1 className="font-bold text-lg lg:text-xl">{branch.name}</h1>
           <p className="text-base text-muted-foreground">{branch.address}</p>
           <p className="text-base text-muted-foreground font-semibold">
             {branch.phone}
@@ -67,7 +67,7 @@ function index({ branch, store, onEdit }: BranchCardProps) {
       <div className=" space-y-2 p-2 gap-2">
         <Button
           variant="secondary"
-          className="flex items-center justify-center gap-2 rounded-xl mb-3"
+          className="w-full flex items-center justify-center rounded-xl"
           onClick={() => onEdit?.(branch)}
         >
           Configuración
