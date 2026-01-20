@@ -1,7 +1,7 @@
 "use client";
 
 import { Calendar } from "lucide-react";
-import { formatDateTime } from "@/app/(dashboard)/utils/dates";
+import { formatDateTime } from "@/app/utils/dates";
 import { OrderCollab } from "../../../OrderCollab";
 import { ReactNode } from "react";
 
@@ -32,17 +32,25 @@ export function HistoryEventCard({
           <small>{formatDateTime(date)}</small>
         </div>
       </div>
-      {collaborator && (
-        <OrderCollab
-          collab={{
-            id: collaborator.id,
-            firstName: collaborator.firstName,
-            lastName: collaborator.lastName,
-            image: collaborator.image ?? null,
-            variant: "small",
-          }}
-        />
-      )}
+      <div className="flex gap-2 items-center">
+        <p className="italic">Actualizado por:</p>
+        {collaborator && (
+          <>
+            <OrderCollab
+              collab={{
+                id: collaborator.id,
+                firstName: collaborator.firstName,
+                lastName: collaborator.lastName,
+                image: collaborator.image ?? null,
+                variant: "small",
+              }}
+            />
+            <p className="text-sm font-medium">
+              {collaborator.firstName} {collaborator.lastName}
+            </p>
+          </>
+        )}
+      </div>
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { getOrderStatusColor, getOrderStatusLabel } from "../../../constants";
-import { formatDate } from "@/app/(dashboard)/utils/dates";
+import { formatDateTime } from "@/app/utils/dates";
 import { OrderCollab } from "./OrderCollab";
 import { OrderDetailModal } from "./OrderDetailModal/ModalContent";
 import { useOrderStore } from "@/app/zustand/orderStore";
@@ -55,9 +55,11 @@ export function OrderCardClient({
             />
           ) : null}
           <div>
-            <h3 className="text-accent-foreground">#ORD-{order.code ?? order.id}</h3>
+            <h3 className="text-accent-foreground">
+              #ORD-{order.code ?? order.id}
+            </h3>
             <p className="text-sm text-muted-foreground">
-              {formatDate(order.createdAt)}
+              {formatDateTime(order.createdAt)}
             </p>
           </div>
         </div>

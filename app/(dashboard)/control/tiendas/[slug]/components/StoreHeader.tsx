@@ -4,6 +4,7 @@ import { LogoPlaceholder } from "../../../../components/LogoPlaceholder";
 import { StoreHeaderActions } from "./StoreHeaderActions";
 import { getCurrentProfile } from "@/lib/auth/session";
 import HasPricesButton from "@/app/(dashboard)/components/HasPricesButton";
+import { LinkToPublicStore } from "./LinkToPublicStore";
 
 interface StoreHeaderProps {
   store: Store;
@@ -29,14 +30,18 @@ export async function StoreHeader({ store }: StoreHeaderProps) {
         )}
         <div>
           <div className="flex flex-col lg:flex-row lg:justify-center lg:items-center gap-4">
-            <h1 className="font-bold text-xl lg:text-3xl">{store.name}</h1>
+            <div className="flex gap-2">
+              <h1 className="font-bold text-xl lg:text-3xl">{store.name}</h1>
+              <LinkToPublicStore store={store.slug} />
+            </div>
             {isAdminSupremo && (
               <div className="flex gap-2">
                 <IsActiveButton isActive={store.isActive} variant="small" />
-                {store.withPrices && <HasPricesButton isActive={store.isActive} variant="small" />}
+                {store.withPrices && (
+                  <HasPricesButton isActive={store.isActive} variant="small" />
+                )}
               </div>
             )}
-
           </div>
           <p className="text-muted-foreground mt-4 lg:mt-0">{store.address}</p>
           <p className="text-muted-foreground">{store.phone}</p>

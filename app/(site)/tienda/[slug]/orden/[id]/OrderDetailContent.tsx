@@ -7,6 +7,7 @@ import { OrderTabControl, type OrderTabValue } from "./OrderTabControl";
 import { ClientMessageList } from "./ClientMessageList";
 import { Separator } from "@/components/ui/separator";
 import { type OrderStatus as OrderStatusType } from "@/app/(dashboard)/control/tiendas/[slug]/constants";
+import { formatDateTime } from "@/app/utils/dates";
 
 interface Message {
   id: number;
@@ -36,7 +37,14 @@ interface OrderDetailContentProps {
 
 const getLastReadMessageKey = (orderId: string) => `lastReadMessage_${orderId}`;
 
-export function OrderDetailContent({ order, products, messages, storeName, withPrices = false, showBranchInfo = false }: OrderDetailContentProps) {
+export function OrderDetailContent({
+  order,
+  products,
+  messages,
+  storeName,
+  withPrices = false,
+  showBranchInfo = false,
+}: OrderDetailContentProps) {
   const [activeTab, setActiveTab] = useState<OrderTabValue>("products");
   const [hasUnreadMessages, setHasUnreadMessages] = useState(false);
 
@@ -64,10 +72,13 @@ export function OrderDetailContent({ order, products, messages, storeName, withP
   // Marcar como leído cuando se abre la pestaña de mensajes
   const handleTabChange = (tab: OrderTabValue) => {
     setActiveTab(tab);
-    
+
     if (tab === "messages" && messages.length > 0) {
       const latestMessageId = messages[0]?.id;
-      localStorage.setItem(getLastReadMessageKey(order.id), String(latestMessageId));
+      localStorage.setItem(
+        getLastReadMessageKey(order.id),
+        String(latestMessageId)
+      );
       setHasUnreadMessages(false);
     }
   };
@@ -79,7 +90,7 @@ export function OrderDetailContent({ order, products, messages, storeName, withP
           <h1 className="text-xl font-normal text-gray-600">
             Detalles de la orden: #{order.id}
           </h1>
-          <small>Creada el {order.createdAt.toLocaleDateString()}</small>
+          <small>Creada el {formatDateTime(order.createdAt)}</small>
         </div>
         <div className="flex flex-col items-end">
           <OrderStatus status={order.status} />
@@ -90,12 +101,12 @@ export function OrderDetailContent({ order, products, messages, storeName, withP
           )}
         </div>
       </div>
-      
+
       <div className="flex flex-col gap-2 mt-4 mb-4">
         <Separator />
-        <OrderTabControl 
-          value={activeTab} 
-          onChange={handleTabChange} 
+        <OrderTabControl
+          value={activeTab}
+          onChange={handleTabChange}
           hasUnreadMessages={hasUnreadMessages}
         />
       </div>
@@ -103,7 +114,7 @@ export function OrderDetailContent({ order, products, messages, storeName, withP
       {activeTab === "products" && (
         <>
           <SelectedProducts order={products} withPrices={withPrices} />
-          
+
           {/* Footer con totales */}
           <div className="mt-6 pt-4">
             <Separator className="mb-4" />
@@ -139,7 +150,7 @@ export function OrderDetailContent({ order, products, messages, storeName, withP
           </div>
         </>
       )}
-      
+
       {activeTab === "messages" && (
         <ClientMessageList messages={messages} storeName={storeName} />
       )}

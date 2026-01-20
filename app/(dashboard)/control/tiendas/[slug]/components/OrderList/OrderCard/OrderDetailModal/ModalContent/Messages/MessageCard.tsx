@@ -1,4 +1,4 @@
-import { formatDate } from "@/app/(dashboard)/utils/dates";
+import { formatDateTime } from "@/app/utils/dates";
 import { MessageBasic } from "@/shared/types/store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -31,7 +31,7 @@ export const MessageCard = ({ message }: { message: MessageBasic }) => {
             {fullName}
           </span>
           <small className="text-muted-foreground text-xs shrink-0">
-            {formatDate(message.createdAt)}
+            {formatDateTime(message.createdAt)}
           </small>
         </div>
         <p className="text-sm text-foreground mt-1">{message.message}</p>

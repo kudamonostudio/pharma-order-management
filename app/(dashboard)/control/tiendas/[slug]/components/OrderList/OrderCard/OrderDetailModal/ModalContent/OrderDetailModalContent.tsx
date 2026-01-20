@@ -8,7 +8,7 @@ import {
 } from "@/app/(dashboard)/control/tiendas/[slug]/constants";
 import { OrderDetailModalProducts } from "../OrderDetailModalProducts";
 import OrderStatusModal from "./OrderStatusModal";
-import { formatDate } from "@/app/(dashboard)/utils/dates";
+import { formatDateTime } from "@/app/utils/dates";
 import { OrderCollab } from "../../OrderCollab";
 import { Separator } from "@/components/ui/separator";
 import { ModalControl, type ModalControlValue } from "./ModalControl";
@@ -58,7 +58,9 @@ export function OrderDetailModalContent({
     useState<ModalControlValue>("products");
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isUpdateStatusModalOpen, setIsUpdateStatusModalOpen] = useState(false);
-  const [messages, setMessages] = useState<MessageBasic[]>(order.messages || []);
+  const [messages, setMessages] = useState<MessageBasic[]>(
+    order.messages || []
+  );
   const statusColor = getOrderStatusColor(order.status as OrderStatusType);
   const collaborator = order.collaborator;
 
@@ -75,7 +77,7 @@ export function OrderDetailModalContent({
         messageData.message,
         messageData.type
       );
-      
+
       // Convert OrderMessageResponse to MessageBasic format and add to the list
       const messageBasic: MessageBasic = {
         id: newMessage.id,
@@ -89,11 +91,11 @@ export function OrderDetailModalContent({
           image: newMessage.collaborator.image,
         },
       };
-      
+
       // Add new message to the list (prepend since messages are sorted by newest first)
-      setMessages(prevMessages => [messageBasic, ...prevMessages]);
+      setMessages((prevMessages) => [messageBasic, ...prevMessages]);
     } catch (error) {
-      console.error('Error creating message:', error);
+      console.error("Error creating message:", error);
     }
   };
 
@@ -113,7 +115,7 @@ export function OrderDetailModalContent({
               <LinkToOrder store={storeSlug} orderId={order.id} />
             </div>
             <span className="text-sm">
-              Creada el {formatDate(order.createdAt)}
+              Creada el {formatDateTime(order.createdAt)}
             </span>
             <h3 className="text-base font-normal">
               Retira en la sucursal:{" "}
@@ -172,12 +174,12 @@ export function OrderDetailModalContent({
                       {collaborator.firstName} {collaborator.lastName}
                     </span>
                     {order.status !== "ENTREGADA" && (
-                    <small
-                      className="underline block cursor-pointer"
-                      onClick={() => setIsAssignModalOpen(true)}
-                    >
-                      Cambiar
-                    </small>
+                      <small
+                        className="underline block cursor-pointer"
+                        onClick={() => setIsAssignModalOpen(true)}
+                      >
+                        Cambiar
+                      </small>
                     )}
                   </>
                 )}
@@ -190,7 +192,10 @@ export function OrderDetailModalContent({
           <ModalControl value={controlValue} onChange={setControlValue} />
         </div>
         {controlValue === "products" && (
-          <OrderDetailModalProducts order={order.items} withPrices={withPrices} />
+          <OrderDetailModalProducts
+            order={order.items}
+            withPrices={withPrices}
+          />
         )}
         <div
           className={controlValue === "internal-messages" ? "block" : "hidden"}
@@ -209,51 +214,59 @@ export function OrderDetailModalContent({
           </div>
         </div>
       </div>
-      
-      {/* Fixed Footer for Products - only show when viewing products with prices */}
-      {controlValue === "products" && withPrices && (() => {
-        const totalQuantity = order.items.reduce(
-          (sum: number, product: any) => sum + (product.quantity || 0),
-          0
-        );
-        const totalAmount = order.items.reduce((sum: number, product: any) => {
-          const price = product.price || 0;
-          return sum + price * (product.quantity || 0);
-        }, 0);
 
-        return (
-          <div className="fixed w-full bottom-0 bg-background p-4">
-            <div className="max-w-4xl mx-auto">
-              <Separator className="mb-4" />
-              <div className="grid grid-cols-5 gap-4">
-                <div className="col-span-3 flex items-center justify-between px-4 py-3 bg-muted/30 rounded-lg">
-                  <span className="text-lg font-medium text-foreground">
-                    Total de productos
-                  </span>
-                  <span className="text-2xl font-bold text-primary">
-                    {totalQuantity}
-                  </span>
-                </div>
-                <div className="col-span-2 flex items-center justify-between px-4 py-4 bg-emerald-50 dark:bg-emerald-950 rounded-lg border border-emerald-600">
-                  <span className="text-xl text-foreground">
-                    Total de la orden
-                  </span>
-                  <span className="text-xl font-medium text-emerald-600">
-                    ${totalAmount.toFixed(2)}
-                  </span>
+      {/* Fixed Footer for Products - only show when viewing products with prices */}
+      {controlValue === "products" &&
+        withPrices &&
+        (() => {
+          const totalQuantity = order.items.reduce(
+            (sum: number, product: any) => sum + (product.quantity || 0),
+            0
+          );
+          const totalAmount = order.items.reduce(
+            (sum: number, product: any) => {
+              const price = product.price || 0;
+              return sum + price * (product.quantity || 0);
+            },
+            0
+          );
+
+          return (
+            <div className="fixed w-full bottom-0 bg-background p-4">
+              <div className="max-w-4xl mx-auto">
+                <Separator className="mb-4" />
+                <div className="grid grid-cols-5 gap-4">
+                  <div className="col-span-3 flex items-center justify-between px-4 py-3 bg-muted/30 rounded-lg">
+                    <span className="text-lg font-medium text-foreground">
+                      Total de productos
+                    </span>
+                    <span className="text-2xl font-bold text-primary">
+                      {totalQuantity}
+                    </span>
+                  </div>
+                  <div className="col-span-2 flex items-center justify-between px-4 py-4 bg-emerald-50 dark:bg-emerald-950 rounded-lg border border-emerald-600">
+                    <span className="text-xl text-foreground">
+                      Total de la orden
+                    </span>
+                    <span className="text-xl font-medium text-emerald-600">
+                      ${totalAmount.toFixed(2)}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        );
-      })()}
+          );
+        })()}
 
       {/* Fixed Message Input Footer - only show when viewing messages */}
-      {(controlValue === "internal-messages" || controlValue === "client-messages") && (
+      {(controlValue === "internal-messages" ||
+        controlValue === "client-messages") && (
         <div className="fixed w-full bottom-0 bg-background border-t p-4">
           <MessageInput
             orderId={order.id}
-            messageType={controlValue === "internal-messages" ? "INTERN" : "TO_CLIENT"}
+            messageType={
+              controlValue === "internal-messages" ? "INTERN" : "TO_CLIENT"
+            }
             availableCollaborators={availableCollaborators}
             onMessageSent={handleMessageSent}
           />

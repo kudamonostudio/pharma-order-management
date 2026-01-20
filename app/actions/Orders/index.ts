@@ -9,6 +9,7 @@ import {
 import { Order, OrderStatus, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
+import { createMessage } from "@/app/actions/Messages";
 
 export async function createOrder(formData: FormData) {
   const storeSlug = formData.get("storeSlug") as string;
@@ -131,6 +132,29 @@ export async function updateOrderStatus(data: UpdateOrderStatusData) {
       note: "Actualizacion de Estado",
     },
   });
+
+  // Enviar mensajes automáticos al cliente para cambios de estado específicos
+  let messageText = "";
+  
+  if (order.status === "PENDIENTE" && status === "EN_PROCESO") {
+    messageText = "Se comenzó a procesar la orden..";
+  } else if (status === "LISTO_PARA_RETIRO") {
+    messageText = "La orden está lista para retirar!";
+  }
+
+  if (messageText && collaboratorId) {
+    try {
+      await createMessage({
+        orderId: updatedOrder.id,
+        collaboratorId,
+        message: messageText,
+        type: "TO_CLIENT"
+      });
+    } catch (error) {
+      console.error("Error al enviar mensaje automático:", error);
+      // No fallar toda la operación si el envío de mensaje falla
+    }
+  }
 
   return updatedOrder.id;
 }
