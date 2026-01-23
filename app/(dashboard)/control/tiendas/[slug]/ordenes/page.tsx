@@ -2,8 +2,7 @@ import { getStoreWithOrders } from "@/app/actions/Store";
 import { getCollaboratorsByStore } from "@/app/actions/Collaborators";
 import { getCurrentProfile } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
-import { OrderList } from "../components/OrderList";
-import { OrdersFilters } from "./components/OrdersFilters";
+import { OrdersPageContent } from "./components/OrdersPageContent";
 
 interface OrdenesPageProps {
   params: Promise<{ slug: string }>;
@@ -24,13 +23,21 @@ export default async function OrdenesPage({
   // Get current user profile for role-based access control
   const currentProfile = await getCurrentProfile();
 
-  // Convert status to uppercase to match Prisma OrderStatus enum
-  const normalizedStatus = status ? status.toUpperCase() : undefined;
+  // Convert status to uppercase and handle comma-separated values
+  const normalizedStatus = status 
+    ? status.split(",").map(s => s.trim().toUpperCase()) 
+    : undefined;
+
+  // Force locationId filter for SUCURSAL_ADMIN (can only see their branch orders)
+  let effectiveLocationId = locationId ? Number(locationId) : undefined;
+  if (currentProfile?.role === 'SUCURSAL_ADMIN' && currentProfile.locationId) {
+    effectiveLocationId = currentProfile.locationId;
+  }
 
   const response = await getStoreWithOrders(slug, {
     status: normalizedStatus as any,
     collaboratorId: collaboratorId ? Number(collaboratorId) : undefined,
-    locationId: locationId ? Number(locationId) : undefined,
+    locationId: effectiveLocationId,
     ordersLimit: 50,
     ordersPage: 1,
   });
@@ -43,6 +50,7 @@ export default async function OrdenesPage({
 
   // Get store locations for branch filtering (only fetch if user has permission)
   const canAccessBranchFilter = currentProfile?.role === 'ADMIN_SUPREMO' || currentProfile?.role === 'TIENDA_ADMIN';
+  const isAdminSupremo = currentProfile?.role === 'ADMIN_SUPREMO';
   
   const storeLocations = canAccessBranchFilter ? store.locations || [] : [];
 
@@ -60,30 +68,18 @@ export default async function OrdenesPage({
     <div className="px-8 py-4 w-full max-w-5xl">
       <h1 className="font-medium text-2xl mb-6">Órdenes</h1>
 
-      <div className="mb-6">
-        <OrdersFilters
-          storeSlug={slug}
-          availableCollaborators={availableCollaborators}
-          availableLocations={storeLocations}
-          currentStatus={status}
-          currentCollaboratorId={collaboratorId}
-          currentLocationId={locationId}
-          canAccessBranchFilter={canAccessBranchFilter}
-        />
-      </div>
-
-      <section className="latest-orders">
-        {store.orders?.length ? (
-          <OrderList
-            orders={store.orders ?? []}
-            storeSlug={slug}
-            availableCollaborators={availableCollaborators}
-            withPrices={store.withPrices}
-          />
-        ) : (
-          <p className="italic mx-2">No hay resultados para estos filtros</p>
-        )}
-      </section>
+      <OrdersPageContent
+        orders={store.orders ?? []}
+        storeSlug={slug}
+        availableCollaborators={availableCollaborators}
+        availableLocations={storeLocations}
+        withPrices={store.withPrices}
+        isAdminSupremo={isAdminSupremo}
+        canAccessBranchFilter={canAccessBranchFilter}
+        currentStatus={status}
+        currentCollaboratorId={collaboratorId}
+        currentLocationId={locationId}
+      />
     </div>
   );
 }

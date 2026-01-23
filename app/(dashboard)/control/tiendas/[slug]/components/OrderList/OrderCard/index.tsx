@@ -1,5 +1,3 @@
-// import { Order } from "@prisma/client";
-import { getCurrentProfile } from "@/lib/auth/session";
 import { OrderCardClient } from "./OrderCardClient";
 import { OrderInStore } from "@/shared/types/store";
 
@@ -17,17 +15,20 @@ type OrderCardProps = {
   storeSlug: string;
   availableCollaborators: Collaborator[];
   withPrices: boolean;
+  isAdminSupremo: boolean;
+  onOrderUpdated?: (orderId: number, newStatus: string) => void;
+  onCollaboratorAssigned?: (orderId: number, collaboratorId: number) => void;
 };
 
-export const OrderCard = async ({
+export const OrderCard = ({
   order,
   storeSlug,
   availableCollaborators,
   withPrices,
+  isAdminSupremo,
+  onOrderUpdated,
+  onCollaboratorAssigned,
 }: OrderCardProps) => {
-  const profile = await getCurrentProfile();
-  const isAdminSupremo = profile?.role === "ADMIN_SUPREMO";
-
   return (
     <OrderCardClient
       order={order}
@@ -35,6 +36,8 @@ export const OrderCard = async ({
       storeSlug={storeSlug}
       availableCollaborators={availableCollaborators}
       withPrices={withPrices}
+      onOrderUpdated={onOrderUpdated}
+      onCollaboratorAssigned={onCollaboratorAssigned}
     />
   );
 };

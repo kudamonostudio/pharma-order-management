@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState, useEffect } from "react";
+import { useCallback, useState, useEffect, useTransition } from "react";
 import {
   ORDER_STATUS_LABELS,
   type OrderStatus as DashboardOrderStatus,
@@ -28,7 +28,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
+import { Check, ChevronsUpDown, RefreshCw, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
@@ -54,6 +54,7 @@ interface OrdersFiltersProps {
   currentCollaboratorId?: string;
   currentLocationId?: string;
   canAccessBranchFilter: boolean;
+  onStatusChange?: (newStatuses: string[]) => void;
 }
 
 export function OrdersFilters({
@@ -64,14 +65,17 @@ export function OrdersFilters({
   currentCollaboratorId,
   currentLocationId,
   canAccessBranchFilter,
+  onStatusChange,
 }: OrdersFiltersProps) {
   const ALL_OPTION_VALUE = "ALL";
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isFilterPending, startFilterTransition] = useTransition();
+  const [isRefreshPending, startRefreshTransition] = useTransition();
 
-  // Local state for filters
-  const [localStatus, setLocalStatus] = useState<string>(
-    currentStatus || "PENDIENTE"
+  // Local state for filters - support multiple statuses
+  const [localStatus, setLocalStatus] = useState<string[]>(
+    currentStatus ? currentStatus.split(",") : ["PENDIENTE"]
   );
   const [localCollaboratorId, setLocalCollaboratorId] = useState<string>(
     currentCollaboratorId || ALL_OPTION_VALUE
@@ -99,9 +103,9 @@ export function OrdersFilters({
   const applyFilters = useCallback(() => {
     const params = new URLSearchParams(searchParams.toString());
 
-    // Handle status filter
-    if (localStatus && localStatus !== ALL_OPTION_VALUE) {
-      params.set("status", localStatus);
+    // Handle status filter - join array with commas
+    if (localStatus && localStatus.length > 0 && !localStatus.includes(ALL_OPTION_VALUE)) {
+      params.set("status", localStatus.join(","));
     } else {
       params.delete("status");
     }
@@ -125,11 +129,13 @@ export function OrdersFilters({
       ? `/control/tiendas/${storeSlug}/ordenes?${query}`
       : `/control/tiendas/${storeSlug}/ordenes`;
 
-    router.push(url);
+    startFilterTransition(() => {
+      router.push(url);
+    });
   }, [localStatus, localCollaboratorId, localLocationId, canAccessBranchFilter, searchParams, storeSlug, router]);
 
   const handleStatusChange = (value: string) => {
-    setLocalStatus(value);
+    setLocalStatus([value]);
   };
 
   const handleCollaboratorSelect = (collaboratorId: string) => {
@@ -174,7 +180,7 @@ export function OrdersFilters({
     <div className="flex flex-col lg:flex-row gap-4 items-end">
       <div className="flex-1 space-y-1">
         <Label htmlFor="status-filter">Filtrar por estado</Label>
-        <Select onValueChange={handleStatusChange} value={localStatus}>
+        <Select onValueChange={handleStatusChange} value={localStatus[0] || "PENDIENTE"}>
           <SelectTrigger id="status-filter" className="w-full">
             <SelectValue placeholder="Todos los estados" />
           </SelectTrigger>
@@ -357,9 +363,50 @@ export function OrdersFilters({
         </div>
       )}
 
-      <div className="shrink-0">
-        <Button onClick={applyFilters} className="w-full lg:w-auto">
-          Filtrar
+      <div className="shrink-0 flex gap-2">
+        <Button 
+          onClick={applyFilters} 
+          className="w-full lg:w-auto"
+          disabled={isFilterPending || isRefreshPending}
+        >
+          {isFilterPending ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Filtrando...
+            </>
+          ) : (
+            "Filtrar"
+          )}
+        </Button>
+        <Button 
+          onClick={() => {
+            // Reset local state
+            setLocalStatus(["PENDIENTE"]);
+            setLocalCollaboratorId(ALL_OPTION_VALUE);
+            setLocalLocationId(ALL_OPTION_VALUE);
+            setCollaboratorSearchValue("");
+            setLocationSearchValue("");
+            
+            // Navigate with transition
+            startRefreshTransition(() => {
+              router.push(`/control/tiendas/${storeSlug}/ordenes?status=PENDIENTE`);
+            });
+          }} 
+          variant="outline" 
+          className="w-full lg:w-auto"
+          disabled={isFilterPending || isRefreshPending}
+        >
+          {isRefreshPending ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Actualizando...
+            </>
+          ) : (
+            <>
+              <RefreshCw className="h-4 w-4 mr-2" />
+              Actualizar
+            </>
+          )}
         </Button>
       </div>
     </div>

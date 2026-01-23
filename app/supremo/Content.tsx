@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, MapPin, Phone, Settings } from "lucide-react";
+import { ArrowRight, Mail, MapPin, Phone, Settings } from "lucide-react";
 import Link from "next/link";
 import { StoreConfigModal } from "../(dashboard)/components/StoreConfigModal";
 import { Store } from "@prisma/client";
@@ -12,18 +12,21 @@ import IsActiveButton from "../(dashboard)/components/IsActiveButton";
 import { CreateStoreModal } from "./CreateStoreModal";
 import { LogoPlaceholder } from "../(dashboard)/components/LogoPlaceholder";
 import { StoreFilter } from "./components/StoreFilter";
-
 import { StoreConfigButton } from "../(dashboard)/components/StoreConfigButton";
 import HasPricesButton from "../(dashboard)/components/HasPricesButton";
 
+type StoreWithAdmin = Store & {
+  profile: { email: string | null }[];
+};
+
 interface TiendasContentProps {
-  stores: Store[];
+  stores: StoreWithAdmin[];
 }
 
 export default function TiendasContent({ stores }: TiendasContentProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedStore, setSelectedStore] = useState<Store | null>(null);
+  const [selectedStore, setSelectedStore] = useState<StoreWithAdmin | null>(null);
   const [filter, setFilter] = useState<"all" | "active" | "inactive">("all");
 
   const filteredStores = stores.filter((store) => {
@@ -98,6 +101,15 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
                   <div className="flex items-center justify-center gap-1 text-sm text-neutral-600">
                     <Phone className="h-4 w-4" />
                     <span>{store.phone}</span>
+                  </div>
+                )}
+
+                {store.profile[0]?.email && (
+                  <div className="flex items-center justify-center gap-1 text-sm text-neutral-600">
+                    <Mail className="h-4 w-4 flex-shrink-0" />
+                    <div className="w-32 overflow-hidden text-ellipsis whitespace-nowrap">
+                      {store.profile[0].email}
+                    </div>
                   </div>
                 )}
               </div>

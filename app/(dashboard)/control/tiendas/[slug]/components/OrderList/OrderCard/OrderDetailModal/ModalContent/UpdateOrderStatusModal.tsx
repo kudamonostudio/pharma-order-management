@@ -33,6 +33,7 @@ interface UpdateOrderStatusModalProps {
   currentStatus: OrderStatusType;
   currentCollaboratorId?: number | null;
   availableCollaborators: Collaborator[];
+  onOrderUpdated?: (orderId: number, newStatus: OrderStatusType) => void;
 }
 
 const STATUS_OPTIONS: OrderStatusType[] = [
@@ -51,6 +52,7 @@ export function UpdateOrderStatusModal({
   currentStatus,
   currentCollaboratorId,
   availableCollaborators,
+  onOrderUpdated,
 }: UpdateOrderStatusModalProps) {
   const router = useRouter();
   const [selectedStatus, setSelectedStatus] = useState<OrderStatusType>(currentStatus);
@@ -85,11 +87,19 @@ export function UpdateOrderStatusModal({
         collaboratorId: confirmedByCollaboratorId,
         prevCollaboratorId: currentCollaboratorId ?? undefined,
       });
+      
+      // Notify parent after successful update
+      onOrderUpdated?.(orderId, selectedStatus);
+      
+      // Close both modals
       setShowCodeModal(false);
       onOpenChange(false);
+      
+      // Refresh to update history
       router.refresh();
     } catch (error) {
       console.error("Error updating order status:", error);
+      // Re-throw to show error in ConfirmCollaboratorCodeModal
       throw error;
     } finally {
       setIsLoading(false);

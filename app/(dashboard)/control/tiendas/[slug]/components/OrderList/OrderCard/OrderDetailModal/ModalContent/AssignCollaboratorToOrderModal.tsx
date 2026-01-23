@@ -32,6 +32,7 @@ interface AssignCollaboratorToOrderModalProps {
   locationId: number | null;
   currentCollaboratorId?: number | null;
   availableCollaborators: AvailableCollaborator[];
+  onCollaboratorAssigned?: (orderId: number, collaboratorId: number) => void;
 }
 
 export function AssignCollaboratorToOrderModal({
@@ -43,6 +44,7 @@ export function AssignCollaboratorToOrderModal({
   locationId,
   currentCollaboratorId,
   availableCollaborators,
+  onCollaboratorAssigned,
 }: AssignCollaboratorToOrderModalProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -71,11 +73,18 @@ export function AssignCollaboratorToOrderModal({
     setIsLoading(true);
     try {
       await assignCollaboratorToOrder(orderId, selectedId, storeSlug, confirmedByCollaboratorId);
+      
+      // Notify parent after successful update
+      onCollaboratorAssigned?.(orderId, selectedId);
+      
+      // Close the code modal - main order modal stays open
       setShowCodeModal(false);
-      onOpenChange(false);
+      
+      // Refresh to update history without closing modal
       router.refresh();
     } catch (error) {
       console.error("Error assigning collaborator to order:", error);
+      // Re-throw to show error in ConfirmCollaboratorCodeModal
       throw error;
     } finally {
       setIsLoading(false);

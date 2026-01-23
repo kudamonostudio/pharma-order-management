@@ -42,3 +42,17 @@ export const getStoreMenuItems = (storeSlug: string) => [
     icon: NotepadText,
   },
 ];
+
+// Items para SUCURSAL_ADMIN (solo órdenes)
+export const getBranchAdminMenuItems = (storeSlug: string) => [
+  {
+    title: "Inicio",
+    url: `/control/tiendas/${storeSlug}`,
+    icon: House,
+  },
+  {
+    title: "Órdenes",
+    url: `/control/tiendas/${storeSlug}/ordenes?status=PENDIENTE`,
+    icon: NotepadText,
+  },
+];

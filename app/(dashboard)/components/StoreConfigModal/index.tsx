@@ -22,11 +22,16 @@ import { ToggleStorePricesModal } from "./ToggleStorePricesModal";
 import { Store } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { uploadStoreLogo } from "@/lib/supabase/client/uploadImage";
+import { useUserStore } from "@/app/zustand/userStore";
+
+type StoreWithAdmin = Store & {
+  profile?: { email: string | null }[];
+};
 
 interface StoreConfigModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  store: Store | null;
+  store: StoreWithAdmin | null;
 }
 
 type ModalView = "menu" | "edit";
@@ -49,7 +54,10 @@ export function StoreConfigModal({
     name: "",
     address: "",
     phone: "",
+    adminEmail: "",
   });
+
+  const isAdminSupremo = useUserStore((state) => state.isAdminSupremo);
 
   const onDrop = (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
@@ -89,6 +97,7 @@ export function StoreConfigModal({
         name: store.name,
         address: store.address || "",
         phone: store.phone || "",
+        adminEmail: store.profile?.[0]?.email || "",
       });
     }
   }, [store]);
@@ -103,6 +112,7 @@ export function StoreConfigModal({
       formDataToSend.append("name", formData.name);
       formDataToSend.append("address", formData.address);
       formDataToSend.append("phone", formData.phone);
+      formDataToSend.append("adminEmail", formData.adminEmail);
 
       await updateStore(store.id, formDataToSend);
 
@@ -151,40 +161,46 @@ export function StoreConfigModal({
                 Editar información
               </Button>
 
-              {/* Habilitar/Deshabilitar Precios */}
-              <Button
-                variant="outline"
-                className="justify-start gap-2 h-12"
-                onClick={() => setIsTogglePricesModalOpen(true)}
-              >
-                <DollarSign className="h-4 w-4" />
-                {store.withPrices
-                  ? "Deshabilitar precios"
-                  : "Habilitar precios"}
-              </Button>
+              {/* Habilitar/Deshabilitar Precios - Solo Admin Supremo */}
+              {isAdminSupremo && (
+                <Button
+                  variant="outline"
+                  className="justify-start gap-2 h-12"
+                  onClick={() => setIsTogglePricesModalOpen(true)}
+                >
+                  <DollarSign className="h-4 w-4" />
+                  {store.withPrices
+                    ? "Deshabilitar precios"
+                    : "Habilitar precios"}
+                </Button>
+              )}
 
-              {/* Inactivar/Activar */}
-              <Button
-                variant="outline"
-                className={cn(
-                  "justify-start gap-2 h-12",
-                  store.isActive ? "bg-gray-100" : ""
-                )}
-                onClick={() => setIsToggleActiveModalOpen(true)}
-              >
-                <Power className="h-4 w-4" />
-                {store.isActive ? "Inactivar tienda" : "Activar tienda"}
-              </Button>
+              {/* Inactivar/Activar - Solo Admin Supremo */}
+              {isAdminSupremo && (
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "justify-start gap-2 h-12",
+                    store.isActive ? "bg-gray-100" : ""
+                  )}
+                  onClick={() => setIsToggleActiveModalOpen(true)}
+                >
+                  <Power className="h-4 w-4" />
+                  {store.isActive ? "Inactivar tienda" : "Activar tienda"}
+                </Button>
+              )}
 
-              {/* Eliminar */}
-              <Button
-                variant="destructive"
-                className="justify-start gap-2 h-12"
-                onClick={() => setIsDeleteModalOpen(true)}
-              >
-                <Trash2 className="h-4 w-4" />
-                Eliminar tienda
-              </Button>
+              {/* Eliminar - Solo Admin Supremo */}
+              {isAdminSupremo && (
+                <Button
+                  variant="destructive"
+                  className="justify-start gap-2 h-12"
+                  onClick={() => setIsDeleteModalOpen(true)}
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Eliminar tienda
+                </Button>
+              )}
             </div>
           ) : (
             /* Formulario de Edición */
@@ -225,6 +241,22 @@ export function StoreConfigModal({
                   }
                 />
               </div>
+
+              {/* Email del Administrador - Solo Admin Supremo */}
+              {isAdminSupremo && (
+                <div className="space-y-2">
+                  <Label htmlFor="edit-admin-email">Email del Administrador</Label>
+                  <Input
+                    id="edit-admin-email"
+                    type="email"
+                    placeholder="Ej: admin@tienda.com"
+                    value={formData.adminEmail}
+                    onChange={(e) =>
+                      setFormData({ ...formData, adminEmail: e.target.value })
+                    }
+                  />
+                </div>
+              )}
 
               <div className="space-y-2">
                 <Label>Logo (opcional)</Label>

@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import {
   ADMIN_SUPREMO_DASHBOARD_ITEMS,
   getStoreMenuItems,
+  getBranchAdminMenuItems,
 } from "../utils/constants";
 import {
   DropdownMenu,
@@ -57,9 +58,11 @@ export function AppSidebar({ userRole, user, store }: AppSidebarProps) {
   const showAdminItems = userRole === Role.ADMIN_SUPREMO;
   const showStoreItems =
     userRole === Role.TIENDA_ADMIN || (userRole === Role.ADMIN_SUPREMO && store);
+  const showBranchItems = userRole === Role.SUCURSAL_ADMIN && store;
 
   // Generar items de tienda con URLs dinámicas si hay store
   const storeMenuItems = store ? getStoreMenuItems(store.slug) : [];
+  const branchMenuItems = store ? getBranchAdminMenuItems(store.slug) : [];
 
   const mapperRole = (role: string) => {
     switch (role) {
@@ -156,6 +159,48 @@ export function AppSidebar({ userRole, user, store }: AppSidebarProps) {
             <SidebarGroupContent>
               <SidebarMenu>
                 {storeMenuItems.map((item) => {
+                  const isActive =
+                    pathname === item.url ||
+                    pathname.startsWith(item.url + "/");
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild isActive={isActive}>
+                        <Link href={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
+
+        {/* Grupo de Sucursal - Solo para SUCURSAL_ADMIN */}
+        {showBranchItems && store && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="flex items-center gap-2">
+              {store.logo ? (
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={store.logo} alt={store.name} />
+                  <AvatarFallback className="text-xs">
+                    {store.name.substring(0, 2).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              ) : (
+                <LogoPlaceholder
+                  variant="store"
+                  isActive={store.isActive}
+                  className="h-6 w-6"
+                />
+              )}
+              <span className="truncate">{store.name}</span>
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {branchMenuItems.map((item) => {
                   const isActive =
                     pathname === item.url ||
                     pathname.startsWith(item.url + "/");

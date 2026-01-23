@@ -51,7 +51,8 @@ export default function ConfirmOrderModalContent({
 }: Props) {
   const [step, setStep] = useState<"products" | "form">("products");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { order, getOrderQuantity, getOrderTotal, clearOrder } = useOrderStore();
+  const { order, getOrderQuantity, getOrderTotal, clearOrder } =
+    useOrderStore();
   const router = useRouter();
 
   // Obtener datos guardados del localStorage
@@ -114,10 +115,10 @@ export default function ConfirmOrderModalContent({
   const onSubmit = async (data: FormData) => {
     try {
       setIsSubmitting(true);
-      
+
       // Calcular el total
       const totalAmount = getOrderTotal();
-      
+
       // Preparar los items (sin precio, solo productId, quantity y name)
       const items = order.map((item) => ({
         productId: parseInt(item.id),
@@ -135,7 +136,7 @@ export default function ConfirmOrderModalContent({
       formData.append("totalAmount", totalAmount.toString());
 
       // Llamar a la server action
-      await createOrder(formData);
+      const createdOrderId = await createOrder(formData);
 
       // Guardar datos del cliente en localStorage
       localStorage.setItem("customerFullName", data.fullName);
@@ -146,9 +147,10 @@ export default function ConfirmOrderModalContent({
 
       // Cerrar el modal
       handleOpenChange(false);
-      
-      // Opcional: Mostrar mensaje de éxito o redirigir
-      router.refresh();
+
+      // Redirigir a la orden
+      router.push(`./${storeSlug}/orden/${createdOrderId}`);
+      /* router.refresh(); */
     } catch (error) {
       console.error("Error al crear la orden:", error);
       // Aquí podrías mostrar un toast o mensaje de error
@@ -182,8 +184,8 @@ export default function ConfirmOrderModalContent({
               <SelectedProducts order={order} withPrices={withPrices} />
             </div>
             <div className="shrink-0 pt-4">
-              <SelectedProductsTotal 
-                totalQuantity={getOrderQuantity()} 
+              <SelectedProductsTotal
+                totalQuantity={getOrderQuantity()}
                 totalAmount={getOrderTotal()}
                 withPrices={withPrices}
               />

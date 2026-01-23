@@ -23,6 +23,8 @@ type OrderCardClientProps = {
   storeSlug: string;
   availableCollaborators: Collaborator[];
   withPrices: boolean;
+  onOrderUpdated?: (orderId: number, newStatus: string) => void;
+  onCollaboratorAssigned?: (orderId: number, collaboratorId: number) => void;
 };
 
 export function OrderCardClient({
@@ -31,6 +33,8 @@ export function OrderCardClient({
   storeSlug,
   availableCollaborators,
   withPrices,
+  onOrderUpdated,
+  onCollaboratorAssigned,
 }: OrderCardClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { order: mockProducts } = useOrderStore();
@@ -79,6 +83,8 @@ export function OrderCardClient({
         storeSlug={storeSlug}
         availableCollaborators={availableCollaborators}
         withPrices={withPrices}
+        onOrderUpdated={onOrderUpdated}
+        onCollaboratorAssigned={onCollaboratorAssigned}
       />
     </>
   );

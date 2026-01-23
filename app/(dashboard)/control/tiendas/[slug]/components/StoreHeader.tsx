@@ -47,7 +47,7 @@ export async function StoreHeader({ store }: StoreHeaderProps) {
           <p className="text-muted-foreground">{store.phone}</p>
         </div>
       </div>
-      {isAdminSupremo && <StoreHeaderActions store={store} />}
+      {profile?.role !== "SUCURSAL_ADMIN" && <StoreHeaderActions store={store} />}
     </div>
   );
 }

@@ -1,15 +1,19 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { Role } from "@prisma/client";
 
 interface UserProfile {
   email: string;
   name?: string;
   avatar?: string;
+  role?: Role;
 }
 
 interface UserStore {
   user: UserProfile | null;
+  isAdminSupremo: boolean;
   setUser: (user: UserProfile | null) => void;
+  setRole: (role: Role) => void;
   clearUser: () => void;
   getInitials: () => string;
 }
@@ -18,8 +22,19 @@ export const useUserStore = create<UserStore>()(
   persist(
     (set, get) => ({
       user: null,
-      setUser: (user) => set({ user }),
-      clearUser: () => set({ user: null }),
+      isAdminSupremo: false,
+      setUser: (user) => set({ 
+        user,
+        isAdminSupremo: user?.role === Role.ADMIN_SUPREMO,
+      }),
+      setRole: (role) => {
+        const user = get().user;
+        set({
+          user: user ? { ...user, role } : null,
+          isAdminSupremo: role === Role.ADMIN_SUPREMO,
+        });
+      },
+      clearUser: () => set({ user: null, isAdminSupremo: false }),
       getInitials: () => {
         const user = get().user;
         if (!user) return "U";

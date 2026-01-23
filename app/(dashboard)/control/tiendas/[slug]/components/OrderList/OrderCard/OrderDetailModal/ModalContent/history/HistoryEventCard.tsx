@@ -33,9 +33,9 @@ export function HistoryEventCard({
         </div>
       </div>
       <div className="flex gap-2 items-center">
-        <p className="italic">Actualizado por:</p>
         {collaborator && (
           <>
+        <p className="italic">Actualizado por:</p>
             <OrderCollab
               collab={{
                 id: collaborator.id,

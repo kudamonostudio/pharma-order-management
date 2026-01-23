@@ -59,12 +59,37 @@ export async function updateLocation(id: number, storeSlug: string, formData: Fo
   if (formData.has("address")) data.address = formData.get("address") as string;
   if (formData.has("phone")) data.phone = formData.get("phone") as string | null;
 
-  await prisma.location.update({
+  const location = await prisma.location.update({
     where: { id },
     data,
   });
 
+  // Update admin email if provided
+  if (formData.has("adminEmail")) {
+    const adminEmail = formData.get("adminEmail") as string;
+    if (adminEmail) {
+      // Check if there's an existing admin for this location
+      const existingAdmin = await prisma.profile.findFirst({
+        where: {
+          locationId: id,
+          role: Role.SUCURSAL_ADMIN,
+        },
+      });
+
+      if (existingAdmin) {
+        // If email changed, invite new user
+        if (existingAdmin.email !== adminEmail) {
+          await createAdminLocation(adminEmail, location.storeId, id);
+        }
+      } else {
+        // No existing admin, create new one
+        await createAdminLocation(adminEmail, location.storeId, id);
+      }
+    }
+  }
+
   revalidatePath(`/control/tiendas/${storeSlug}`);
+  revalidatePath(`/control/tiendas/${storeSlug}/sucursales`);
 }
 
 export async function deleteLocation(id: number, storeSlug: string) {

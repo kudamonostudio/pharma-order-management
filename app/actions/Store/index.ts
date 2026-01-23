@@ -104,6 +104,32 @@ export async function updateStore(id: number, formData: FormData) {
     data,
   });
 
+  // Update admin email if provided
+  if (formData.has("adminEmail")) {
+    const adminEmail = formData.get("adminEmail") as string;
+    if (adminEmail) {
+      // Check if there's an existing admin for this store
+      const existingAdmin = await prisma.profile.findFirst({
+        where: {
+          storeId: id,
+          role: "TIENDA_ADMIN",
+        },
+      });
+
+      if (existingAdmin) {
+        // If email changed, we need to invite a new user
+        if (existingAdmin.email !== adminEmail) {
+          // Invite new admin via Supabase (sends confirmation email)
+          await createAdminStore(adminEmail, id);
+        }
+        // If email is the same, no action needed
+      } else {
+        // No existing admin, create new one
+        await createAdminStore(adminEmail, id);
+      }
+    }
+  }
+
   revalidatePath("/supremo");
 
   return updatedStore;
@@ -153,6 +179,15 @@ export async function getStoreBySlug(slug: string) {
               },
             },
           },
+          profile: {
+            where: {
+              role: "SUCURSAL_ADMIN",
+            },
+            select: {
+              email: true,
+            },
+            take: 1,
+          },
         },
       },
     },
@@ -171,8 +206,15 @@ export async function getStoreWithOrders(
 
   const skip = (ordersPage - 1) * ordersLimit;
 
+  // Handle both single status and array of statuses
+  const statusWhere = status 
+    ? Array.isArray(status) 
+      ? { status: { in: status } }
+      : { status }
+    : {};
+
   const orderWhere = {
-    ...(status && { status }),
+    ...statusWhere,
     ...(params.collaboratorId && { collaboratorId: params.collaboratorId }),
     ...(params.locationId && { locationId: params.locationId }),
   };
@@ -196,6 +238,8 @@ export async function getStoreWithOrders(
           totalAmount: true,
           currency: true,
           createdAt: true,
+          fullname: true,
+          phoneContact: true,
           collaborator: {
             select: { id: true, firstName: true, lastName: true, image: true },
           },
@@ -247,7 +291,7 @@ export async function getStoreWithOrders(
   const totalOrders = await prisma.order.count({
     where: {
       storeId: store.id,
-      ...(status && { status }),
+      ...statusWhere,
       ...(params.collaboratorId && { collaboratorId: params.collaboratorId }),
       ...(params.locationId && { locationId: params.locationId }),
     },

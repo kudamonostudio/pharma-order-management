@@ -15,7 +15,7 @@ export interface LocationWithCollaborators extends Location {
 export interface StoreWithOrdersParams {
   ordersPage?: number;
   ordersLimit?: number;
-  status?: OrderStatus;
+  status?: OrderStatus | OrderStatus[];
   collaboratorId?: number;
   locationId?: number;
 }
@@ -63,6 +63,8 @@ export interface OrderInStore {
   location: LocationBasic | null;
   messages: MessageBasic[];
   history?: OrderHistoryItem[];
+  fullname: string;
+  phoneContact: string;
 }
 
 export interface CollaboratorBasic {

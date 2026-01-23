@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PackageCheck, Phone, UserPen } from "lucide-react";
+import { PackageCheck, UserPen } from "lucide-react";
 import {
   type OrderStatus as OrderStatusType,
   getOrderStatusColor,
@@ -24,6 +24,8 @@ import { createOrderMessage } from "./Messages/actions";
 import { MessageType } from "@prisma/client";
 import { MessageBasic } from "@/shared/types/store";
 import { LinkToOrder } from "../../../../../colaboradores/LinkToOrder";
+import Image from "next/image";
+import Link from "next/link";
 
 interface AvailableCollaborator {
   id: number;
@@ -45,6 +47,8 @@ interface OrderDetailModalContentProps {
   storeSlug: string;
   availableCollaborators: AvailableCollaborator[];
   withPrices: boolean;
+  onOrderUpdated?: (orderId: number, newStatus: OrderStatusType) => void;
+  onCollaboratorAssigned?: (orderId: number, collaboratorId: number) => void;
 }
 
 export function OrderDetailModalContent({
@@ -53,6 +57,8 @@ export function OrderDetailModalContent({
   storeSlug,
   availableCollaborators,
   withPrices,
+  onOrderUpdated,
+  onCollaboratorAssigned,
 }: OrderDetailModalContentProps) {
   const [controlValue, setControlValue] =
     useState<ModalControlValue>("products");
@@ -127,13 +133,25 @@ export function OrderDetailModalContent({
               <p className="text-sm">
                 Cliente:{" "}
                 <span className="text-accent-foreground font-medium">
-                  John Doe
+                 {order.fullname}
                 </span>
               </p>
+              <Link
+                  href={`https://wa.me/+598${order.phoneContact}?text=Hola%20${order.fullname}!%20Tu orden está lista para retirar, ${order.location?.name}. Gracias!`}
+                  className="flex gap-1 hover:scale-110 transition-transform duration-200"
+                  target="_blank"
+                >
               <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                <Phone className="h-4 w-4" />
-                <p>+59899123345</p>
+                <Image 
+                  src="/whatsapp.svg" 
+                  alt="WhatsApp" 
+                  width={24} 
+                  height={24}
+                  className="h-5 w-5"
+                />
+                <p>{order.phoneContact}</p>
               </div>
+              </Link>
             </div>
           </div>
           <div className="flex flex-col items-end gap-6">
@@ -282,6 +300,7 @@ export function OrderDetailModalContent({
         locationId={order.location?.id ?? null}
         currentCollaboratorId={order.collaborator?.id}
         availableCollaborators={availableCollaborators}
+        onCollaboratorAssigned={onCollaboratorAssigned}
       />
       {order.collaborator && (
         <UpdateOrderStatusModal
@@ -292,6 +311,7 @@ export function OrderDetailModalContent({
           currentStatus={order.status as OrderStatusType}
           currentCollaboratorId={order.collaborator?.id}
           availableCollaborators={availableCollaborators}
+          onOrderUpdated={onOrderUpdated}
         />
       )}
     </div>

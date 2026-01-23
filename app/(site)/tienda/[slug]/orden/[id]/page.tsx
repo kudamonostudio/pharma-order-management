@@ -1,3 +1,4 @@
+import Link from "next/link";
 import StoreContainer from "../../components/StoreContainer";
 import StoreLogo from "../../components/StoreLogo";
 import { OrderDetailContent } from "./OrderDetailContent";
@@ -19,7 +20,9 @@ type OrderItemPayload = {
   imageUrl?: string | null;
 };
 
-async function getProductPrices(productIds: number[]): Promise<Map<number, number>> {
+async function getProductPrices(
+  productIds: number[],
+): Promise<Map<number, number>> {
   const products = await prisma.product.findMany({
     where: { id: { in: productIds } },
     select: { id: true, price: true },
@@ -95,7 +98,7 @@ const Page = async ({ params }: PageProps) => {
   const withPrices = dbOrder.store?.withPrices ?? false;
 
   const orderItems = dbOrder.items as OrderItemPayload[];
-  
+
   // Obtener precios actuales si la tienda tiene withPrices
   let priceMap = new Map<number, number>();
   if (withPrices) {
@@ -129,12 +132,15 @@ const Page = async ({ params }: PageProps) => {
 
   return (
     <StoreContainer>
-      <div className="pt-12 pb-8 flex gap-4 items-center justify-center border-b">
+      <Link
+        href={`/tienda/${slug}`}
+        className="pt-12 pb-8 flex gap-4 items-center justify-center border-b"
+      >
         <StoreLogo logoUrl={storeLogo} />
         <h1 className="text-3xl font-semibold text-foreground tracking-tight">
           {storeName}
         </h1>
-      </div>
+      </Link>
       <OrderDetailContent
         order={orderForView}
         products={products}

@@ -19,6 +19,7 @@ import { DeleteBranchModal } from "./DeleteBranchModal";
 import { AssignCollaboratorsModal } from "./AssignCollaboratorsModal";
 import { AssignmentWithCollaborator } from "@/shared/types/store";
 import { Branch } from "@/shared/types/collaborator";
+import { useUserStore } from "@/app/zustand/userStore";
 
 interface Collaborator {
   collaboratorId: number;
@@ -36,8 +37,8 @@ interface SimpleCollaborator {
 }
 
 interface LocationWithCollaborators extends Location {
-  // profiles: SimpleCollaborator[];
   collaboratorAssignments: AssignmentWithCollaborator[];
+  profile?: { email: string | null }[];
 }
 
 interface BranchConfigModalProps {
@@ -68,6 +69,7 @@ export function BranchConfigModal({
     name: "",
     address: "",
     phone: "",
+    adminEmail: "",
   });
 
   useEffect(() => {
@@ -82,6 +84,7 @@ export function BranchConfigModal({
         name: branch.name,
         address: branch.address,
         phone: branch.phone || "",
+        adminEmail: branch.profile?.[0]?.email || "",
       });
     }
   }, [branch]);
@@ -96,6 +99,7 @@ export function BranchConfigModal({
       formDataToSend.append("name", formData.name);
       formDataToSend.append("address", formData.address);
       formDataToSend.append("phone", formData.phone);
+      formDataToSend.append("adminEmail", formData.adminEmail);
 
       await updateLocation(branch.id, storeSlug, formDataToSend);
 
@@ -194,6 +198,20 @@ export function BranchConfigModal({
                   value={formData.phone}
                   onChange={(e) =>
                     setFormData({ ...formData, phone: e.target.value })
+                  }
+                />
+              </div>
+
+              {/* Email del Administrador - Solo Admin Supremo y Admin Tienda */}
+              <div className="space-y-2">
+                <Label htmlFor="edit-admin-email">Email del Colaborador</Label>
+                <Input
+                  id="edit-admin-email"
+                  type="email"
+                  placeholder="Ej: colaborador@tienda.com"
+                  value={formData.adminEmail}
+                  onChange={(e) =>
+                    setFormData({ ...formData, adminEmail: e.target.value })
                   }
                 />
               </div>

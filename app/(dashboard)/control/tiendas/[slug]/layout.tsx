@@ -7,6 +7,7 @@ import { AdminNavbar } from "../../../components/AdminNavbar";
 import { CreateBranchModal } from "./sucursales/CreateBranchModal";
 import { StoreHeader } from "./components/StoreHeader";
 import { CreateProductModal } from "./productos/components/modals/CreateProductModal";
+import { UserStoreHydrator } from "@/app/zustand/UserStoreHydrator";
 
 export default async function StoreLayout({
   children,
@@ -51,6 +52,12 @@ export default async function StoreLayout({
 
   return (
     <SidebarProvider>
+      <UserStoreHydrator
+        email={profile.email || ""}
+        name={`${profile.firstName || ""} ${profile.lastName || ""}`.trim()}
+        avatar={profile.imageUrl || undefined}
+        role={profile.role}
+      />
       <AppSidebar userRole={profile.role} user={profile} store={store} />
       <main className="w-full">
         <AdminNavbar />

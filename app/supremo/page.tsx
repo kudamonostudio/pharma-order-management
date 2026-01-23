@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { prisma } from "@/lib/prisma";
 import TiendasContent from "./Content";
+import { UserStoreHydrator } from "@/app/zustand/UserStoreHydrator";
 
 
 export default async function ProtectedPage() {
@@ -11,6 +12,17 @@ export default async function ProtectedPage() {
   const stores = await prisma.store.findMany({
     where: {
       deletedAt: null,
+    },
+    include: {
+      profile: {
+        where: {
+          role: "TIENDA_ADMIN",
+        },
+        select: {
+          email: true,
+        },
+        take: 1,
+      },
     },
   });
 
@@ -29,5 +41,15 @@ export default async function ProtectedPage() {
     redirect("/protected"); // TODO a /control/slug
   }
 
-  return <TiendasContent stores={stores} />;
+  return (
+    <>
+      <UserStoreHydrator
+        email={profile.email || ""}
+        name={`${profile.firstName || ""} ${profile.lastName || ""}`.trim()}
+        avatar={profile.imageUrl || undefined}
+        role={profile.role}
+      />
+      <TiendasContent stores={stores} />
+    </>
+  );
 }
