@@ -27,6 +27,7 @@ import {
 } from "@/app/actions/Collaborators";
 import { uploadImage } from "@/lib/supabase/client/uploadImage";
 import { useGenerateCode } from "@/app/(dashboard)/hooks/use-generate-code";
+import Image from "next/image";
 
 interface SimpleLocation {
   id: number;
@@ -50,10 +51,10 @@ export function CreateCollaboratorModal({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const isOpen = useCollaboratorStore(
-    (state) => state.isCreateCollaboratorModalOpen
+    (state) => state.isCreateCollaboratorModalOpen,
   );
   const close = useCollaboratorStore(
-    (state) => state.closeCreateCollaboratorModal
+    (state) => state.closeCreateCollaboratorModal,
   );
 
   const onDrop = (acceptedFiles: File[]) => {
@@ -87,7 +88,6 @@ export function CreateCollaboratorModal({
     const formData = new FormData(e.currentTarget);
     const newCode = generateCode();
     formData.append("code", newCode);
-    console.log(Array.from(formData.entries()));
     try {
       const newCollaboratorId = await createCollaborator(formData);
       if (!newCollaboratorId) throw new Error("No se creó el colaborador");
@@ -177,10 +177,12 @@ export function CreateCollaboratorModal({
               <input {...getInputProps()} />
               {collaboratorImage ? (
                 previewUrl && (
-                  <img
+                  <Image
                     src={previewUrl}
                     alt="Vista previa"
                     className="mx-auto h-32 w-32 object-cover rounded-full"
+                    width={128}
+                    height={128}
                   />
                 )
               ) : isDragActive ? (

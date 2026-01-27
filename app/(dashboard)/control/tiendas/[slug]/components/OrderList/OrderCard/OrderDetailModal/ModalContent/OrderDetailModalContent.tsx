@@ -53,7 +53,7 @@ interface OrderDetailModalContentProps {
 
 export function OrderDetailModalContent({
   order,
-  products,
+  /* products, */
   storeSlug,
   availableCollaborators,
   withPrices,
@@ -104,8 +104,6 @@ export function OrderDetailModalContent({
       console.error("Error creating message:", error);
     }
   };
-
-  console.log("@@Order", { order });
 
   return (
     <div className="flex flex-col ">
@@ -238,11 +236,11 @@ export function OrderDetailModalContent({
         withPrices &&
         (() => {
           const totalQuantity = order.items.reduce(
-            (sum: number, product: any) => sum + (product.quantity || 0),
+            (sum, product) => sum + (product.quantity || 0),
             0
           );
           const totalAmount = order.items.reduce(
-            (sum: number, product: any) => {
+            (sum, product) => {
               const price = product.price || 0;
               return sum + price * (product.quantity || 0);
             },

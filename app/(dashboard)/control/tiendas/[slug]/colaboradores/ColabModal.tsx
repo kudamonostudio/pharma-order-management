@@ -13,23 +13,27 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/auth/checkbox";
-import {
+/* import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select"; */
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2, Power } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { DeleteColabModal } from "./DeleteColabModal";
 import { ToggleColabActiveModal } from "./ToggleColabActiveModal";
-import { updateCollaborator, updateCollaboratorLocations } from "@/app/actions/Collaborators";
+import {
+  updateCollaborator,
+  updateCollaboratorLocations,
+} from "@/app/actions/Collaborators";
 import { uploadCollaboratorImage } from "@/lib/supabase/client/uploadImage";
 import { Branch } from "@/shared/types/collaborator";
 import { useGenerateCode } from "@/app/(dashboard)/hooks/use-generate-code";
-import { set } from "zod";
+import Image from "next/image";
+/* import { set } from "zod"; */
 
 interface SimpleLocation {
   id: number;
@@ -37,7 +41,7 @@ interface SimpleLocation {
 }
 
 export interface Collaborator {
-  collaboratorId: number;
+  id: number;
   assignmentId: number;
   image: string;
   firstName: string;
@@ -79,7 +83,7 @@ export function ColabModal({
     lastName: "",
     code: "",
   });
-  
+
   const [selectedLocationIds, setSelectedLocationIds] = useState<number[]>([]);
 
   // Move hook call to component body
@@ -88,7 +92,6 @@ export function ColabModal({
     e.preventDefault();
     const newCode = generateCode();
     setFormData({ ...formData, code: newCode });
-    console.log(newCode);
   };
 
   const onDrop = (acceptedFiles: File[]) => {
@@ -128,13 +131,13 @@ export function ColabModal({
       setFormData({
         firstName: collaborator.firstName,
         lastName: collaborator.lastName,
-        code: collaborator.code ?? '',
+        code: collaborator.code ?? "",
       });
-      
+
       // Get currently active location IDs
       const activeLocationIds = collaborator.branches
-        .filter(branch => branch.isActive)
-        .map(branch => branch.id);
+        .filter((branch) => branch.isActive)
+        .map((branch) => branch.id);
       setSelectedLocationIds(activeLocationIds);
     }
   }, [collaborator]);
@@ -151,37 +154,30 @@ export function ColabModal({
       if (imageFile && storeId) {
         imageUrl = await uploadCollaboratorImage(
           storeId,
-          collaborator.collaboratorId,
-          imageFile
+          collaborator.id,
+          imageFile,
         );
         URL.revokeObjectURL(previewUrl as string);
       }
 
       await updateCollaborator(
-        collaborator.collaboratorId,
+        collaborator.id,
         {
           firstName: formData.firstName,
           lastName: formData.lastName,
-          code: formData.code !== '' ? formData.code : null,
+          code: formData.code !== "" ? formData.code : null,
           image: imageUrl,
         },
-        storeSlug
+        storeSlug,
       );
 
       // Update location assignments if storeId is available
       if (storeId) {
-        console.log("About to call updateCollaboratorLocations with:", {
-          collaboratorId: collaborator.collaboratorId,
-          selectedLocationIds,
-          storeId,
-          storeSlug
-        });
-        
         await updateCollaboratorLocations(
-          collaborator.collaboratorId,
+          collaborator.id,
           selectedLocationIds,
           storeId,
-          storeSlug
+          storeSlug,
         );
       }
 
@@ -196,9 +192,9 @@ export function ColabModal({
 
   const handleLocationChange = (locationId: number, checked: boolean) => {
     if (checked) {
-      setSelectedLocationIds(prev => [...prev, locationId]);
+      setSelectedLocationIds((prev) => [...prev, locationId]);
     } else {
-      setSelectedLocationIds(prev => prev.filter(id => id !== locationId));
+      setSelectedLocationIds((prev) => prev.filter((id) => id !== locationId));
     }
   };
 
@@ -239,7 +235,7 @@ export function ColabModal({
                 variant="outline"
                 className={cn(
                   "justify-start gap-2 h-12",
-                  isActive ? "bg-gray-100" : ""
+                  isActive ? "bg-gray-100" : "",
                 )}
                 onClick={() => setIsToggleActiveModalOpen(true)}
               >
@@ -294,14 +290,19 @@ export function ColabModal({
                     setFormData({ ...formData, code: e.target.value })
                   }
                 />
-                <Button title="test" size={"sm"} onClick={(e)=> createCode(e)}>Generar código</Button>
+                <Button title="test" size={"sm"} onClick={(e) => createCode(e)}>
+                  Generar código
+                </Button>
               </div>
 
               <div className="space-y-2">
                 <Label>Sucursales</Label>
                 <div className="space-y-2 max-h-32 overflow-y-auto border rounded-md p-2">
                   {locations.map((location) => (
-                    <div key={location.id} className="flex items-center space-x-2">
+                    <div
+                      key={location.id}
+                      className="flex items-center space-x-2"
+                    >
                       <Checkbox
                         id={`location-${location.id}`}
                         checked={selectedLocationIds.includes(location.id)}
@@ -332,17 +333,21 @@ export function ColabModal({
                   <input {...getInputProps()} />
                   {imageFile ? (
                     previewUrl && (
-                      <img
+                      <Image
                         src={previewUrl}
                         alt="Vista previa"
                         className="mx-auto h-32 w-32 object-cover rounded-full"
+                        width={128}
+                        height={128}
                       />
                     )
                   ) : collaborator.image ? (
-                    <img
+                    <Image
                       src={collaborator.image}
                       alt="Imagen actual"
                       className="mx-auto h-32 w-32 object-cover rounded-full"
+                      width={128}
+                      height={128}
                     />
                   ) : isDragActive ? (
                     <p>Suelta la imagen aquí…</p>
@@ -376,7 +381,7 @@ export function ColabModal({
       <DeleteColabModal
         open={isDeleteModalOpen}
         onOpenChange={setIsDeleteModalOpen}
-        collaboratorId={collaborator.collaboratorId}
+        collaboratorId={collaborator.id}
         storeSlug={storeSlug}
         onSuccess={() => {
           setIsDeleteModalOpen(false);
@@ -388,7 +393,7 @@ export function ColabModal({
       <ToggleColabActiveModal
         open={isToggleActiveModalOpen}
         onOpenChange={setIsToggleActiveModalOpen}
-        collaboratorId={collaborator.collaboratorId}
+        collaboratorId={collaborator.id}
         isActive={isActive}
         storeSlug={storeSlug}
         onSuccess={() => {

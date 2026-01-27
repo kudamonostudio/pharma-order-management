@@ -21,6 +21,7 @@ import { ToggleProductActiveModal } from "./ToggleProductActiveModal";
 import { updateProduct, updateProductImage } from "@/app/actions/Products";
 import { uploadProductImage } from "@/lib/supabase/client/uploadImage";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 type ProductWithNumberPrice = Omit<Product, "price"> & { price: number };
 
@@ -103,9 +104,9 @@ export function ProductConfigModal({
     setIsLoading(true);
 
     try {
-      const updateData: any = {
+      const updateData = {
         name: formData.name,
-        description: formData.description || null,
+        description: formData.description || undefined,
         price: Number(formData.price),
       };
 
@@ -237,17 +238,21 @@ export function ProductConfigModal({
                   <input {...getInputProps()} />
                   {imageFile ? (
                     previewUrl && (
-                      <img
+                      <Image
                         src={previewUrl}
                         alt="Vista previa"
                         className="mx-auto h-32 w-32 object-cover rounded-md"
+                        width={128}
+                        height={128}
                       />
                     )
                   ) : product.imageUrl ? (
-                    <img
+                    <Image
                       src={product.imageUrl}
                       alt="Imagen actual"
                       className="mx-auto h-32 w-32 object-cover rounded-md"
+                      width={128}
+                      height={128}
                     />
                   ) : isDragActive ? (
                     <p>Suelta la imagen aquí…</p>

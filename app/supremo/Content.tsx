@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight, Mail, MapPin, Phone, Settings } from "lucide-react";
+import { ArrowRight, Mail, MapPin, Phone } from "lucide-react";
 import Link from "next/link";
 import { StoreConfigModal } from "../(dashboard)/components/StoreConfigModal";
 import { Store } from "@prisma/client";
@@ -26,7 +26,7 @@ interface TiendasContentProps {
 export default function TiendasContent({ stores }: TiendasContentProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedStore, setSelectedStore] = useState<StoreWithAdmin | null>(null);
+  const [selectedStore] = useState<StoreWithAdmin | null>(null);
   const [filter, setFilter] = useState<"all" | "active" | "inactive">("all");
 
   const filteredStores = stores.filter((store) => {

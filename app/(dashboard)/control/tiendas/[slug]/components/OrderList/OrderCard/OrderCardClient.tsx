@@ -6,6 +6,7 @@ import { formatDateTime } from "@/app/utils/dates";
 import { OrderCollab } from "./OrderCollab";
 import { OrderDetailModal } from "./OrderDetailModal/ModalContent";
 import { useOrderStore } from "@/app/zustand/orderStore";
+import { useUserStore } from "@/app/zustand/userStore";
 import { OrderInStore } from "@/shared/types/store";
 
 interface Collaborator {
@@ -19,7 +20,6 @@ interface Collaborator {
 
 type OrderCardClientProps = {
   order: OrderInStore;
-  isAdminSupremo: boolean;
   storeSlug: string;
   availableCollaborators: Collaborator[];
   withPrices: boolean;
@@ -29,7 +29,6 @@ type OrderCardClientProps = {
 
 export function OrderCardClient({
   order,
-  isAdminSupremo,
   storeSlug,
   availableCollaborators,
   withPrices,
@@ -38,6 +37,7 @@ export function OrderCardClient({
 }: OrderCardClientProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { order: mockProducts } = useOrderStore();
+  const isAdminSupremo = useUserStore((state) => state.isAdminSupremo);
 
   const handleClick = () => {
     setIsModalOpen(true);

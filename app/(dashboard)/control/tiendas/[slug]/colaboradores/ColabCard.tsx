@@ -4,10 +4,16 @@ import { Badge } from "@/components/ui/badge";
 import { Pencil, NotepadText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Branch } from "@/shared/types/collaborator";
-import { Collaborator } from "@prisma/client";
 import Link from "next/link";
 
-interface ColabCardProps extends Collaborator {
+interface ColabCardProps {
+  id: number;
+  assignmentId: number;
+  firstName: string;
+  lastName: string;
+  code: string | null;
+  image: string | null;
+  isActive: boolean;
   branches: Branch[];
   onEditClick?: () => void;
 }
@@ -72,7 +78,7 @@ export const ColabCard = ({ onEditClick, ...collaborator }: ColabCardProps) => {
             </Button>
           )}
           <Link
-            href={`./ordenes?status=PENDIENTE&collaboratorId=${collaborator.collaboratorId}`}
+            href={`./ordenes?status=PENDIENTE&collaboratorId=${collaborator.id}`}
           >
             <Button className="w-full mt-3">
               <NotepadText className="h-4 w-4" />

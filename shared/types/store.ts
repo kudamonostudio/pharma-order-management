@@ -1,9 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Collaborator, CollaboratorAssignment, MessageType, OrderStatus } from "@prisma/client";
+import { CollaboratorAssignment, MessageType, OrderStatus } from "@prisma/client";
 import { OrderHistoryItem } from "./order";
 
+export interface CollaboratorBasicForAssignment {
+  id: number;
+  firstName: string;
+  lastName: string;
+  image: string | null;
+  email?: string | null;
+}
+
 export interface AssignmentWithCollaborator extends CollaboratorAssignment {
-  collaborator: Collaborator;
+  collaborator: CollaboratorBasicForAssignment;
 }
 
 export interface LocationWithCollaborators extends Location {
@@ -51,11 +59,20 @@ export interface StoreWithOrdersResponse {
   ordersStats: StoreOrdersStats;
 }
 
+export interface OrderItem {
+  id: string;
+  name: string;
+  quantity: number;
+  price?: number;
+  image?: string;
+  imageUrl?: string;
+}
+
 export interface OrderInStore {
   id: number;
   code: string | null;
   status: OrderStatus;
-  items: any; // JSON
+  items: OrderItem[];
   totalAmount: number;
   currency: string;
   createdAt: Date;

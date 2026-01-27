@@ -61,7 +61,7 @@ export default function ColaboradoresContent({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4">
           {collaborators.map((collab) => (
             <ColabCard 
-              key={collab.collaboratorId} 
+              key={collab.id} 
               {...collab} 
               onEditClick={() => handleEditClick(collab)}
             />

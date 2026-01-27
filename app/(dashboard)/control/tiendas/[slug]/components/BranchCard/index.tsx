@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { AssignmentWithCollaborator } from "@/shared/types/store";
 import { Store, Location } from "@prisma/client";
 import { ArrowRight, Settings } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 // interface Collaborator {
@@ -35,10 +36,12 @@ function index({ branch, store, onEdit }: BranchCardProps) {
     >
       <div className="flex flex-row gap-4 justify-center">
         {store.logo ? (
-          <img
+          <Image
             src={store.logo}
             alt={store.name}
             className="w-12 h-12 xl:w-16 xl:h-16 rounded-full object-cover"
+            width={48}
+            height={48}
           />
         ) : (
           <LogoPlaceholder
@@ -78,10 +81,11 @@ function index({ branch, store, onEdit }: BranchCardProps) {
           href={`/control/tiendas/${store.slug}/sucursales/${branch.id}`}
           className="w-full"
         >
-          <Button className="w-full flex items-center justify-center rounded-xl">
+          {/* Queda comentado ya que no hay una pagina de sucursal, se deja comentado para funciones que puedan ser implementadas en el futuro */}
+          {/* <Button className="w-full flex items-center justify-center rounded-xl">
             Ir a la sucursal
             <ArrowRight className="w-4 h-4" />
-          </Button>
+          </Button> */}
         </Link>
       </div>
     </Card>

@@ -65,7 +65,7 @@ export function OrdersFilters({
   currentCollaboratorId,
   currentLocationId,
   canAccessBranchFilter,
-  onStatusChange,
+  /* onStatusChange, */
 }: OrdersFiltersProps) {
   const ALL_OPTION_VALUE = "ALL";
   const router = useRouter();

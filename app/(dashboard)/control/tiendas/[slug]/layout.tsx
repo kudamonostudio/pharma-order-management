@@ -19,9 +19,9 @@ export default async function StoreLayout({
   // Authentication check
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
-  const {
+/*   const {
     data: { user },
-  } = await supabase.auth.getUser();
+  } = await supabase.auth.getUser(); */
 
   if (error || !data?.claims) {
     redirect("/auth/login");

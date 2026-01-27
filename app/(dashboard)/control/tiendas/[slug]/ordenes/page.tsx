@@ -3,6 +3,7 @@ import { getCollaboratorsByStore } from "@/app/actions/Collaborators";
 import { getCurrentProfile } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
 import { OrdersPageContent } from "./components/OrdersPageContent";
+import { OrderStatus } from "@prisma/client";
 
 interface OrdenesPageProps {
   params: Promise<{ slug: string }>;
@@ -35,7 +36,7 @@ export default async function OrdenesPage({
   }
 
   const response = await getStoreWithOrders(slug, {
-    status: normalizedStatus as any,
+    status: normalizedStatus as OrderStatus[] | undefined,
     collaboratorId: collaboratorId ? Number(collaboratorId) : undefined,
     locationId: effectiveLocationId,
     ordersLimit: 50,
@@ -50,7 +51,6 @@ export default async function OrdenesPage({
 
   // Get store locations for branch filtering (only fetch if user has permission)
   const canAccessBranchFilter = currentProfile?.role === 'ADMIN_SUPREMO' || currentProfile?.role === 'TIENDA_ADMIN';
-  const isAdminSupremo = currentProfile?.role === 'ADMIN_SUPREMO';
   
   const storeLocations = canAccessBranchFilter ? store.locations || [] : [];
 
@@ -74,7 +74,6 @@ export default async function OrdenesPage({
         availableCollaborators={availableCollaborators}
         availableLocations={storeLocations}
         withPrices={store.withPrices}
-        isAdminSupremo={isAdminSupremo}
         canAccessBranchFilter={canAccessBranchFilter}
         currentStatus={status}
         currentCollaboratorId={collaboratorId}

@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Ellipsis } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface ShowAvatarsProps {
   items: {
@@ -39,10 +40,12 @@ export function ShowAvatars({ items, max = 3, className, type = "user" }: ShowAv
           >
             {isPlaceholder ? (
               <div className="w-full h-full flex items-center justify-center">
-                <img
+                <Image
                   src={imageSrc}
                   alt="Avatar"
                   className="w-1/2 h-1/2 object-contain"
+                  width={128}
+                  height={128}
                 />
               </div>
             ) : (

@@ -24,7 +24,7 @@ export default async function StorePage({
     redirect("/supremo");
   }
 
-  const { store, ordersPagination, ordersStats } = response;
+  const { store, /* ordersPagination, */ ordersStats } = response;
 
   const pendingOrdersCount = ordersStats?.pending ?? 0;
   const completedThisMonthCount = ordersStats?.completedThisMonth ?? 0;

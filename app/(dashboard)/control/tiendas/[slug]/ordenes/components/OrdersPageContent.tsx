@@ -26,7 +26,6 @@ interface OrdersPageContentProps {
   availableCollaborators: Collaborator[];
   availableLocations: LocationOption[];
   withPrices: boolean;
-  isAdminSupremo: boolean;
   canAccessBranchFilter: boolean;
   currentStatus?: string;
   currentCollaboratorId?: string;
@@ -39,7 +38,6 @@ export function OrdersPageContent({
   availableCollaborators,
   availableLocations,
   withPrices,
-  isAdminSupremo,
   canAccessBranchFilter,
   currentStatus,
   currentCollaboratorId,
@@ -100,7 +98,6 @@ export function OrdersPageContent({
             storeSlug={storeSlug}
             availableCollaborators={availableCollaborators}
             withPrices={withPrices}
-            isAdminSupremo={isAdminSupremo}
             onStatusFilterChange={handleStatusFilterChange}
           />
         ) : (

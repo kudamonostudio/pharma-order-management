@@ -13,8 +13,10 @@ export async function createCollaborator(formData: FormData) {
   const locationId = toNumberOrNull(formData.get("locationId"));
   const code = formData.get("code") as string | null;
 
-  if (!storeId || !firstName  || !lastName || !locationId) {
-    throw new Error("Campos requeridos faltantes: storeId, firstName, lastName o locationId");
+  if (!storeId || !firstName || !lastName || !locationId) {
+    throw new Error(
+      "Campos requeridos faltantes: storeId, firstName, lastName o locationId",
+    );
   }
 
   const collaborator = await prisma.collaborator.create({
@@ -52,7 +54,7 @@ export async function updateCollaborator(
     image?: string;
     code?: string | null;
   },
-  storeSlug?: string
+  storeSlug?: string,
 ) {
   await prisma.collaborator.update({
     where: { id: collaboratorId },
@@ -83,11 +85,11 @@ export async function deleteCollaborator(id: number, storeSlug: string) {
 export async function toggleCollaboratorActive(
   collaboratorId: number,
   isActive: boolean,
-  storeSlug: string
+  storeSlug: string,
 ) {
   await prisma.collaborator.update({
     where: {
-      id: collaboratorId
+      id: collaboratorId,
     },
     data: { isActive },
   });
@@ -96,7 +98,10 @@ export async function toggleCollaboratorActive(
 }
 
 // Obtener colaboradores de una tienda
-export async function getCollaboratorsByStore(storeId: number, locationId?: number) {
+export async function getCollaboratorsByStore(
+  storeId: number,
+  locationId?: number,
+) {
   const collaboratorAssignments = await prisma.collaboratorAssignment.findMany({
     where: {
       storeId,
@@ -134,7 +139,8 @@ export async function getCollaboratorsByStore(storeId: number, locationId?: numb
 
     if (!map.has(key)) {
       map.set(key, {
-        collaboratorId: c.collaborator.id,
+        id: c.collaborator.id,
+        assignmentId: c.id,
         firstName: c.collaborator.firstName ?? "Sin nombre",
         lastName: c.collaborator.lastName ?? "Sin apellidos",
         code: c.collaborator.code,
@@ -189,15 +195,8 @@ export async function updateCollaboratorLocations(
   collaboratorId: number,
   activeLocationIds: number[],
   storeId: number,
-  storeSlug: string
+  storeSlug: string,
 ) {
-  console.log("updateCollaboratorLocations called with:", {
-    collaboratorId,
-    activeLocationIds,
-    storeId,
-    storeSlug
-  });
-
   if (!collaboratorId || !storeId) {
     throw new Error("updateCollaboratorLocations: missing required parameters");
   }
@@ -211,10 +210,7 @@ export async function updateCollaboratorLocations(
     select: { id: true, locationId: true, isActive: true },
   });
 
-  console.log("existingAssignments:", existingAssignments);
-
   const activeSet = new Set(activeLocationIds);
-  console.log("activeSet:", activeSet);
 
   const updatesToActivate: number[] = [];
   const updatesToDeactivate: number[] = [];

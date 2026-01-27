@@ -26,11 +26,11 @@ interface Collaborator {
   branches: Branch[];
 }
 
-interface SimpleCollaborator {
+/* interface SimpleCollaborator {
   id: string;
   name: string | null;
   imageUrl: string | null;
-}
+} */
 
 interface AssignCollaboratorsModalProps {
   open: boolean;

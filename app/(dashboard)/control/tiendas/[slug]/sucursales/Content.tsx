@@ -9,8 +9,8 @@ import { AssignmentWithCollaborator } from "@/shared/types/store";
 import { Branch } from "@/shared/types/collaborator";
 
 interface StoreCollaborator {
+  id: number;
   assignmentId: number;
-  collaboratorId: number;
   firstName: string;
   lastName: string;
   image: string | null;
@@ -48,7 +48,7 @@ export default function SucursalesContent({
 
   // Convertir allCollaborators al formato esperado por el modal (con todos los campos)
   const collaboratorsForModal = allCollaborators.map((c) => ({
-    collaboratorId: c.collaboratorId,
+    collaboratorId: c.id,
     firstName: c.firstName,
     lastName: c.lastName,
     image: c.image,

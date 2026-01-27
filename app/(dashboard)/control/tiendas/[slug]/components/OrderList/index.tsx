@@ -19,7 +19,6 @@ interface OrderListProps {
   storeSlug: string;
   availableCollaborators: Collaborator[];
   withPrices: boolean;
-  isAdminSupremo: boolean;
   onStatusFilterChange?: (newStatuses: string[]) => void;
 }
 
@@ -28,7 +27,6 @@ export function OrderList({
   storeSlug,
   availableCollaborators,
   withPrices,
-  isAdminSupremo,
   onStatusFilterChange,
 }: OrderListProps) {
   const [localOrders, setLocalOrders] = useState<OrderInStore[]>(orders);
@@ -92,7 +90,6 @@ export function OrderList({
           storeSlug={storeSlug}
           availableCollaborators={availableCollaborators}
           withPrices={withPrices}
-          isAdminSupremo={isAdminSupremo}
           onOrderUpdated={handleOrderUpdated}
           onCollaboratorAssigned={handleCollaboratorAssigned}
         />

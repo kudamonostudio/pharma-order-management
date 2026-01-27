@@ -17,6 +17,7 @@ import { createProduct, updateProductImage } from "@/app/actions/Products";
 import { Textarea } from "@/components/ui/text-area";
 import { useDropzone } from "react-dropzone";
 import { uploadProductImage } from "@/lib/supabase/client/uploadImage";
+import Image from "next/image";
 
 interface CreateProductModalProps {
   storeId: number;
@@ -151,10 +152,12 @@ export function CreateProductModal({
               <input {...getInputProps()} />
               {productImage ? (
                 previewUrl && (
-                  <img
+                  <Image
                     src={previewUrl}
                     alt="Vista previa"
                     className="mx-auto h-32 w-32 object-cover rounded-md"
+                    width={128}
+                    height={128}
                   />
                 )
               ) : isDragActive ? (

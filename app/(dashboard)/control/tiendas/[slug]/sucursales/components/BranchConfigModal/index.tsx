@@ -19,7 +19,7 @@ import { DeleteBranchModal } from "./DeleteBranchModal";
 import { AssignCollaboratorsModal } from "./AssignCollaboratorsModal";
 import { AssignmentWithCollaborator } from "@/shared/types/store";
 import { Branch } from "@/shared/types/collaborator";
-import { useUserStore } from "@/app/zustand/userStore";
+/* import { useUserStore } from "@/app/zustand/userStore"; */
 
 interface Collaborator {
   collaboratorId: number;
@@ -30,11 +30,11 @@ interface Collaborator {
   branches: Branch[];
 }
 
-interface SimpleCollaborator {
+/* interface SimpleCollaborator {
   id: string;
   name: string | null;
   imageUrl: string | null;
-}
+} */
 
 interface LocationWithCollaborators extends Location {
   collaboratorAssignments: AssignmentWithCollaborator[];

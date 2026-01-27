@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { createStore, updateLogo } from "@/app/actions/Store";
 import { useRouter } from "next/navigation";
 import { uploadStoreLogo } from "@/lib/supabase/client/uploadImage";
+import Image from "next/image";
 
 interface CreateStoreModalProps {
   open: boolean;
@@ -174,10 +175,12 @@ export function CreateStoreModal({
               <input {...getInputProps()} />
               {logoFile ? (
                 previewUrl && (
-                  <img
+                  <Image
                     src={previewUrl}
                     alt="Vista previa"
                     className="mx-auto h-32 w-32 object-cover rounded-md"
+                    width={128}
+                    height={128}
                   />
                 )
               ) : isDragActive ? (

@@ -15,7 +15,6 @@ type OrderCardProps = {
   storeSlug: string;
   availableCollaborators: Collaborator[];
   withPrices: boolean;
-  isAdminSupremo: boolean;
   onOrderUpdated?: (orderId: number, newStatus: string) => void;
   onCollaboratorAssigned?: (orderId: number, collaboratorId: number) => void;
 };
@@ -25,14 +24,12 @@ export const OrderCard = ({
   storeSlug,
   availableCollaborators,
   withPrices,
-  isAdminSupremo,
   onOrderUpdated,
   onCollaboratorAssigned,
 }: OrderCardProps) => {
   return (
     <OrderCardClient
       order={order}
-      isAdminSupremo={isAdminSupremo}
       storeSlug={storeSlug}
       availableCollaborators={availableCollaborators}
       withPrices={withPrices}

@@ -42,8 +42,8 @@ interface Props {
 export default function ConfirmOrderModalContent({
   open,
   onOpenChange,
-  storeId,
-  storeName,
+  /* storeId,
+  storeName, */
   storeLogo,
   locations,
   storeSlug,

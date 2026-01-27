@@ -23,6 +23,7 @@ import { Store } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { uploadStoreLogo } from "@/lib/supabase/client/uploadImage";
 import { useUserStore } from "@/app/zustand/userStore";
+import Image from "next/image";
 
 type StoreWithAdmin = Store & {
   profile?: { email: string | null }[];
@@ -267,17 +268,21 @@ export function StoreConfigModal({
                   <input {...getInputProps()} />
                   {logoFile ? (
                     previewUrl && (
-                      <img
+                      <Image
                         src={previewUrl}
                         alt="Vista previa"
                         className="mx-auto h-32 w-32 object-cover rounded-md"
+                        width={128}
+                        height={128}
                       />
                     )
                   ) : store.logo ? (
-                    <img
+                    <Image
                       src={store.logo}
                       alt="Logo actual"
                       className="mx-auto h-32 w-32 object-cover rounded-md"
+                      width={128}
+                      height={128}
                     />
                   ) : isDragActive ? (
                     <p>Suelta la imagen aquí…</p>

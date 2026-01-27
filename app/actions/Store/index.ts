@@ -9,6 +9,7 @@ import { Role, Store, OrderStatus } from "@prisma/client";
 import {
   StoreWithOrdersParams,
   StoreWithOrdersResponse,
+  OrderInStore,
 } from "@/shared/types/store";
 import { LIMIT_PER_PAGE } from "@/lib/constants";
 import { supabaseAdmin } from "@/lib/supabase/admin";
@@ -357,9 +358,9 @@ export async function getStoreWithOrders(
   const enrichedOrders = orders.map(order => ({
     ...order,
     items: Array.isArray(order.items)
-      ? order.items.map((item: any) => ({
+      ? (order.items as Record<string, unknown>[]).map((item) => ({
           ...item,
-          price: priceMap.get(item.productId) || null,
+          price: priceMap.get(item.productId as number) || null,
         }))
       : order.items,
   }));
@@ -367,7 +368,7 @@ export async function getStoreWithOrders(
   return {
     store: {
       ...store,
-      orders: enrichedOrders,
+      orders: enrichedOrders as unknown as OrderInStore[],
     },
     ordersPagination: {
       total: totalOrders,

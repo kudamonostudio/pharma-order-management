@@ -10,8 +10,8 @@ export default async function ProtectedLayout({
   // Authentication check
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
-  const { data: { user } } = await supabase.auth.getUser();
-  
+  /*   const { data: { user } } = await supabase.auth.getUser();
+   */
   if (error || !data?.claims) {
     redirect("/login");
   }
@@ -26,10 +26,6 @@ export default async function ProtectedLayout({
   if (!profile) {
     redirect("/login");
   }
-  
-  return (
-    <main className="min-h-screen flex flex-col w-full">
-      {children}
-    </main>
-  );
+
+  return <main className="min-h-screen flex flex-col w-full">{children}</main>;
 }

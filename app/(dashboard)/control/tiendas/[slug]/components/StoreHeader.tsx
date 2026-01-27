@@ -5,6 +5,7 @@ import { StoreHeaderActions } from "./StoreHeaderActions";
 import { getCurrentProfile } from "@/lib/auth/session";
 import HasPricesButton from "@/app/(dashboard)/components/HasPricesButton";
 import { LinkToPublicStore } from "./LinkToPublicStore";
+import Image from "next/image";
 
 interface StoreHeaderProps {
   store: Store;
@@ -20,10 +21,12 @@ export async function StoreHeader({ store }: StoreHeaderProps) {
     <div className="flex justify-between py-4 gap-2">
       <div className="flex items-center gap-4">
         {store.logo ? (
-          <img
+          <Image
             src={store.logo}
             alt={store.name}
             className="w-20 h-20 rounded-full object-cover"
+            width={80}
+            height={80}
           />
         ) : (
           <LogoPlaceholder variant="store" isActive={store.isActive} />
