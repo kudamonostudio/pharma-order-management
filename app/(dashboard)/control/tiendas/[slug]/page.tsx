@@ -32,7 +32,7 @@ export default async function StorePage({
   // Obtener colaboradores de la tienda
   const collaboratorsData = await getCollaboratorsByStore(store.id);
   const availableCollaborators = collaboratorsData.map((c) => ({
-    id: c.collaboratorId,
+    id: c.id,
     firstName: c.firstName,
     lastName: c.lastName,
     code: c.code,
