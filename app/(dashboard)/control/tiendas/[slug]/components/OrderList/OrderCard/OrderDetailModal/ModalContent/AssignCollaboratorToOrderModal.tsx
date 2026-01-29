@@ -193,7 +193,7 @@ export function AssignCollaboratorToOrderModal({
             </Button>
             <Button
               onClick={handleConfirmClick}
-              disabled={isLoading || !selectedId}
+              disabled={isLoading || selectedId === null}
             >
               Continuar
             </Button>
