@@ -25,8 +25,8 @@ export const MessageList = ({
 
   return (
     <div className="flex flex-col gap-1">
-      {filteredMessages.map((message) => (
-        <MessageCard key={message.id} message={message} />
+      {filteredMessages.map((message, index) => (
+        <MessageCard key={message.id} message={message} index={index} />
       ))}
     </div>
   );

@@ -263,7 +263,7 @@ export async function getStoreWithOrders(
               },
             },
             orderBy: {
-              createdAt: "asc",
+              createdAt: "desc",
             },
           },
           orderHistories: {

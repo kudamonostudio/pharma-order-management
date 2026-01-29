@@ -2,7 +2,13 @@ import { formatDateTime } from "@/app/utils/dates";
 import { MessageBasic } from "@/shared/types/store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-export const MessageCard = ({ message }: { message: MessageBasic }) => {
+export const MessageCard = ({
+  message,
+  index,
+}: {
+  message: MessageBasic;
+  index: number;
+}) => {
   const collaborator = message.collaborator;
   const initials = collaborator
     ? `${collaborator.firstName?.charAt(0) ?? ""}${
@@ -14,7 +20,9 @@ export const MessageCard = ({ message }: { message: MessageBasic }) => {
     : "Usuario desconocido";
 
   return (
-    <div className="flex gap-3 p-3 border-emerald-500/30 w-fit bg-emerald-100 border rounded-sm">
+    <div
+      className={`flex gap-3 p-3  ${index === 0 ? "border-emerald-500/30 w-fit bg-emerald-100 border rounded-sm" : "border-gray-300/30 w-fit bg-gray-50 border rounded-sm"}`}
+    >
       <Avatar className="w-10 h-10 shrink-0">
         {collaborator?.image && (
           <AvatarImage
