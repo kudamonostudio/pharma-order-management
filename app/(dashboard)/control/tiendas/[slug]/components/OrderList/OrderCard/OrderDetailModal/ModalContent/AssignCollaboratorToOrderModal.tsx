@@ -106,7 +106,7 @@ export function AssignCollaboratorToOrderModal({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-125">
           <DialogHeader>
             <DialogTitle>Asignar Colaborador</DialogTitle>
             <DialogDescription>
@@ -115,7 +115,7 @@ export function AssignCollaboratorToOrderModal({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="py-4 max-h-[400px] overflow-y-auto">
+          <div className="py-4 max-h-100 overflow-y-auto">
             {filteredCollaborators.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">
                 No hay colaboradores disponibles para esta sucursal.

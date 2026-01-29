@@ -6,6 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Send } from "lucide-react";
 import { MessageType } from "@prisma/client";
 import { ConfirmCollaboratorCodeModal } from "../ConfirmCollaboratorCodeModal";
+import { createOrderMessage } from "./actions";
+import { useRouter } from "next/navigation";
 
 interface Collaborator {
   id: number;
@@ -18,15 +20,10 @@ interface MessageInputProps {
   orderId: number;
   messageType: MessageType;
   availableCollaborators: Collaborator[];
-  onMessageSent?: (messageData: {
-    message: string;
-    orderId: number;
-    collaboratorId: number;
-    type: MessageType;
-  }) => Promise<void>;
 }
 
-const MessageInput = ({ orderId, messageType, availableCollaborators, onMessageSent }: MessageInputProps) => {
+const MessageInput = ({ orderId, messageType, availableCollaborators }: MessageInputProps) => {
+  const router = useRouter();
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showCodeModal, setShowCodeModal] = useState(false);
@@ -46,21 +43,24 @@ const MessageInput = ({ orderId, messageType, availableCollaborators, onMessageS
     setIsLoading(true);
     
     try {
-      // Notify parent component to handle message creation
-      await onMessageSent?.({
-        message: pendingMessage,
+      await createOrderMessage(
         orderId,
-        collaboratorId: confirmedByCollaboratorId,
-        type: messageType,
-      });
+        confirmedByCollaboratorId,
+        pendingMessage,
+        messageType
+      );
       
       // Clear input and pending message after successful send
       setMessage("");
       setPendingMessage("");
       setShowCodeModal(false);
       
+      // Refresh to update messages (same pattern as UpdateOrderStatusModal)
+      router.refresh();
+      
     } catch (error) {
       console.error("Error sending message:", error);
+      throw error;
     } finally {
       setIsLoading(false);
     }

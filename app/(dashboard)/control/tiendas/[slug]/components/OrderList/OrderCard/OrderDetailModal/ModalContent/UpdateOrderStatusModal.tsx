@@ -120,7 +120,7 @@ export function UpdateOrderStatusModal({
   return (
     <>
       <Dialog open={open} onOpenChange={handleDialogOpenChange}>
-        <DialogContent className="sm:max-w-[500px]">
+        <DialogContent className="sm:max-w-125">
           <DialogHeader>
             <DialogTitle>Actualizar estado</DialogTitle>
             <DialogDescription>
@@ -129,7 +129,7 @@ export function UpdateOrderStatusModal({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="py-4 max-h-[400px] overflow-y-auto space-y-2">
+          <div className="py-4 max-h-100 overflow-y-auto space-y-2">
             {STATUS_OPTIONS.map((status) => {
               const isSelected = selectedStatus === status;
               const colorClasses = ORDER_STATUS_COLORS[status];

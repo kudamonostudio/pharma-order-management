@@ -81,7 +81,7 @@ export function ConfirmCollaboratorCodeModal({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[400px]">
+      <DialogContent className="sm:max-w-100">
         <DialogHeader>
           <DialogTitle>Confirmar asignación</DialogTitle>
           <DialogDescription className="text-base text-foreground font-medium pt-2">

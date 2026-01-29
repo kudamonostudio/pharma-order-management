@@ -20,9 +20,6 @@ import { UpdateOrderStatusModal } from "./UpdateOrderStatusModal";
 import { HistoryEventCard } from "./history/HistoryEventCard";
 import { OrderHistoryList } from "./history/OrderHistoryList";
 import MessageInput from "./Messages/MessageInput";
-import { createOrderMessage } from "./Messages/actions";
-import { MessageType } from "@prisma/client";
-import { MessageBasic } from "@/shared/types/store";
 import { LinkToOrder } from "../../../../../colaboradores/LinkToOrder";
 import Image from "next/image";
 import Link from "next/link";
@@ -64,46 +61,8 @@ export function OrderDetailModalContent({
     useState<ModalControlValue>("products");
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isUpdateStatusModalOpen, setIsUpdateStatusModalOpen] = useState(false);
-  const [messages, setMessages] = useState<MessageBasic[]>(
-    order.messages || []
-  );
   const statusColor = getOrderStatusColor(order.status as OrderStatusType);
   const collaborator = order.collaborator;
-
-  const handleMessageSent = async (messageData: {
-    message: string;
-    orderId: number;
-    collaboratorId: number;
-    type: MessageType;
-  }) => {
-    try {
-      const newMessage = await createOrderMessage(
-        messageData.orderId,
-        messageData.collaboratorId,
-        messageData.message,
-        messageData.type
-      );
-
-      // Convert OrderMessageResponse to MessageBasic format and add to the list
-      const messageBasic: MessageBasic = {
-        id: newMessage.id,
-        type: newMessage.type,
-        message: newMessage.message,
-        createdAt: newMessage.createdAt,
-        collaborator: {
-          id: newMessage.collaborator.id,
-          firstName: newMessage.collaborator.firstName,
-          lastName: newMessage.collaborator.lastName,
-          image: newMessage.collaborator.image,
-        },
-      };
-
-      // Add new message to the list (prepend since messages are sorted by newest first)
-      setMessages((prevMessages) => [messageBasic, ...prevMessages]);
-    } catch (error) {
-      console.error("Error creating message:", error);
-    }
-  };
 
   return (
     <div className="flex flex-col ">
@@ -216,12 +175,12 @@ export function OrderDetailModalContent({
         <div
           className={controlValue === "internal-messages" ? "block" : "hidden"}
         >
-          <MessageList messages={messages} type="INTERN" />
+          <MessageList messages={order.messages ?? []} type="INTERN" />
         </div>
         <div
           className={controlValue === "client-messages" ? "block" : "hidden"}
         >
-          <MessageList messages={messages} type="TO_CLIENT" />
+          <MessageList messages={order.messages ?? []} type="TO_CLIENT" />
         </div>
         <div className={controlValue === "history" ? "block" : "hidden"}>
           <div className="flex flex-col gap-2">
@@ -284,7 +243,6 @@ export function OrderDetailModalContent({
               controlValue === "internal-messages" ? "INTERN" : "TO_CLIENT"
             }
             availableCollaborators={availableCollaborators}
-            onMessageSent={handleMessageSent}
           />
         </div>
       )}
