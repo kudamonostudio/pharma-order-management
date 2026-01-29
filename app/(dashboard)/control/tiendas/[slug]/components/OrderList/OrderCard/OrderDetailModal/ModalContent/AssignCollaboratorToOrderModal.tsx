@@ -63,12 +63,12 @@ export function AssignCollaboratorToOrderModal({
   };
 
   const handleConfirmClick = () => {
-    if (!selectedId) return;
+    if (selectedId === null) return;
     setShowCodeModal(true);
   };
 
   const handleCodeConfirmed = async (confirmedByCollaboratorId: number) => {
-    if (!selectedId) return;
+    if (selectedId === null) return;
 
     setIsLoading(true);
     try {
@@ -99,7 +99,7 @@ export function AssignCollaboratorToOrderModal({
     ? availableCollaborators
     : availableCollaborators;
 
-  const selectedCollaborator = selectedId
+  const selectedCollaborator = selectedId !== null
     ? availableCollaborators.find((c) => c.id === selectedId)
     : null;
 
