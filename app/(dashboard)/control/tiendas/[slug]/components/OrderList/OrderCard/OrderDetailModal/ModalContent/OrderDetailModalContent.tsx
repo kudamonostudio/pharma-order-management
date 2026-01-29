@@ -173,12 +173,12 @@ export function OrderDetailModalContent({
           />
         )}
         <div
-          className={controlValue === "internal-messages" ? "block" : "hidden"}
+          className={controlValue === "internal-messages" ? "block mb-16" : "hidden"}
         >
           <MessageList messages={order.messages ?? []} type="INTERN" />
         </div>
         <div
-          className={controlValue === "client-messages" ? "block" : "hidden"}
+          className={controlValue === "client-messages" ? "block mb-16" : "hidden"}
         >
           <MessageList messages={order.messages ?? []} type="TO_CLIENT" />
         </div>
