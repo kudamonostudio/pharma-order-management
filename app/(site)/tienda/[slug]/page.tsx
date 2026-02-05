@@ -6,6 +6,7 @@ import StoreLogo from "./components/StoreLogo";
 import StoreContainer from "./components/StoreContainer";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
+import SearchOrder from "./components/SearchOrder";
 
 interface PageProps {
   params: Promise<{
@@ -84,6 +85,7 @@ const Page = async ({ params }: PageProps) => {
           {store.name}
         </h1>
       </div>
+      <SearchOrder />
       <ProductList products={products} withPrices={store.withPrices} />
       <ProductListFooter 
         storeId={store.id} 

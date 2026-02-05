@@ -19,6 +19,7 @@ import SelectedProductsTotal from "../SelectedProductsTotal";
 import { StoreLocation } from "@/app/types/store";
 import { createOrder } from "@/app/actions/Orders";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 const formSchema = z.object({
   fullName: z.string().min(3, "Mínimo 3 caracteres"),
@@ -141,12 +142,10 @@ export default function ConfirmOrderModalContent({
       // Guardar datos del cliente en localStorage
       localStorage.setItem("customerFullName", data.fullName);
       localStorage.setItem("customerPhone", data.phone);
+      localStorage.setItem("lastOrderInThisDevice", createdOrderId.toString());
 
       // Limpiar la orden
       clearOrder();
-
-      // Cerrar el modal
-      handleOpenChange(false);
 
       // Redirigir a la orden
       router.push(`./${storeSlug}/orden/${createdOrderId}`);
@@ -154,14 +153,12 @@ export default function ConfirmOrderModalContent({
     } catch (error) {
       console.error("Error al crear la orden:", error);
       // Aquí podrías mostrar un toast o mensaje de error
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="w-full md:min-w-4xl max-w-4xl h-screen rounded-none flex flex-col p-0">
+      <DialogContent className="w-full md:min-w-4xl max-w-4xl h-screen rounded-none flex flex-col p-0 border-none">
         <div className="px-6 pt-6 pb-4">
           <DialogHeader>
             <div className="flex gap-6 items-center mb-2">
@@ -214,6 +211,18 @@ export default function ConfirmOrderModalContent({
           onBack={handleBack}
           isSubmitting={isSubmitting}
         />
+
+        {isSubmitting && (
+          <div className="absolute inset-0 bg-teal-600/80 flex flex-col items-center justify-center z-50">
+            <Loader2 className="h-12 w-12 animate-spin text-white mb-4" />
+            <p className="text-3xl font-semibold text-white">
+              Creando orden...
+            </p>
+            <p className="text-lg text-white/90 mt-2">
+              Aguarda unos momentos por favor...
+            </p>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );
