@@ -5,6 +5,7 @@ import {
   GetOrdersByStoreResponse,
   UpdateOrderStatusData,
   OrderHistoryItem,
+  UpdatePaymentMethodTypeData,
 } from "@/shared/types/order";
 import { Order, OrderStatus, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
@@ -157,6 +158,22 @@ export async function updateOrderStatus(data: UpdateOrderStatusData) {
   }
 
   return updatedOrder.id;
+}
+
+export async function updatePaymentMethod(data: UpdatePaymentMethodTypeData) {
+  const { id, paymentMethodType } = data;
+  const order = await prisma.order.findUnique({
+    where: { id },
+  });
+
+  if (!order) {
+    throw new Error("Orden no encontrada");
+  }
+
+  await prisma.order.update({
+    where: { id },
+    data: { paymentMethodType },
+  });
 }
 
 export async function getOrderHistory(

@@ -18,8 +18,12 @@ export async function createStore(formData: FormData) {
   const name = formData.get("name") as string;
   const address = formData.get("address") as string;
   const phone = formData.get("phone") as string | null;
-  const email = formData.get("email") as string | null;
+  const email = formData.get("email") as string;
   let slug = generateSlug(name);
+
+  if (!email) {
+    throw new Error("Email admin is required");
+  }
 
   const exists = await prisma.store.findUnique({
     where: { slug },
@@ -28,6 +32,14 @@ export async function createStore(formData: FormData) {
   if (exists) {
     const hash = crypto.randomBytes(3).toString("hex");
     slug = `${slug}-${hash}`;
+  }
+
+  const existsEmail = await prisma.profile.findUnique({
+    where: { email },
+  });
+
+  if(existsEmail) {
+    throw new Error("Email already exists for another store as an admin");
   }
 
   const store = await prisma.store.create({
@@ -241,6 +253,7 @@ export async function getStoreWithOrders(
           createdAt: true,
           fullname: true,
           phoneContact: true,
+          paymentMethodType: true,
           collaborator: {
             select: { id: true, firstName: true, lastName: true, image: true },
           },

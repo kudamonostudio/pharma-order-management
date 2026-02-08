@@ -6,6 +6,17 @@ export type OrderStatus =
   | "EN_PROCESO"
   | "LISTO_PARA_RETIRO";
 
+export type PaymentMethodType =
+  | "WITH_CARD"
+  | "WITH_CASH"
+  | "EITHER";
+
+export const paymentMethodOptions = [
+  { value: "WITH_CARD", label: "Tarjeta" },
+  { value: "WITH_CASH", label: "Efectivo" },
+  { value: "EITHER", label: "Cualquiera" },
+];
+
 // Order status display names
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   ENTREGADA: "Entregada",
@@ -33,3 +44,13 @@ export const getOrderStatusColor = (status: OrderStatus): string => {
 export const getOrderStatusLabel = (status: OrderStatus): string => {
   return ORDER_STATUS_LABELS[status] || status;
 };
+
+export function mapPaymentMethodLabel(
+  value?: string | null
+): string {
+  if (!value) return "—";
+
+  return (
+    paymentMethodOptions.find((opt) => opt.value === value)?.label ?? value
+  );
+}

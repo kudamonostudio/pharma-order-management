@@ -66,9 +66,7 @@ export function CreateStoreModal({
       formDataToSend.append("name", formData.name);
       formDataToSend.append("address", formData.address);
       formDataToSend.append("phone", formData.phone);
-      if(formData.email !== "") {
-        formDataToSend.append("email", formData.email);
-      }
+      formDataToSend.append("email", formData.email);
 
       const newStore = await createStore(formDataToSend);
 
@@ -154,7 +152,7 @@ export function CreateStoreModal({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Correo electrónico administrador</Label>
+            <Label htmlFor="email">Correo electrónico administrador *</Label>
             <Input
               id="email"
               placeholder="Ej: admin@tienda.com"
@@ -162,6 +160,7 @@ export function CreateStoreModal({
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
+              required
             />
           </div>
           {/* TODO: MOSTRAR IMAGEN SI YA TIENE UNA IMAGEN PARA PODER CAMBIARLA */}

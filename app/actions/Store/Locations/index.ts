@@ -10,10 +10,18 @@ export async function createLocation(formData: FormData) {
   const name = (formData.get("name") as string) || "";
   const address = (formData.get("address") as string) || "";
   const phone = (formData.get("phone") as string) || null;
-  const email = formData.get("email") as string | null;
+  const email = formData.get("email") as string;
 
-  if (!storeId || !name || !address) {
-    throw new Error(`createLocation: missing fields ${JSON.stringify({ storeId, name, address })}`);
+  if (!storeId || !name || !address || !email) {
+    throw new Error(`createLocation: missing fields ${JSON.stringify({ storeId, name, address, email })}`);
+  }
+
+  const existsEmail = await prisma.profile.findUnique({
+    where: { email },
+  });
+
+  if(existsEmail) {
+    throw new Error("Email already exists for another store as an admin");
   }
 
   const location = await prisma.location.create({

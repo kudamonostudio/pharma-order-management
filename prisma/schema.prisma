@@ -82,6 +82,7 @@ model Order {
   items          Json
   phoneContact   String
   totalAmount    Decimal        @db.Decimal(10, 2)
+  paymentMethodType           PaymentMethodType?
   orderHistories OrderHistory[]
   messages       Message[]
   collaborator   Collaborator?  @relation(fields: [collaboratorId], references: [id])
@@ -210,3 +211,8 @@ enum MessageType {
   TO_CLIENT
 }
 
+enum PaymentMethodType {
+  WITH_CARD
+  WITH_CASH
+  EITHER
+}
