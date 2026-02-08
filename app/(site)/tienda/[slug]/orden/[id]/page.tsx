@@ -52,6 +52,7 @@ const Page = async ({ params }: PageProps) => {
       status: true,
       createdAt: true,
       items: true,
+      paymentMethodType: true,
       location: {
         select: {
           id: true,
@@ -117,6 +118,7 @@ const Page = async ({ params }: PageProps) => {
   const orderForView = {
     id: dbOrder.id.toString(),
     status: dbOrder.status,
+    paymentMethodType: dbOrder.paymentMethodType,
     createdAt: dbOrder.createdAt,
     branch: {
       id: dbOrder.location?.id.toString() ?? "",

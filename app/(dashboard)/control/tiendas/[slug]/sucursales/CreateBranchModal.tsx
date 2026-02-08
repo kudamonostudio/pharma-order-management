@@ -75,11 +75,12 @@ export function CreateBranchModal({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Correo electrónico administrador</Label>
+            <Label htmlFor="email">Correo electrónico administrador *</Label>
             <Input
               id="email"
               name="email"
               placeholder="Ej: admin@sucursal.com"
+              required
             />
           </div>
           <div className="space-y-2">

@@ -6,8 +6,9 @@ import OrderStatus from "./OrderStatus";
 import { OrderTabControl, type OrderTabValue } from "./OrderTabControl";
 import { ClientMessageList } from "./ClientMessageList";
 import { Separator } from "@/components/ui/separator";
-import { type OrderStatus as OrderStatusType } from "@/app/(dashboard)/control/tiendas/[slug]/constants";
+import { mapPaymentMethodLabel, type OrderStatus as OrderStatusType } from "@/app/(dashboard)/control/tiendas/[slug]/constants";
 import { formatDateTime } from "@/app/utils/dates";
+import { PaymentMethodType } from "@/app/(dashboard)/control/tiendas/[slug]/constants";
 
 interface Message {
   id: number;
@@ -19,6 +20,7 @@ interface OrderDetailContentProps {
   order: {
     id: string;
     status: OrderStatusType | string;
+    paymentMethodType: PaymentMethodType | null;
     createdAt: Date;
     branch: { id: string; name: string };
   };
@@ -90,6 +92,14 @@ export function OrderDetailContent({
           <h1 className="text-xl font-normal text-gray-600">
             Detalles de la orden: #{order.id}
           </h1>
+          {
+            order.paymentMethodType && (
+              <h2 className="text-xl font-normal text-gray-600">
+                Método de pago: {mapPaymentMethodLabel(order.paymentMethodType)}
+              </h2>
+            )
+          }
+          
           <small>Creada el {formatDateTime(order.createdAt)}</small>
         </div>
         <div className="flex flex-col items-end">

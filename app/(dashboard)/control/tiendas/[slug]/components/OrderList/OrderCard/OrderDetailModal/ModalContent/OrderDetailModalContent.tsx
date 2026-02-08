@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PackageCheck, UserPen } from "lucide-react";
 import {
   type OrderStatus as OrderStatusType,
+  PaymentMethodType,
   getOrderStatusColor,
+  paymentMethodOptions,
 } from "@/app/(dashboard)/control/tiendas/[slug]/constants";
 import { OrderDetailModalProducts } from "../OrderDetailModalProducts";
 import OrderStatusModal from "./OrderStatusModal";
@@ -23,6 +25,14 @@ import MessageInput from "./Messages/MessageInput";
 import { LinkToOrder } from "../../../../../colaboradores/LinkToOrder";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { updatePaymentMethod } from "@/app/actions/Orders";
 
 interface AvailableCollaborator {
   id: number;
@@ -61,8 +71,36 @@ export function OrderDetailModalContent({
     useState<ModalControlValue>("products");
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [isUpdateStatusModalOpen, setIsUpdateStatusModalOpen] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState(
+    order.paymentMethodType ?? ""
+  );
+  const [loadingPayment, setLoadingPayment] = useState(false);
+
   const statusColor = getOrderStatusColor(order.status as OrderStatusType);
   const collaborator = order.collaborator;
+
+  const handlePaymentMethodChange = async (value: PaymentMethodType) => {
+  if (!value || value === paymentMethod) return;
+
+  try {
+    setLoadingPayment(true);
+    await updatePaymentMethod({
+      id: order.id,
+      paymentMethodType: value,
+    });
+    setPaymentMethod(value);
+  } catch (error) {
+    console.error(error);
+    alert("Error al actualizar el método de pago");
+  } finally {
+    setLoadingPayment(false);
+  }
+};
+
+  useEffect(() => {
+    setPaymentMethod(order.paymentMethodType ?? "");
+  }, [order.paymentMethodType]);
+
 
   return (
     <div className="flex flex-col ">
@@ -109,6 +147,26 @@ export function OrderDetailModalContent({
                 <p>{order.phoneContact}</p>
               </div>
               </Link>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <span>Método de pago:</span>
+
+              <Select
+                value={paymentMethod}
+                onValueChange={handlePaymentMethodChange}
+                disabled={loadingPayment}
+              >
+                <SelectTrigger className="w-[180px] h-8">
+                  <SelectValue placeholder="Seleccionar" />
+                </SelectTrigger>
+                <SelectContent>
+                  {paymentMethodOptions.map((opt) => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div className="flex flex-col items-end gap-6">

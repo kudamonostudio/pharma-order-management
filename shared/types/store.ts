@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CollaboratorAssignment, MessageType, OrderStatus } from "@prisma/client";
+import { CollaboratorAssignment, MessageType, OrderStatus, PaymentMethodType } from "@prisma/client";
 import { OrderHistoryItem } from "./order";
 
 export interface CollaboratorBasicForAssignment {
@@ -82,6 +82,7 @@ export interface OrderInStore {
   history?: OrderHistoryItem[];
   fullname: string;
   phoneContact: string;
+  paymentMethodType:  PaymentMethodType | null;
 }
 
 export interface CollaboratorBasic {

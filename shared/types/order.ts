@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { OrderStatus } from "@prisma/client";
+import { OrderStatus, PaymentMethodType } from "@prisma/client";
 
 export interface StoreOrder {
   id: number;
@@ -27,6 +27,11 @@ export interface UpdateOrderStatusData {
   status: OrderStatus,
   collaboratorId: number,
   prevCollaboratorId?: number,
+}
+
+export interface UpdatePaymentMethodTypeData {
+  id: number,
+  paymentMethodType: PaymentMethodType,
 }
 
 export interface OrderHistoryItem {
