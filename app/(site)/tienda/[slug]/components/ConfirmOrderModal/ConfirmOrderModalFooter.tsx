@@ -18,9 +18,9 @@ export default function ConfirmOrderModalFooter({
   return (
     <div className="border-t bg-background px-6 py-4 mt-auto">
       <div className="flex items-center justify-between">
-        <p className="text-muted-foreground">
+        <p className="text-muted-foreground text-sm md:text-base">
           {step === "products" ? (
-            "¿Están bien los productos elegidos? Si es así, da click en Siguiente."
+            "Si los productos elegidos son correctos, da click en Siguiente."
           ) : (
             <Button
               type="button"

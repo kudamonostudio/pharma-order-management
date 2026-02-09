@@ -5,7 +5,6 @@ import type React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { loginUnique } from "@/lib/auth/login";
@@ -27,7 +26,7 @@ export default function LoginForm() {
       try {
         const { profile, storeSlug, userProfile } = await loginUnique(
           email,
-          password
+          password,
         );
 
         // Guardar datos del usuario en el store
@@ -97,13 +96,13 @@ export default function LoginForm() {
       >
         {isPending ? "Iniciando sesión..." : "Iniciar sesión"}
       </Button>
-
-      <div className="mt-4 text-center text-sm">
+      {/* No es necesario registro al momento */}
+      {/*       <div className="mt-4 text-center text-sm">
         ¿No tienes una cuenta?{" "}
         <Link href="/auth/sign-up" className="underline underline-offset-4">
           Regístrate
         </Link>
-      </div>
+      </div> */}
     </form>
   );
 }

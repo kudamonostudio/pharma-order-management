@@ -27,11 +27,11 @@ function SelectedProducts({
         return (
           <Card
             key={product.id}
-            className={`p-4 bg-card ${
+            className={`md:p-4 bg-card ${
               !isLastItem ? "border-b!" : ""
             } border-dashed border-0 shadow-none! rounded-none`}
           >
-            <div className="flex items-center gap-4 min-w-md justify-between">
+            <div className="flex items-center gap-4 md:min-w-md justify-between">
               {/* Imagen del producto */}
               <div className="relative w-20 h-20 shrink-0 bg-linear-to-br from-muted to-muted/50 rounded-lg overflow-hidden flex items-center justify-center">
                 {product.image ? (
@@ -54,7 +54,7 @@ function SelectedProducts({
               </div>
               {/* Nombre del producto y precio */}
               <div className="flex-1 min-w-0 text-center">
-                <h3 className="text-lg text-foreground leading-tight">
+                <h3 className="text-base md:text-lg text-foreground leading-tight">
                   {product.name}
                 </h3>
                 {withPrices && product.price !== undefined && (
@@ -62,15 +62,15 @@ function SelectedProducts({
                     <p className="text-sm text-muted-foreground">
                       ${product.price.toFixed(2)} c/u
                     </p>
-                    <p className="text-lg font-bold text-emerald-600">
+                    <p className="text-base md:text-lg font-bold text-emerald-600">
                       ${subtotal.toFixed(2)}
                     </p>
                   </div>
                 )}
               </div>
               {/* Cantidad */}
-              <div className="shrink-0 bg-zinc-800 rounded-full px-4 py-2">
-                <span className="text-2xl font-bold text-white">
+              <div className="shrink-0 bg-zinc-800 rounded-full px-2.5 md:px-4 py-2">
+                <span className="text-base font-bold text-white">
                   X {product.quantity}
                 </span>
               </div>

@@ -39,7 +39,7 @@ const ProductListFooter = ({ storeId, storeName, storeLogo, locations, storeSlug
   return (
     <>
       <div className="min-h-24 md:h-24 w-full bg-white shadow-[0_-1px_3px_rgba(0,0,0,0.05)] border-t fixed bottom-0 left-0 flex">
-        <div className="max-w-4xl mx-auto px-6 h-full flex justify-center items-center w-full">
+        <div className="max-w-4xl mx-auto px-4 md:px-6 flex justify-center items-center w-full">
           {isLoading && (
             <div className="flex items-center gap-2.5">
               <ShoppingCart
@@ -76,7 +76,7 @@ const ProductListFooter = ({ storeId, storeName, storeLogo, locations, storeSlug
                 </div>
                 {withPrices && (
                   <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-semibold text-emerald-600">
+                    <span className="text-lg md:text-2xl font-semibold text-emerald-600">
                       ${getOrderTotal().toFixed(2)}
                     </span>
                   </div>

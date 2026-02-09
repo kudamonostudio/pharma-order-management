@@ -15,7 +15,7 @@ const ProductList = ({ products, withPrices }: ProductListProps) => {
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
 
   return (
-    <div className="px-4 py-8 mb-36">
+    <div className="px-4 pt-8 pb-12 mb-36">
       <div className="flex gap-2.5 mb-6 items-center justify-between">
         <div className="flex gap-2.5 items-center">
           <Store className="w-5 h-5 text-muted-foreground" strokeWidth={2} />
@@ -26,7 +26,7 @@ const ProductList = ({ products, withPrices }: ProductListProps) => {
 
         <button
           onClick={() => setViewMode(viewMode === "grid" ? "list" : "grid")}
-          className="p-2 rounded-lg border border-border bg-background hover:bg-muted transition-colors cursor-pointer"
+          className="hidden md:block p-2 rounded-lg border border-border bg-background hover:bg-muted transition-colors cursor-pointer"
           aria-label="Toggle view"
         >
           {viewMode === "grid" ? (

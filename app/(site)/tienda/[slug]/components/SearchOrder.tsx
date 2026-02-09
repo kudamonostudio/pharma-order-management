@@ -32,7 +32,7 @@ export default function SearchOrder() {
   };
 
   return (
-    <div className="flex flex-col items-center lg:items-end py-8 gap-2">
+    <div className="flex flex-col items-end py-8 px-4 lg:px-0 gap-2">
       <div className="flex gap-2 w-full max-w-md">
         <Input
           type="number"
