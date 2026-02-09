@@ -89,17 +89,17 @@ export function OrderDetailContent({
   };
 
   return (
-    <div className="flex flex-col py-8 gap-2">
-      <div className="flex justify-between">
+    <div className="flex flex-col py-8 px-6 lg:px-0 gap-2">
+      <div className="md:flex gap-4 justify-between">
         <div>
-          <h1 className="text-xl font-normal ">
+          <h1 className="text-base md:text-xl font-normal ">
             Detalles de la orden:{" "}
             <span className="font-semibold text-gray-700">#{order.id}</span>
           </h1>
 
           <small>Creada el {formatDateTime(order.createdAt)}</small>
         </div>
-        <div className="flex flex-col items-end">
+        <div className="flex flex-col items-end gap-4">
           <OrderStatus status={order.status} />
           {order.paymentMethodType && (
             <h2 className="text-md font-normal mt-4">
@@ -107,8 +107,11 @@ export function OrderDetailContent({
             </h2>
           )}
           {showBranchInfo && (
-            <h3 className="text-lg font-normal">
-              Retira en la sucursal: <span className="font-semibold text-gray-700">{order.branch.name}</span>
+            <h3 className="text-base md:text-lg font-normal">
+              Retira en la sucursal:{" "}
+              <span className="font-semibold text-gray-700">
+                {order.branch.name}
+              </span>
             </h3>
           )}
         </div>
