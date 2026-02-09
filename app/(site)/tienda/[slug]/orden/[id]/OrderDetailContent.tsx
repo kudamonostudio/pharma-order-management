@@ -6,7 +6,10 @@ import OrderStatus from "./OrderStatus";
 import { OrderTabControl, type OrderTabValue } from "./OrderTabControl";
 import { ClientMessageList } from "./ClientMessageList";
 import { Separator } from "@/components/ui/separator";
-import { mapPaymentMethodLabel, type OrderStatus as OrderStatusType } from "@/app/(dashboard)/control/tiendas/[slug]/constants";
+import {
+  mapPaymentMethodLabel,
+  type OrderStatus as OrderStatusType,
+} from "@/app/(dashboard)/control/tiendas/[slug]/constants";
 import { formatDateTime } from "@/app/utils/dates";
 import { PaymentMethodType } from "@/app/(dashboard)/control/tiendas/[slug]/constants";
 
@@ -79,7 +82,7 @@ export function OrderDetailContent({
       const latestMessageId = messages[0]?.id;
       localStorage.setItem(
         getLastReadMessageKey(order.id),
-        String(latestMessageId)
+        String(latestMessageId),
       );
       setHasUnreadMessages(false);
     }
@@ -89,24 +92,23 @@ export function OrderDetailContent({
     <div className="flex flex-col py-8 gap-2">
       <div className="flex justify-between">
         <div>
-          <h1 className="text-xl font-normal text-gray-600">
-            Detalles de la orden: #{order.id}
+          <h1 className="text-xl font-normal ">
+            Detalles de la orden:{" "}
+            <span className="font-semibold text-gray-700">#{order.id}</span>
           </h1>
-          {
-            order.paymentMethodType && (
-              <h2 className="text-xl font-normal text-gray-600">
-                Método de pago: {mapPaymentMethodLabel(order.paymentMethodType)}
-              </h2>
-            )
-          }
-          
+
           <small>Creada el {formatDateTime(order.createdAt)}</small>
         </div>
         <div className="flex flex-col items-end">
           <OrderStatus status={order.status} />
+          {order.paymentMethodType && (
+            <h2 className="text-md font-normal mt-4">
+              Método de pago: {mapPaymentMethodLabel(order.paymentMethodType)}
+            </h2>
+          )}
           {showBranchInfo && (
-            <h3 className="text-lg font-normal mt-4">
-              Retira en la sucursal: {order.branch.name}
+            <h3 className="text-lg font-normal">
+              Retira en la sucursal: <span className="font-semibold text-gray-700">{order.branch.name}</span>
             </h3>
           )}
         </div>

@@ -9,19 +9,23 @@ import {
 } from "@/components/ui/select";
 import { UseFormRegister, FieldErrors } from "react-hook-form";
 import { StoreLocation } from "@/app/types/store";
+import { paymentMethodOptions } from "@/app/(dashboard)/control/tiendas/[slug]/constants";
 
 interface FormData {
   fullName: string;
   phone: string;
   branchId: string;
+  paymentMethod: string;
 }
 
 interface ConfirmOrderModalFormProps {
   register: UseFormRegister<FormData>;
   errors: FieldErrors<FormData>;
   branchId: string;
+  paymentMethod: string;
   locations: StoreLocation[];
   onBranchChange: (value: string) => void;
+  onPaymentMethodChange: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
@@ -29,8 +33,10 @@ export default function ConfirmOrderModalForm({
   register,
   errors,
   branchId,
+  paymentMethod,
   locations,
   onBranchChange,
+  onPaymentMethodChange,
   onSubmit,
 }: ConfirmOrderModalFormProps) {
   return (
@@ -68,6 +74,32 @@ export default function ConfirmOrderModalForm({
         {errors.phone && (
           <p className="text-sm text-red-500 mt-1">
             {errors.phone.message}
+          </p>
+        )}
+      </div>
+
+      <div>
+        <Label htmlFor="paymentMethod" className="font-normal text-lg mb-3">
+          Método de Pago
+        </Label>
+        <Select
+          value={paymentMethod}
+          onValueChange={onPaymentMethodChange}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Selecciona un método de pago" />
+          </SelectTrigger>
+          <SelectContent>
+            {paymentMethodOptions.map((opt) => (
+              <SelectItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {errors.paymentMethod && (
+          <p className="text-sm text-red-500 mt-1">
+            {errors.paymentMethod.message}
           </p>
         )}
       </div>

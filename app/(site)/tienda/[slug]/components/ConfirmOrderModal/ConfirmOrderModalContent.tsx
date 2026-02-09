@@ -25,6 +25,7 @@ const formSchema = z.object({
   fullName: z.string().min(3, "Mínimo 3 caracteres"),
   phone: z.string().min(8, "Mínimo 8 dígitos"),
   branchId: z.string().min(1, "Selecciona una sucursal"),
+  paymentMethod: z.string().min(1, "Selecciona un método de pago"),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -81,10 +82,12 @@ export default function ConfirmOrderModalContent({
       fullName: savedFullName,
       phone: savedPhone,
       branchId: "",
+      paymentMethod: "",
     },
   });
 
   const branchId = watch("branchId");
+  const paymentMethod = watch("paymentMethod");
 
   // Cargar datos del localStorage cuando se abre el modal
   useEffect(() => {
@@ -133,6 +136,7 @@ export default function ConfirmOrderModalContent({
       formData.append("fullname", data.fullName);
       formData.append("phoneContact", data.phone);
       formData.append("locationId", data.branchId);
+      formData.append("paymentMethod", data.paymentMethod);
       formData.append("items", JSON.stringify(items));
       formData.append("totalAmount", totalAmount.toString());
 
@@ -194,10 +198,15 @@ export default function ConfirmOrderModalContent({
               register={register}
               errors={errors}
               branchId={branchId}
+              paymentMethod={paymentMethod}
               locations={locations}
               onBranchChange={(value: string) => {
                 setValue("branchId", value);
                 trigger("branchId");
+              }}
+              onPaymentMethodChange={(value: string) => {
+                setValue("paymentMethod", value);
+                trigger("paymentMethod");
               }}
               onSubmit={handleSubmit(onSubmit)}
             />

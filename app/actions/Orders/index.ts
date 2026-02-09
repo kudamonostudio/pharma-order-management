@@ -7,7 +7,7 @@ import {
   OrderHistoryItem,
   UpdatePaymentMethodTypeData,
 } from "@/shared/types/order";
-import { Order, OrderStatus, Prisma } from "@prisma/client";
+import { Order, OrderStatus, PaymentMethodType, Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { createMessage } from "@/app/actions/Messages";
@@ -54,6 +54,7 @@ export async function createOrder(formData: FormData) {
     totalAmount: Number(formData.get("totalAmount")),
     currency: "UYU",
     status: "PENDIENTE" as OrderStatus,
+    paymentMethodType: (formData.get("paymentMethod") as PaymentMethodType) || null,
   };
 
   const order = await prisma.order.create({
