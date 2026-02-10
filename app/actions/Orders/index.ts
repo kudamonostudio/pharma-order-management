@@ -45,10 +45,14 @@ export async function createOrder(formData: FormData) {
     imageUrl: productImageMap.get(item.productId) || null,
   }));
 
+  const locationIdRaw = formData.get("locationId");
+  const shippingAddress = formData.get("shippingAddress") as string | null;
+
   const data = {
     fullname: toNullable(formData.get("fullname")) || "",
     phoneContact: toNullable(formData.get("phoneContact")) || "",
-    locationId: Number(formData.get("locationId")),
+    locationId: locationIdRaw ? Number(locationIdRaw) : null,
+    shippingAddress: shippingAddress || null,
     storeId: store.id,
     items: itemsWithImages,
     totalAmount: Number(formData.get("totalAmount")),

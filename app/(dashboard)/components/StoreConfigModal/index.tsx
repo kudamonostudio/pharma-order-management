@@ -14,11 +14,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { updateStore } from "@/app/actions/Store";
 import { useRouter } from "next/navigation";
-import { Pencil, Power, Trash2, DollarSign } from "lucide-react";
+import { Pencil, Power, Trash2, DollarSign, Truck, MapPin } from "lucide-react";
 import { updateLogo } from "@/app/actions/Store";
 import { DeleteStoreModal } from "./DeleteStoreModal";
 import { ToggleStoreActiveModal } from "./ToggleStoreActiveModal";
 import { ToggleStorePricesModal } from "./ToggleStorePricesModal";
+import { ToggleStoreShippingModal } from "./ToggleStoreShippingModal";
+import { ToggleStoreLocationModal } from "./ToggleStoreLocationModal";
 import { Store } from "@prisma/client";
 import { cn } from "@/lib/utils";
 import { uploadStoreLogo } from "@/lib/supabase/client/uploadImage";
@@ -48,6 +50,8 @@ export function StoreConfigModal({
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isToggleActiveModalOpen, setIsToggleActiveModalOpen] = useState(false);
   const [isTogglePricesModalOpen, setIsTogglePricesModalOpen] = useState(false);
+  const [isToggleShippingModalOpen, setIsToggleShippingModalOpen] = useState(false);
+  const [isToggleLocationModalOpen, setIsToggleLocationModalOpen] = useState(false);
   const [logoFile, setLogoFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -173,6 +177,34 @@ export function StoreConfigModal({
                   {store.withPrices
                     ? "Deshabilitar precios"
                     : "Habilitar precios"}
+                </Button>
+              )}
+
+              {/* Habilitar/Deshabilitar Envíos - Solo Admin Supremo */}
+              {isAdminSupremo && (
+                <Button
+                  variant="outline"
+                  className="justify-start gap-2 h-12"
+                  onClick={() => setIsToggleShippingModalOpen(true)}
+                >
+                  <Truck className="h-4 w-4" />
+                  {store.withShipping
+                    ? "Deshabilitar envíos"
+                    : "Habilitar envíos"}
+                </Button>
+              )}
+
+              {/* Habilitar/Deshabilitar Retiro en Sucursal - Solo Admin Supremo */}
+              {isAdminSupremo && (
+                <Button
+                  variant="outline"
+                  className="justify-start gap-2 h-12"
+                  onClick={() => setIsToggleLocationModalOpen(true)}
+                >
+                  <MapPin className="h-4 w-4" />
+                  {store.withLocation
+                    ? "Deshabilitar retiro en sucursal"
+                    : "Habilitar retiro en sucursal"}
                 </Button>
               )}
 
@@ -343,6 +375,30 @@ export function StoreConfigModal({
         withPrices={store.withPrices}
         onSuccess={() => {
           setIsTogglePricesModalOpen(false);
+          onOpenChange(false);
+          router.refresh();
+        }}
+      />
+
+      <ToggleStoreShippingModal
+        open={isToggleShippingModalOpen}
+        onOpenChange={setIsToggleShippingModalOpen}
+        storeId={store.id}
+        withShipping={store.withShipping}
+        onSuccess={() => {
+          setIsToggleShippingModalOpen(false);
+          onOpenChange(false);
+          router.refresh();
+        }}
+      />
+
+      <ToggleStoreLocationModal
+        open={isToggleLocationModalOpen}
+        onOpenChange={setIsToggleLocationModalOpen}
+        storeId={store.id}
+        withLocation={store.withLocation}
+        onSuccess={() => {
+          setIsToggleLocationModalOpen(false);
           onOpenChange(false);
           router.refresh();
         }}

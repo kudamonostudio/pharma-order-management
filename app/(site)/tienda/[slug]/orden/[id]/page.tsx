@@ -53,6 +53,7 @@ const Page = async ({ params }: PageProps) => {
       createdAt: true,
       items: true,
       paymentMethodType: true,
+      shippingAddress: true,
       location: {
         select: {
           id: true,
@@ -120,6 +121,7 @@ const Page = async ({ params }: PageProps) => {
     status: dbOrder.status,
     paymentMethodType: dbOrder.paymentMethodType,
     createdAt: dbOrder.createdAt,
+    shippingAddress: dbOrder.shippingAddress,
     branch: {
       id: dbOrder.location?.id.toString() ?? "",
       name: dbOrder.location?.name ?? "Sucursal sin asignar",

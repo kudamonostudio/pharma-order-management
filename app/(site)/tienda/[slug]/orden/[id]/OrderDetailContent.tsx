@@ -25,6 +25,7 @@ interface OrderDetailContentProps {
     status: OrderStatusType | string;
     paymentMethodType: PaymentMethodType | null;
     createdAt: Date;
+    shippingAddress?: string | null;
     branch: { id: string; name: string };
   };
   products: Array<{
@@ -106,7 +107,14 @@ export function OrderDetailContent({
               Método de pago: {mapPaymentMethodLabel(order.paymentMethodType)}
             </h2>
           )}
-          {showBranchInfo && (
+          {showBranchInfo && order.shippingAddress ? (
+            <h3 className="text-base md:text-lg font-normal">
+              Envío a:{" "}
+              <span className="font-semibold text-gray-700">
+                {order.shippingAddress}
+              </span>
+            </h3>
+          ) : showBranchInfo && (
             <h3 className="text-base md:text-lg font-normal">
               Retira en la sucursal:{" "}
               <span className="font-semibold text-gray-700">

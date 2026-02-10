@@ -4,6 +4,8 @@ import { LogoPlaceholder } from "../../../../components/LogoPlaceholder";
 import { StoreHeaderActions } from "./StoreHeaderActions";
 import { getCurrentProfile } from "@/lib/auth/session";
 import HasPricesButton from "@/app/(dashboard)/components/HasPricesButton";
+import HasShippingButton from "@/app/(dashboard)/components/HasShippingButton";
+import HasLocationButton from "@/app/(dashboard)/components/HasLocationButton";
 import { LinkToPublicStore } from "./LinkToPublicStore";
 import Image from "next/image";
 
@@ -42,6 +44,12 @@ export async function StoreHeader({ store }: StoreHeaderProps) {
                 <IsActiveButton isActive={store.isActive} variant="small" />
                 {store.withPrices && (
                   <HasPricesButton isActive={store.isActive} variant="small" />
+                )}
+                {store.withShipping && (
+                  <HasShippingButton isActive={store.isActive} variant="small" />
+                )}
+                {store.withLocation && (
+                  <HasLocationButton isActive={store.isActive} variant="small" />
                 )}
               </div>
             )}

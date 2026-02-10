@@ -21,14 +21,36 @@ import { createOrder } from "@/app/actions/Orders";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 
+type DeliveryMethod = "location" | "shipping";
+
 const formSchema = z.object({
   fullName: z.string().min(3, "Mínimo 3 caracteres"),
   phone: z.string().min(8, "Mínimo 8 dígitos"),
-  branchId: z.string().min(1, "Selecciona una sucursal"),
   paymentMethod: z.string().min(1, "Selecciona un método de pago"),
+  branchId: z.string(),
+  shippingAddress: z.string(),
 });
 
 type FormData = z.infer<typeof formSchema>;
+
+function getFormSchema(deliveryMethod: DeliveryMethod) {
+  return formSchema.superRefine((data, ctx) => {
+    if (deliveryMethod === "location" && (!data.branchId || data.branchId.length === 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Selecciona una sucursal",
+        path: ["branchId"],
+      });
+    }
+    if (deliveryMethod === "shipping" && (!data.shippingAddress || data.shippingAddress.length < 5)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Mínimo 5 caracteres",
+        path: ["shippingAddress"],
+      });
+    }
+  });
+}
 
 interface Props {
   open: boolean;
@@ -39,6 +61,8 @@ interface Props {
   locations: StoreLocation[];
   storeSlug: string;
   withPrices: boolean;
+  withShipping: boolean;
+  withLocation: boolean;
 }
 
 export default function ConfirmOrderModalContent({
@@ -50,12 +74,21 @@ export default function ConfirmOrderModalContent({
   locations,
   storeSlug,
   withPrices,
+  withShipping,
+  withLocation,
 }: Props) {
   const [step, setStep] = useState<"products" | "form">("products");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { order, getOrderQuantity, getOrderTotal, clearOrder } =
     useOrderStore();
   const router = useRouter();
+
+  // Determinar el método de entrega por defecto
+  const defaultDeliveryMethod: DeliveryMethod = withLocation ? "location" : "shipping";
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>(defaultDeliveryMethod);
+
+  // Determinar si el usuario puede elegir entre ambas opciones
+  const canChooseDelivery = withShipping && withLocation;
 
   // Obtener datos guardados del localStorage
   const savedFullName =
@@ -76,18 +109,20 @@ export default function ConfirmOrderModalContent({
     reset,
     trigger,
   } = useForm<FormData>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(getFormSchema(deliveryMethod)),
     mode: "onTouched",
     defaultValues: {
       fullName: savedFullName,
       phone: savedPhone,
       branchId: "",
+      shippingAddress: "",
       paymentMethod: "",
     },
   });
 
   const branchId = watch("branchId");
   const paymentMethod = watch("paymentMethod");
+  const shippingAddress = watch("shippingAddress");
 
   // Cargar datos del localStorage cuando se abre el modal
   useEffect(() => {
@@ -100,9 +135,21 @@ export default function ConfirmOrderModalContent({
     }
   }, [open, step, setValue]);
 
+  const handleDeliveryMethodChange = (method: DeliveryMethod) => {
+    setDeliveryMethod(method);
+    // Limpiar campos del método anterior
+    if (method === "shipping") {
+      setValue("branchId", "");
+    } else {
+      setValue("shippingAddress", "");
+    }
+    trigger();
+  };
+
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       setStep("products");
+      setDeliveryMethod(defaultDeliveryMethod);
       reset();
     }
     onOpenChange(open);
@@ -135,7 +182,12 @@ export default function ConfirmOrderModalContent({
       formData.append("storeSlug", storeSlug);
       formData.append("fullname", data.fullName);
       formData.append("phoneContact", data.phone);
-      formData.append("locationId", data.branchId);
+      if (deliveryMethod === "location" && data.branchId) {
+        formData.append("locationId", data.branchId);
+      }
+      if (deliveryMethod === "shipping" && data.shippingAddress) {
+        formData.append("shippingAddress", data.shippingAddress);
+      }
       formData.append("paymentMethod", data.paymentMethod);
       formData.append("items", JSON.stringify(items));
       formData.append("totalAmount", totalAmount.toString());
@@ -174,7 +226,7 @@ export default function ConfirmOrderModalContent({
             <DialogDescription className="text-lg font-normal">
               {step === "products"
                 ? "Repasa los productos seleccionados antes de continuar"
-                : "Completa tus datos y elige sucursal para confirmar tu orden"}
+                : "Completa tus datos para confirmar tu orden"}
             </DialogDescription>
           </DialogHeader>
         </div>
@@ -197,9 +249,15 @@ export default function ConfirmOrderModalContent({
             <ConfirmOrderModalForm
               register={register}
               errors={errors}
-              branchId={branchId}
+              branchId={branchId || ""}
               paymentMethod={paymentMethod}
+              shippingAddress={shippingAddress || ""}
               locations={locations}
+              deliveryMethod={deliveryMethod}
+              canChooseDelivery={canChooseDelivery}
+              withShipping={withShipping}
+              withLocation={withLocation}
+              onDeliveryMethodChange={handleDeliveryMethodChange}
               onBranchChange={(value: string) => {
                 setValue("branchId", value);
                 trigger("branchId");

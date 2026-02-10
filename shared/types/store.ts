@@ -83,6 +83,7 @@ export interface OrderInStore {
   fullname: string;
   phoneContact: string;
   paymentMethodType:  PaymentMethodType | null;
+  shippingAddress: string | null;
 }
 
 export interface CollaboratorBasic {

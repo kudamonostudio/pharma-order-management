@@ -10,8 +10,10 @@ interface ConfirmOrderModalProps {
   locations: StoreLocation[];
   storeSlug: string;
   withPrices: boolean;
+  withShipping: boolean;
+  withLocation: boolean;
 }
 
-export default function ConfirmOrderModal({ open, onOpenChange, storeId, storeName, storeLogo, locations, storeSlug, withPrices }: ConfirmOrderModalProps) {
-  return <ConfirmOrderModalContent open={open} onOpenChange={onOpenChange} storeId={storeId} storeName={storeName} storeLogo={storeLogo} locations={locations} storeSlug={storeSlug} withPrices={withPrices} />;
+export default function ConfirmOrderModal({ open, onOpenChange, storeId, storeName, storeLogo, locations, storeSlug, withPrices, withShipping, withLocation }: ConfirmOrderModalProps) {
+  return <ConfirmOrderModalContent open={open} onOpenChange={onOpenChange} storeId={storeId} storeName={storeName} storeLogo={storeLogo} locations={locations} storeSlug={storeSlug} withPrices={withPrices} withShipping={withShipping} withLocation={withLocation} />;
 }

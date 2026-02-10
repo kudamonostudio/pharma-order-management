@@ -111,6 +111,10 @@ export async function updateStore(id: number, formData: FormData) {
     data.isActive = formData.get("isActive") === "true";
   if (formData.has("withPrices"))
     data.withPrices = formData.get("withPrices") === "true";
+  if (formData.has("withShipping"))
+    data.withShipping = formData.get("withShipping") === "true";
+  if (formData.has("withLocation"))
+    data.withLocation = formData.get("withLocation") === "true";
 
   const updatedStore = await prisma.store.update({
     where: { id },
@@ -254,6 +258,7 @@ export async function getStoreWithOrders(
           fullname: true,
           phoneContact: true,
           paymentMethodType: true,
+          shippingAddress: true,
           collaborator: {
             select: { id: true, firstName: true, lastName: true, image: true },
           },

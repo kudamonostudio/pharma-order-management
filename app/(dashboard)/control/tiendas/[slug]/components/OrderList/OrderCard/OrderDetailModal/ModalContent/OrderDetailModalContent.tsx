@@ -83,12 +83,21 @@ export function OrderDetailModalContent({
             <span className="text-sm">
               Creada el {formatDateTime(order.createdAt)}
             </span>
-            <h3 className="text-base font-normal">
-              Retira en la sucursal:{" "}
-              <span className="text-accent-foreground font-medium">
-                {order.location?.name ?? "Sin asignar"}
-              </span>
-            </h3>
+            {order.shippingAddress ? (
+              <h3 className="text-base font-normal">
+                Envío a:{" "}
+                <span className="text-accent-foreground font-medium">
+                  {order.shippingAddress}
+                </span>
+              </h3>
+            ) : (
+              <h3 className="text-base font-normal">
+                Retira en la sucursal:{" "}
+                <span className="text-accent-foreground font-medium">
+                  {order.location?.name ?? "Sin asignar"}
+                </span>
+              </h3>
+            )}
             <div className="flex items-center gap-2 mt-2">
               <p className="text-sm">
                 Cliente:{" "}

@@ -14,6 +14,8 @@ import { LogoPlaceholder } from "../(dashboard)/components/LogoPlaceholder";
 import { StoreFilter } from "./components/StoreFilter";
 import { StoreConfigButton } from "../(dashboard)/components/StoreConfigButton";
 import HasPricesButton from "../(dashboard)/components/HasPricesButton";
+import HasShippingButton from "../(dashboard)/components/HasShippingButton";
+import HasLocationButton from "../(dashboard)/components/HasLocationButton";
 
 type StoreWithAdmin = Store & {
   profile: { email: string | null }[];
@@ -68,9 +70,17 @@ export default function TiendasContent({ stores }: TiendasContentProps) {
               <IsActiveButton isActive={store.isActive} variant="small" />
             </div>
 
-            {store.withPrices && (<div className="absolute top-3 right-3 z-10">
-              <HasPricesButton isActive={store.isActive} variant="small" />
-            </div>)}
+            <div className="absolute top-3 right-3 z-10 flex gap-1">
+              {store.withPrices && (
+                <HasPricesButton isActive={store.isActive} variant="small" />
+              )}
+              {store.withShipping && (
+                <HasShippingButton isActive={store.isActive} variant="small" />
+              )}
+              {store.withLocation && (
+                <HasLocationButton isActive={store.isActive} variant="small" />
+              )}
+            </div>
 
             <div className="flex flex-col items-center gap-4 pt-8 pb-4 relative z-10">
               {/* Logo */}

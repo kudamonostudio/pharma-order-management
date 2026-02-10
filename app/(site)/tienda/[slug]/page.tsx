@@ -29,6 +29,8 @@ const Page = async ({ params }: PageProps) => {
       name: true,
       logo: true,
       withPrices: true,
+      withShipping: true,
+      withLocation: true,
       locations: {
         where: {
           deletedAt: null,
@@ -94,6 +96,8 @@ const Page = async ({ params }: PageProps) => {
         locations={store.locations}
         storeSlug={slug}
         withPrices={store.withPrices}
+        withShipping={store.withShipping}
+        withLocation={store.withLocation}
       />
     </StoreContainer>
   );
