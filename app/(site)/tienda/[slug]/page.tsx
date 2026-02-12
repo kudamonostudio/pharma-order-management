@@ -1,6 +1,5 @@
 // Listado de productos de la tienda, primer contacto del cliente/usuario con la tienda
 import ProductList from "./components/ProductList";
-import { StoreProductItem } from "@/app/types/store";
 import ProductListFooter from "./components/ProductListFooter";
 import StoreLogo from "./components/StoreLogo";
 import StoreContainer from "./components/StoreContainer";
@@ -51,34 +50,6 @@ const Page = async ({ params }: PageProps) => {
     notFound();
   }
 
-  // Obtener productos activos de la tienda
-  const dbProducts = await prisma.product.findMany({
-    where: {
-      storeId: store.id,
-      isActive: true,
-      deletedAt: null,
-    },
-    select: {
-      id: true,
-      name: true,
-      imageUrl: true,
-      description: true,
-      price: true,
-    },
-    orderBy: {
-      name: "asc",
-    },
-  });
-
-  // Transformar productos al formato esperado
-  const products: StoreProductItem[] = dbProducts.map((product) => ({
-    id: product.id.toString(),
-    name: product.name,
-    image: product.imageUrl || "",
-    description: product.description || "",
-    price: product.price ? Number(product.price) : undefined,
-  }));
-
   return (
     <StoreContainer>
       <div className="pt-12 pb-8 flex gap-4 items-center justify-center border-b">
@@ -88,7 +59,7 @@ const Page = async ({ params }: PageProps) => {
         </h1>
       </div>
       <SearchOrder />
-      <ProductList products={products} withPrices={store.withPrices} />
+      <ProductList storeId={store.id} withPrices={store.withPrices} />
       <ProductListFooter 
         storeId={store.id} 
         storeName={store.name} 

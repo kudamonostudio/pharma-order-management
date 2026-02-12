@@ -110,6 +110,57 @@ export async function getProductsByStore(storeId: number, page = 1, limit = 12) 
   };
 }
 
+// Obtener productos paginados para la tienda pública
+export async function getStoreProducts(
+  storeId: number,
+  page = 1,
+  pageSize = 20,
+  search?: string
+) {
+  const skip = (page - 1) * pageSize;
+
+  const where: Prisma.ProductWhereInput = {
+    storeId,
+    isActive: true,
+    deletedAt: null,
+  };
+
+  if (search && search.trim().length >= MIN_DIGITS_FOR_SEARCH) {
+    where.name = {
+      contains: search.trim(),
+      mode: "insensitive",
+    };
+  }
+
+  const [products, total] = await Promise.all([
+    prisma.product.findMany({
+      where,
+      select: {
+        id: true,
+        name: true,
+        imageUrl: true,
+        description: true,
+        price: true,
+      },
+      orderBy: { name: "asc" },
+      skip,
+      take: pageSize,
+    }),
+    prisma.product.count({ where }),
+  ]);
+
+  return {
+    products: products.map((p) => ({
+      id: p.id.toString(),
+      name: p.name,
+      image: p.imageUrl || "",
+      description: p.description || "",
+      price: p.price ? Number(p.price) : undefined,
+    })),
+    hasMore: skip + products.length < total,
+  };
+}
+
 // Obtener store con productos (optimizado - una sola operación)
 export async function getStoreWithProducts(
   slug: string,
