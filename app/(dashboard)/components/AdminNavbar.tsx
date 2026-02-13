@@ -20,12 +20,13 @@ export function AdminNavbar() {
         <SidebarTrigger />
         <div className="flex-1 max-w-md">
           <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
+            {/* DEJAMOS EL BUSCADOR COMENTADO POR SI SE NECESITA A FUTURO */}
+            {/* <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" /> */}
+            {/* <Input
               type="search"
               placeholder="Buscar..."
               className="w-full pl-8"
-            />
+            /> */}
           </div>
         </div>
         {/*  <div className="flex items-center gap-2 ml-auto">

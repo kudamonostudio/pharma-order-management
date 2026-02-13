@@ -57,7 +57,8 @@ export function AppSidebar({ userRole, user, store }: AppSidebarProps) {
   // Determinar qué items mostrar
   const showAdminItems = userRole === Role.ADMIN_SUPREMO;
   const showStoreItems =
-    userRole === Role.TIENDA_ADMIN || (userRole === Role.ADMIN_SUPREMO && store);
+    userRole === Role.TIENDA_ADMIN ||
+    (userRole === Role.ADMIN_SUPREMO && store);
   const showBranchItems = userRole === Role.SUCURSAL_ADMIN && store;
 
   // Generar items de tienda con URLs dinámicas si hay store
@@ -67,15 +68,15 @@ export function AppSidebar({ userRole, user, store }: AppSidebarProps) {
   const mapperRole = (role: string) => {
     switch (role) {
       case Role.ADMIN_SUPREMO:
-        return 'Admin Supremo';
+        return "Admin Supremo";
       case Role.TIENDA_ADMIN:
-        return 'Administrador de Tienda';
+        return "Administrador de Tienda";
       case Role.SUCURSAL_ADMIN:
-        return 'Administrador de Sucursal';
+        return "Administrador de Sucursal";
       default:
-        return '';
+        return "";
     }
-  }
+  };
 
   return (
     <Sidebar>
@@ -84,17 +85,25 @@ export function AppSidebar({ userRole, user, store }: AppSidebarProps) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="#">
-                <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage
-                    src={user?.imageUrl || "/avatars/shadcn.jpg"}
-                    alt={user?.firstName || "Usuario"}
+                {userRole === Role.ADMIN_SUPREMO ? (
+                  <img
+                    src="/applogo.webp"
+                    alt="App Logo"
+                    className="h-8 w-8 rounded-lg object-cover"
                   />
-                  <AvatarFallback className="rounded-lg">
-                    {isHydrated
-                      ? getInitials()
-                      : user?.email?.charAt(0).toUpperCase() || "U"}
-                  </AvatarFallback>
-                </Avatar>
+                ) : (
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarImage
+                      src={user?.imageUrl || "/avatars/shadcn.jpg"}
+                      alt={user?.firstName || "Usuario"}
+                    />
+                    <AvatarFallback className="rounded-lg">
+                      {isHydrated
+                        ? getInitials()
+                        : user?.email?.charAt(0).toUpperCase() || "U"}
+                    </AvatarFallback>
+                  </Avatar>
+                )}
                 <div className="flex flex-col gap-0.5 leading-none">
                   {user && (
                     <span className="font-semibold">
