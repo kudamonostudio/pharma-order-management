@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { InviteListener } from "@/components/auth/invite-listener";
+import { Toaster } from "sonner";
 
 import "./globals.css";
 /* import { ThemeProvider } from "next-themes"; */
@@ -50,6 +51,7 @@ export default function RootLayout({
           <InviteListener>
             {children}
           </InviteListener>
+          <Toaster richColors position="top-right" />
         {/*   </ThemeProvider> */}
       </body>
     </html>
