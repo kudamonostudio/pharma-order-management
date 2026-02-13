@@ -8,9 +8,10 @@ import { ProductConfigModal } from "./components/modals/ProductConfigModal";
 import { CreateProductButton } from "./components/CreateProductButton";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Pencil, ArrowUpToLine } from "lucide-react";
 import ProductIsActiveButton from "@/app/(dashboard)/control/tiendas/[slug]/productos/components/modals/ProductConfigModal/ProductIsActiveButton";
 import { MIN_DIGITS_FOR_SEARCH } from "@/lib/constants";
+import { ImportProductsExcelModal } from "./components/modals/ImportProductsExcelModal";
 
 type ProductWithNumberPrice = Omit<Product, "price"> & { price: number };
 
@@ -33,6 +34,7 @@ export default function ProductsContent({
   const [search, setSearch] = useState(initialSearch);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductWithNumberPrice | null>(null);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const handleEditClick = (product: ProductWithNumberPrice) => {
     setSelectedProduct(product);
@@ -75,6 +77,15 @@ export default function ProductsContent({
         </form>
 
         <CreateProductButton />
+
+        <Button
+          variant="secondary"
+          onClick={() => setIsImportModalOpen(true)}
+        >
+          <ArrowUpToLine className="w-4 h-4 mr-2" />
+          Cargar productos con Excel
+        </Button>
+
       </div>
 
 
@@ -159,6 +170,12 @@ export default function ProductsContent({
         product={selectedProduct}
         storeSlug={store.slug}
         withPrices={store.withPrices}
+      />
+
+      <ImportProductsExcelModal
+        open={isImportModalOpen}
+        onOpenChange={setIsImportModalOpen}
+        storeSlug={store.slug}
       />
     </div>
   );

@@ -1,10 +1,12 @@
 "use server";
 
+import * as XLSX from "xlsx";
 import { MIN_DIGITS_FOR_SEARCH } from "@/lib/constants";
 import { toNullable, toNumberOrNull } from "@/lib/helpers";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { revalidatePath } from "next/cache";
+
 
 export async function createProduct(formData: FormData) {
   const priceRaw = formData.get("price");
@@ -218,4 +220,88 @@ export async function getStoreWithProducts(
     total,
     pages: Math.ceil(total / limit),
   };
+}
+
+export async function importProductsFromExcel(formData: FormData) {
+  try {
+    const file = formData.get("file") as File;
+    const slug = formData.get("slug") as string;
+
+    if (!file) {
+      return { success: false, message: "Archivo no encontrado" };
+    }
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const workbook = XLSX.read(buffer);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows: any[] = XLSX.utils.sheet_to_json(sheet, {
+      header: 1, // array format (so header optional)
+      blankrows: false,
+    });
+
+    if (rows.length === 0) {
+      return { success: false, message: "El archivo está vacío" };
+    }
+
+    // Detectar si tiene header
+    const firstRow = rows[0];
+    const hasHeader =
+      typeof firstRow[0] === "string" &&
+      firstRow[0].toLowerCase().includes("nombre");
+
+    const dataRows = hasHeader ? rows.slice(1) : rows;
+
+    const store = await prisma.store.findUnique({
+      where: { slug },
+    });
+
+    if (!store) {
+      return { success: false, message: "Tienda no encontrada" };
+    }
+
+    const productsToCreate = [];
+
+    for (const row of dataRows) {
+      const name = row[0]?.toString().trim();
+
+      if (!name) {
+        return {
+          success: false,
+          message:
+            "Hay productos sin nombre. Corrige el archivo y vuelve a intentarlo.",
+        };
+      }
+
+      productsToCreate.push({
+        name,
+        description: row[1] || null,
+        price: row[2] ? Number(row[2]) : null,
+        storeId: store.id,
+      });
+    }
+
+    if (productsToCreate.length === 0) {
+      return {
+        success: false,
+        message: "El archivo no contiene productos para importar.",
+      };
+    }
+
+    await prisma.product.createMany({
+      data: productsToCreate,
+    });
+
+    return {
+      success: true,
+      count: productsToCreate.length,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      success: false,
+      message: "Error procesando el archivo",
+    };
+  }
 }
