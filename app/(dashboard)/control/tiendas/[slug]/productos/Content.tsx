@@ -33,7 +33,8 @@ export default function ProductsContent({
   const router = useRouter();
   const [search, setSearch] = useState(initialSearch);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<ProductWithNumberPrice | null>(null);
+  const [selectedProduct, setSelectedProduct] =
+    useState<ProductWithNumberPrice | null>(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const handleEditClick = (product: ProductWithNumberPrice) => {
@@ -43,14 +44,14 @@ export default function ProductsContent({
 
   const handlePageChange = (page: number) => {
     router.push(
-      `/control/tiendas/${store.slug}/productos?page=${page}&search=${search}`
+      `/control/tiendas/${store.slug}/productos?page=${page}&search=${search}`,
     );
   };
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     router.push(
-      `/control/tiendas/${store.slug}/productos?page=1&search=${search}`
+      `/control/tiendas/${store.slug}/productos?page=1&search=${search}`,
     );
   };
 
@@ -60,10 +61,10 @@ export default function ProductsContent({
         <h1 className="font-bold text-2xl mb-6">Productos de {store.name}</h1>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-2 mt-4 mb-4 items-center justify-between">
+      <div className="flex flex-col-reverse lg:flex-row gap-2 mt-4 mb-4 items-center md:items-start justify-between">
         <form
           onSubmit={handleSearchSubmit}
-          className="flex gap-2 w-full sm:w-auto flex-1 items-center"
+          className="flex gap-2 w-full lg:w-auto flex-1 items-center max-w-2xl"
         >
           <input
             value={search}
@@ -71,23 +72,28 @@ export default function ProductsContent({
             placeholder={`Buscar productos (mínimo ${MIN_DIGITS_FOR_SEARCH} letras)`}
             className="border px-4 py-2 rounded-md w-full h-9"
           />
-          <Button type="submit" className="h-9" disabled={search.trim().length < MIN_DIGITS_FOR_SEARCH && search !== ''}>
+          <Button
+            type="submit"
+            className="h-9"
+            disabled={
+              search.trim().length < MIN_DIGITS_FOR_SEARCH && search !== ""
+            }
+          >
             Buscar
           </Button>
         </form>
+        <div className="flex gap-2 mb-2 lg:mb-0">
+          <CreateProductButton />
 
-        <CreateProductButton />
-
-        <Button
-          variant="secondary"
-          onClick={() => setIsImportModalOpen(true)}
-        >
-          <ArrowUpToLine className="w-4 h-4 mr-2" />
-          Cargar productos con Excel
-        </Button>
-
+          <Button
+            variant="secondary"
+            onClick={() => setIsImportModalOpen(true)}
+          >
+            <ArrowUpToLine className="w-4 h-4 mr-2" />
+            Cargar productos con Excel
+          </Button>
+        </div>
       </div>
-
 
       <div className="space-y-4">
         {initialProducts.length === 0 && (
@@ -102,7 +108,10 @@ export default function ProductsContent({
                 className="border rounded-md shadow-sm bg-white hover:shadow-md transition flex flex-col relative"
               >
                 <div className="absolute top-2 left-2 z-10">
-                  <ProductIsActiveButton isActive={product.isActive} variant="small" />
+                  <ProductIsActiveButton
+                    isActive={product.isActive}
+                    variant="small"
+                  />
                 </div>
                 <div className="w-full h-40 bg-gray-100 rounded-t-md flex items-center justify-center overflow-hidden relative">
                   <Image
@@ -111,33 +120,37 @@ export default function ProductsContent({
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, (max-width: 1536px) 25vw, 16vw"
                     quality={75}
-                    className={isPlaceholder ? "object-contain p-8" : "object-cover"}
+                    className={
+                      isPlaceholder ? "object-contain p-8" : "object-cover"
+                    }
                   />
                 </div>
-              <div className="p-4 flex flex-col justify-between flex-1 gap-3">
-                <div className="flex-1">
-                  <h3 className="font-semibold line-clamp-1">{product.name}</h3>
-                  {product.description && (
-                    <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-                      {product.description}
-                    </p>
-                  )}
-                  {store.withPrices && (
-                    <p className="font-bold text-green-700 mt-2">
-                      ${Number(product.price).toFixed(2)}
-                    </p>
-                  )}
-                </div>
+                <div className="p-4 flex flex-col justify-between flex-1 gap-3">
+                  <div className="flex-1">
+                    <h3 className="font-semibold line-clamp-1">
+                      {product.name}
+                    </h3>
+                    {product.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                        {product.description}
+                      </p>
+                    )}
+                    {store.withPrices && (
+                      <p className="font-bold text-green-700 mt-2">
+                        ${Number(product.price).toFixed(2)}
+                      </p>
+                    )}
+                  </div>
 
-                <Button
-                  onClick={() => handleEditClick(product)}
-                  className="w-full"
-                >
-                  <Pencil className="h-4 w-4" />
-                  Editar
-                </Button>
+                  <Button
+                    onClick={() => handleEditClick(product)}
+                    className="w-full"
+                  >
+                    <Pencil className="h-4 w-4" />
+                    Editar
+                  </Button>
+                </div>
               </div>
-            </div>
             );
           })}
         </div>
