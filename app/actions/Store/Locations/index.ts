@@ -11,9 +11,10 @@ export async function createLocation(formData: FormData) {
   const address = (formData.get("address") as string) || "";
   const phone = (formData.get("phone") as string) || null;
   const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
 
-  if (!storeId || !name || !address || !email) {
-    throw new Error(`createLocation: missing fields ${JSON.stringify({ storeId, name, address, email })}`);
+  if (!storeId || !name || !address || !email || !password) {
+    throw new Error(`createLocation: missing fields ${JSON.stringify({ storeId, name, address, email, password: !!password })}`);
   }
 
   const existsEmail = await prisma.profile.findUnique({
@@ -34,14 +35,18 @@ export async function createLocation(formData: FormData) {
   });
 
   if(email) {
-    await createAdminLocation(email, storeId, location.id);
+    await createAdminLocation(email, password, storeId, location.id);
   }
 
   revalidatePath(`/control/tiendas/${slug}`);
 }
 
-async function createAdminLocation(email: string, storeId: number, locationId: number){
-  const { data, error } = await supabaseAdmin.auth.admin.inviteUserByEmail(email);
+async function createAdminLocation(email: string, password: string, storeId: number, locationId: number){
+  const { data, error } = await supabaseAdmin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+  });
 
   if (error || !data?.user) {
     console.error("Supabase Auth Error:", error);
@@ -75,6 +80,7 @@ export async function updateLocation(id: number, storeSlug: string, formData: Fo
   // Update admin email if provided
   if (formData.has("adminEmail")) {
     const adminEmail = formData.get("adminEmail") as string;
+    const adminPassword = (formData.get("adminPassword") as string) || "";
     if (adminEmail) {
       // Check if there's an existing admin for this location
       const existingAdmin = await prisma.profile.findFirst({
@@ -85,13 +91,14 @@ export async function updateLocation(id: number, storeSlug: string, formData: Fo
       });
 
       if (existingAdmin) {
-        // If email changed, invite new user
         if (existingAdmin.email !== adminEmail) {
-          await createAdminLocation(adminEmail, location.storeId, id);
+          await createAdminLocation(adminEmail, adminPassword, location.storeId, id);
+        } else if (adminPassword) {
+          await supabaseAdmin.auth.admin.updateUserById(existingAdmin.id, { password: adminPassword });
         }
       } else {
         // No existing admin, create new one
-        await createAdminLocation(adminEmail, location.storeId, id);
+        await createAdminLocation(adminEmail, adminPassword, location.storeId, id);
       }
     }
   }

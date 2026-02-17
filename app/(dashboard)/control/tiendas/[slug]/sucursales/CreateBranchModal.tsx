@@ -75,12 +75,23 @@ export function CreateBranchModal({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Correo electrónico administrador *</Label>
+            <Label htmlFor="email">Correo electrónico de la sucursal *</Label>
             <Input
               id="email"
               name="email"
               placeholder="Ej: admin@sucursal.com"
               required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Contraseña *</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="Mínimo 6 caracteres"
+              required
+              minLength={6}
             />
           </div>
           <div className="space-y-2">

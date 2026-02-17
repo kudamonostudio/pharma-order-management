@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useRouter } from "next/navigation";
-import { Pencil, Trash2, Users } from "lucide-react";
+import { KeyRound, Pencil, Trash2, Users } from "lucide-react";
 import { Location } from "@prisma/client";
 import { updateLocation } from "@/app/actions/Store/Locations";
 import { DeleteBranchModal } from "./DeleteBranchModal";
@@ -49,7 +49,7 @@ interface BranchConfigModalProps {
   allCollaborators: Collaborator[];
 }
 
-type ModalView = "menu" | "edit";
+type ModalView = "menu" | "edit" | "password";
 
 export function BranchConfigModal({
   open,
@@ -71,6 +71,7 @@ export function BranchConfigModal({
     phone: "",
     adminEmail: "",
   });
+  const [newPassword, setNewPassword] = useState("");
 
   useEffect(() => {
     if (open) {
@@ -86,6 +87,7 @@ export function BranchConfigModal({
         phone: branch.phone || "",
         adminEmail: branch.profile?.[0]?.email || "",
       });
+      setNewPassword("");
     }
   }, [branch]);
 
@@ -117,15 +119,21 @@ export function BranchConfigModal({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-106.25">
           <DialogHeader>
             <DialogTitle>
-              {view === "menu" ? "Gestionar Sucursal" : "Editar Sucursal"}
+              {view === "menu"
+                ? "Gestionar Sucursal"
+                : view === "edit"
+                  ? "Editar Sucursal"
+                  : "Actualizar Contraseña"}
             </DialogTitle>
             <DialogDescription>
               {view === "menu"
                 ? `Opciones para ${branch.name}`
-                : "Modifica la información de la sucursal"}
+                : view === "edit"
+                  ? "Modifica la información de la sucursal"
+                  : "Establece una nueva contraseña para la sucursal"}
             </DialogDescription>
           </DialogHeader>
 
@@ -151,7 +159,20 @@ export function BranchConfigModal({
                 Asignar Colaboradores
               </Button>
 
-              {/* Opción 3: Eliminar */}
+              {/* Opción 3: Actualizar Contraseña */}
+              <Button
+                variant="outline"
+                className="justify-start gap-2 h-12"
+                onClick={() => {
+                  setNewPassword("");
+                  setView("password");
+                }}
+              >
+                <KeyRound className="h-4 w-4" />
+                Actualizar Contraseña
+              </Button>
+
+              {/* Opción 4: Eliminar */}
               <Button
                 variant="destructive"
                 className="justify-start gap-2 h-12"
@@ -161,6 +182,54 @@ export function BranchConfigModal({
                 Eliminar sucursal
               </Button>
             </div>
+          ) : view === "password" ? (
+            /* Formulario de Contraseña */
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                if (!branch) return;
+                setIsLoading(true);
+                try {
+                  const fd = new FormData();
+                  fd.append("adminEmail", formData.adminEmail);
+                  fd.append("adminPassword", newPassword);
+                  await updateLocation(branch.id, storeSlug, fd);
+                  setNewPassword("");
+                  setView("menu");
+                } catch (error) {
+                  console.error("Error updating password:", error);
+                } finally {
+                  setIsLoading(false);
+                }
+              }}
+              className="space-y-4"
+            >
+              <div className="space-y-2">
+                <Label htmlFor="update-password">Nueva contraseña</Label>
+                <Input
+                  id="update-password"
+                  type="password"
+                  placeholder="Mínimo 6 caracteres"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  required
+                  minLength={6}
+                />
+              </div>
+              <div className="flex justify-end gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setView("menu")}
+                  disabled={isLoading}
+                >
+                  Volver
+                </Button>
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? "Guardando..." : "Actualizar contraseña"}
+                </Button>
+              </div>
+            </form>
           ) : (
             /* Formulario de Edición */
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -204,7 +273,7 @@ export function BranchConfigModal({
 
               {/* Email del Administrador - Solo Admin Supremo y Admin Tienda */}
               <div className="space-y-2">
-                <Label htmlFor="edit-admin-email">Email del Colaborador</Label>
+                <Label htmlFor="edit-admin-email">Email de la sucursal</Label>
                 <Input
                   id="edit-admin-email"
                   type="email"
