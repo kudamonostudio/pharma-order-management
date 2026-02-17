@@ -8,6 +8,7 @@ import { CreateBranchModal } from "./sucursales/CreateBranchModal";
 import { StoreHeader } from "./components/StoreHeader";
 import { CreateProductModal } from "./productos/components/modals/CreateProductModal";
 import { UserStoreHydrator } from "@/app/zustand/UserStoreHydrator";
+import { Role } from "@prisma/client";
 
 export default async function StoreLayout({
   children,
@@ -48,6 +49,12 @@ export default async function StoreLayout({
 
   if (!store) {
     redirect("/supremo");
+  }
+
+  if (profile.role === Role.TIENDA_ADMIN || profile.role === Role.SUCURSAL_ADMIN) {
+    if(profile.storeId !== store.id) {
+      redirect("/protected");
+    }
   }
 
   return (
