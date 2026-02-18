@@ -20,6 +20,10 @@ export default async function ColaboradoresPage({
   // Get current user profile for role-based access control
   const currentProfile = await getCurrentProfile();
 
+  if (currentProfile?.role === "SUCURSAL_ADMIN") {
+    redirect(`/control/tiendas/${slug}/ordenes`);
+  }
+
   const store = await getStoreBySlug(slug);
 
   if (!store) {

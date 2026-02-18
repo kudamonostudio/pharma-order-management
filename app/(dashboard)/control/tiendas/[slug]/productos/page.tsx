@@ -1,6 +1,7 @@
 import { getStoreWithProducts } from "@/app/actions/Products";
 import { LIMIT_PER_PAGE } from "@/lib/constants";
 import { redirect } from "next/navigation";
+import { getCurrentProfile } from "@/lib/auth/session";
 import ProductsContent from "./Content";
 
 export default async function ProductosPage({
@@ -10,6 +11,12 @@ export default async function ProductosPage({
   params: Promise<{ slug: string }>;
   searchParams?: Promise<{ page?: string; search?: string }>;
 }) {
+  const currentProfile = await getCurrentProfile();
+  if (currentProfile?.role === "SUCURSAL_ADMIN") {
+    const { slug: slugForRedirect } = await params;
+    redirect(`/control/tiendas/${slugForRedirect}/ordenes`);
+  }
+
   try {
     const { slug } = await params;
     const resolvedSearchParams = await searchParams;

@@ -37,7 +37,7 @@ export default function LoginForm() {
         } else if (profile?.role === "TIENDA_ADMIN") {
           router.push(`/control/tiendas/${storeSlug}`);
         } else {
-          router.push(`/control/tiendas/${storeSlug}/sucursales`);
+          router.push(`/control/tiendas/${storeSlug}/ordenes`);
         }
       } catch (err) {
         const message =
