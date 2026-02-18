@@ -101,7 +101,7 @@ export function OrderDetailContent({
           <small>Creada el {formatDateTime(order.createdAt)}</small>
         </div>
         <div className="flex flex-col items-end gap-4">
-          <OrderStatus status={order.status} />
+          <OrderStatus status={order.status} isDelivery={!!order.shippingAddress} />
           {order.paymentMethodType && (
             <h2 className="text-md font-normal mt-4">
               Método de pago: {mapPaymentMethodLabel(order.paymentMethodType)}

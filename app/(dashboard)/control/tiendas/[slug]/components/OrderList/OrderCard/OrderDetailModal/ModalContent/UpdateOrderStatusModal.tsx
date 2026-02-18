@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import {
   ORDER_STATUS_LABELS,
+  ORDER_STATUS_LABELS_DELIVERY,
   ORDER_STATUS_COLORS,
   type OrderStatus as OrderStatusType,
 } from "@/app/(dashboard)/control/tiendas/[slug]/constants";
@@ -34,6 +35,7 @@ interface UpdateOrderStatusModalProps {
   currentCollaboratorId?: number | null;
   availableCollaborators: Collaborator[];
   onOrderUpdated?: (orderId: number, newStatus: OrderStatusType) => void;
+  isDelivery?: boolean;
 }
 
 const STATUS_OPTIONS: OrderStatusType[] = [
@@ -53,7 +55,9 @@ export function UpdateOrderStatusModal({
   currentCollaboratorId,
   availableCollaborators,
   onOrderUpdated,
+  isDelivery = false,
 }: UpdateOrderStatusModalProps) {
+  const statusLabels = isDelivery ? ORDER_STATUS_LABELS_DELIVERY : ORDER_STATUS_LABELS;
   const router = useRouter();
   const [selectedStatus, setSelectedStatus] = useState<OrderStatusType>(currentStatus);
   const [showCodeModal, setShowCodeModal] = useState(false);
@@ -146,7 +150,7 @@ export function UpdateOrderStatusModal({
                   }`}
                 >
                   <span className="text-sm font-medium">
-                    {ORDER_STATUS_LABELS[status]}
+                    {statusLabels[status]}
                   </span>
                   {isSelected && (
                     <span className="text-xs font-semibold uppercase text-foreground">

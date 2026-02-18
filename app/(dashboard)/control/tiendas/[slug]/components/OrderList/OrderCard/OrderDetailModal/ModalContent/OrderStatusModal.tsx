@@ -9,9 +9,10 @@ import clsx from "clsx";
 interface OrderStatusModalProps {
   status: OrderStatusType | string;
   variant?: "default" | "small";
+  isDelivery?: boolean;
 }
 
-export default function OrderStatusModal({ status, variant = "default" }: OrderStatusModalProps) {
+export default function OrderStatusModal({ status, variant = "default", isDelivery = false }: OrderStatusModalProps) {
   return (
     <Badge
       className={clsx(
@@ -20,7 +21,7 @@ export default function OrderStatusModal({ status, variant = "default" }: OrderS
         variant === "small" ? "px-2 py-1 text-sm mt-0.5" : "px-4 py-1.5 text-base"
       )}
     >
-      {getOrderStatusLabel(status as OrderStatusType)}
+      {getOrderStatusLabel(status as OrderStatusType, isDelivery)}
     </Badge>
   );
 }

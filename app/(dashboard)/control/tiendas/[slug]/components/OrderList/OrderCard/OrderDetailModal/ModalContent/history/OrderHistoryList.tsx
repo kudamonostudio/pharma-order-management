@@ -11,6 +11,7 @@ import {
 
 interface OrderHistoryListProps {
   history: OrderHistoryItem[];
+  isDelivery?: boolean;
 }
 
 // Status styling function based on order status colors
@@ -20,10 +21,10 @@ const getStatusClasses = (status: DashboardOrderStatus): string => {
   return `${baseClasses} ${statusColors}`;
 };
 
-const StatusBadge = ({ status }: { status: DashboardOrderStatus }) => {
+const StatusBadge = ({ status, isDelivery = false }: { status: DashboardOrderStatus; isDelivery?: boolean }) => {
   return (
     <span className={getStatusClasses(status)}>
-      {getOrderStatusLabel(status)}
+      {getOrderStatusLabel(status, isDelivery)}
     </span>
   );
 };
@@ -56,7 +57,7 @@ const formatAssignmentMessage = (note: string): ReactNode => {
   return note;
 };
 
-export function OrderHistoryList({ history }: OrderHistoryListProps) {
+export function OrderHistoryList({ history, isDelivery = false }: OrderHistoryListProps) {
   if (!history || history.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">Sin actividad registrada luego de la creación.</p>
@@ -74,7 +75,7 @@ export function OrderHistoryList({ history }: OrderHistoryListProps) {
 
           label = (
             <span>
-              Cambio de estado de: <StatusBadge status={fromStatus} /> a <StatusBadge status={toStatus} />
+              Cambio de estado de: <StatusBadge status={fromStatus} isDelivery={isDelivery} /> a <StatusBadge status={toStatus} isDelivery={isDelivery} />
             </span>
           );
         } else if (typeof label === 'string') {

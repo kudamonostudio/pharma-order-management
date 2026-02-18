@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { PackageCheck, UserPen } from "lucide-react";
 import {
   type OrderStatus as OrderStatusType,
@@ -65,6 +65,11 @@ export function OrderDetailModalContent({
 
   const statusColor = getOrderStatusColor(order.status as OrderStatusType);
   const collaborator = order.collaborator;
+  const isDelivery = !!order.shippingAddress;
+
+  const whatsappMessage = isDelivery
+    ? `Hola%20${order.fullname}!%20Tu orden está siendo enviada a destino. Gracias!`
+    : `Hola%20${order.fullname}!%20Tu orden está lista para retirar, ${order.location?.name}. Gracias!`;
 
 
   return (
@@ -77,7 +82,7 @@ export function OrderDetailModalContent({
               <h1 className="text-2xl font-bold text-accent-foreground/85">
                 #{order.code ?? order.id}
               </h1>
-              <OrderStatusModal status={order.status} variant="small" />
+              <OrderStatusModal status={order.status} variant="small" isDelivery={isDelivery} />
               <LinkToOrder store={storeSlug} orderId={order.id} />
             </div>
             <span className="text-sm">
@@ -106,7 +111,7 @@ export function OrderDetailModalContent({
                 </span>
               </p>
               <Link
-                  href={`https://wa.me/+598${order.phoneContact}?text=Hola%20${order.fullname}!%20Tu orden está lista para retirar, ${order.location?.name}. Gracias!`}
+                  href={`https://wa.me/+598${order.phoneContact}?text=${whatsappMessage}`}
                   className="flex gap-1 hover:scale-110 transition-transform duration-200"
                   target="_blank"
                 >
@@ -203,7 +208,7 @@ export function OrderDetailModalContent({
         <div className={controlValue === "history" ? "block" : "hidden"}>
           <div className="flex flex-col gap-2">
             <HistoryEventCard label="Orden creada" date={order.createdAt} />
-            <OrderHistoryList history={order.history ?? []} />
+            <OrderHistoryList history={order.history ?? []} isDelivery={isDelivery} />
           </div>
         </div>
       </div>
@@ -286,6 +291,7 @@ export function OrderDetailModalContent({
           currentCollaboratorId={order.collaborator?.id}
           availableCollaborators={availableCollaborators}
           onOrderUpdated={onOrderUpdated}
+          isDelivery={isDelivery}
         />
       )}
     </div>

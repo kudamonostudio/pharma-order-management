@@ -7,12 +7,13 @@ import {
 
 interface OrderStatusProps {
   status: OrderStatusType | string;
+  isDelivery?: boolean;
 }
 
-export default function OrderStatus({ status }: OrderStatusProps) {
+export default function OrderStatus({ status, isDelivery = false }: OrderStatusProps) {
   return (
     <Badge className={`${getOrderStatusColor(status as OrderStatusType)} text-white text-base px-4 py-1.5`}>
-      {getOrderStatusLabel(status as OrderStatusType)}
+      {getOrderStatusLabel(status as OrderStatusType, isDelivery)}
     </Badge>
   );
 }

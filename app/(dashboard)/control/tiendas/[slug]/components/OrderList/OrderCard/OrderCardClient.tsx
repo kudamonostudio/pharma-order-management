@@ -70,7 +70,7 @@ export function OrderCardClient({
         {isAdminSupremo && <p>{order.location?.name}</p>}
         <div className="text-right">
           <p className="text-sm font-medium">
-            {getOrderStatusLabel(order.status)}
+            {getOrderStatusLabel(order.status, !!order.shippingAddress)}
           </p>
         </div>
       </div>

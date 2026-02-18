@@ -141,11 +141,14 @@ export async function updateOrderStatus(data: UpdateOrderStatusData) {
 
   // Enviar mensajes automáticos al cliente para cambios de estado específicos
   let messageText = "";
+  const isDelivery = !!order.shippingAddress;
   
   if (order.status === "PENDIENTE" && status === "EN_PROCESO") {
     messageText = "Se comenzó a procesar la orden..";
   } else if (status === "LISTO_PARA_RETIRO") {
-    messageText = "La orden está lista para retirar!";
+    messageText = isDelivery 
+      ? "La orden está siendo enviada a destino!" 
+      : "La orden está lista para retirar!";
   }
 
   if (messageText && collaboratorId) {

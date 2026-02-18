@@ -17,13 +17,22 @@ export const paymentMethodOptions = [
   { value: "EITHER", label: "Cualquiera" },
 ];
 
-// Order status display names
+// Order status display names (pickup - retiro en sucursal)
 export const ORDER_STATUS_LABELS: Record<OrderStatus, string> = {
   ENTREGADA: "Entregada",
   PENDIENTE: "Pendiente",
   CANCELADA: "Cancelada",
   EN_PROCESO: "En Proceso",
   LISTO_PARA_RETIRO: "Listo para retiro",
+};
+
+// Order status display names (delivery - envío)
+export const ORDER_STATUS_LABELS_DELIVERY: Record<OrderStatus, string> = {
+  ENTREGADA: "Enviado",
+  PENDIENTE: "Pendiente",
+  CANCELADA: "Cancelada",
+  EN_PROCESO: "En Proceso",
+  LISTO_PARA_RETIRO: "Enviando a destino",
 };
 
 // Order status colors
@@ -41,8 +50,9 @@ export const getOrderStatusColor = (status: OrderStatus): string => {
 };
 
 // Helper function to get status label
-export const getOrderStatusLabel = (status: OrderStatus): string => {
-  return ORDER_STATUS_LABELS[status] || status;
+export const getOrderStatusLabel = (status: OrderStatus, isDelivery = false): string => {
+  const labels = isDelivery ? ORDER_STATUS_LABELS_DELIVERY : ORDER_STATUS_LABELS;
+  return labels[status] || status;
 };
 
 export function mapPaymentMethodLabel(
